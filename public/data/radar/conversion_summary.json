@@ -1,0 +1,79 @@
+[
+  {
+    "file": "la_rioja.geojson",
+    "features": 97,
+    "points": 4,
+    "polygons": 93,
+    "reference_coordinate": [
+      -66.7934091389,
+      -29.37620075
+    ],
+    "size_bytes": 562491
+  },
+  {
+    "file": "villa_mercedes.geojson",
+    "features": 34,
+    "points": 4,
+    "polygons": 30,
+    "reference_coordinate": [
+      -65.3706320556,
+      -33.7384154444
+    ],
+    "size_bytes": 457977
+  },
+  {
+    "file": "cordoba.geojson",
+    "features": 29,
+    "points": 4,
+    "polygons": 25,
+    "reference_coordinate": [
+      -64.2078568611,
+      -31.3197993889
+    ],
+    "size_bytes": 369404
+  },
+  {
+    "file": "general_acha.geojson",
+    "features": 13,
+    "points": 4,
+    "polygons": 9,
+    "reference_coordinate": [
+      -64.63920625,
+      -37.4254276944
+    ],
+    "size_bytes": 379428
+  },
+  {
+    "file": "cafayate.geojson",
+    "features": 91,
+    "points": 4,
+    "polygons": 87,
+    "reference_coordinate": [
+      -65.9259643333,
+      -26.06259825
+    ],
+    "size_bytes": 428622
+  },
+  {
+    "file": "las_lomitas.geojson",
+    "features": 8,
+    "points": 4,
+    "polygons": 4,
+    "reference_coordinate": [
+      -60.5515175556,
+      -24.7300215556
+    ],
+    "size_bytes": 340533
+  },
+  {
+    "file": "oran.geojson",
+    "features": 206,
+    "points": 4,
+    "polygons": 202,
+    "reference_coordinate": [
+      -64.375962,
+      -23.1564104444
+    ],
+    "size_bytes": 854732
+  }
+]

@@ -33,6 +33,15 @@ type BaseMilitar = {
   tipo: "Base aérea" | "Estación radar" | "Centro de comando";
 };
 
+type MascaraRadar = {
+  id: string;
+  nombre: string;
+  archivo: string;
+  bando: Bando;
+  base: string;
+  color: string;
+};
+
 type AeronaveCatalogo = {
   nombre: string;
   base: string;
@@ -116,42 +125,42 @@ const POSICIONES_ETIQUETAS: Record<string, [number, number]> = {
 
 const BASES_PROPIAS: BaseMilitar[] = [
   {
-    nombre: "1ª Brigada Aérea / La Rioja",
-    longitude: -66.85,
-    latitude: -29.41,
+    nombre: "1º Brigada Aérea / La Rioja",
+    longitude: -66.793409,
+    latitude: -29.376201,
     bando: "propio",
     tipo: "Base aérea",
   },
   {
-    nombre: "2ª Brigada Aérea / Villa Mercedes",
-    longitude: -65.47,
-    latitude: -33.68,
+    nombre: "2º Brigada Aérea / Villa Mercedes",
+    longitude: -65.370632,
+    latitude: -33.738415,
     bando: "propio",
     tipo: "Base aérea",
   },
   {
-    nombre: "3ª Brigada Aérea / Córdoba",
-    longitude: -64.19,
-    latitude: -31.42,
+    nombre: "3º Brigada Aérea / Córdoba",
+    longitude: -64.207857,
+    latitude: -31.319799,
     bando: "propio",
     tipo: "Base aérea",
   },
   {
-    nombre: "4ª Brigada Aérea / Mendoza",
+    nombre: "4º Brigada Aérea / Mendoza",
     longitude: -68.84,
     latitude: -32.89,
     bando: "propio",
     tipo: "Base aérea",
   },
   {
-    nombre: "5ª Brigada Aérea / General Acha",
-    longitude: -64.60,
-    latitude: -37.38,
+    nombre: "5º Brigada Aérea / Gral. Acha",
+    longitude: -64.639206,
+    latitude: -37.425428,
     bando: "propio",
     tipo: "Base aérea",
   },
   {
-    nombre: "BAM Malargüe",
+    nombre: "Base Aérea Militar Malargüe",
     longitude: -69.58,
     latitude: -35.47,
     bando: "propio",
@@ -161,72 +170,72 @@ const BASES_PROPIAS: BaseMilitar[] = [
 
 const BASES_ENEMIGAS: BaseMilitar[] = [
   {
-    nombre: "Cuartel General FAN / Salta",
+    nombre: "Cuartel General / Salta",
     longitude: -65.41,
     latitude: -24.79,
     bando: "enemigo",
     tipo: "Centro de comando",
   },
   {
-    nombre: "Ala Aérea N.º 1 / Resistencia",
+    nombre: "Ala Aérea n.º 1 / Resistencia",
     longitude: -58.99,
     latitude: -27.45,
     bando: "enemigo",
     tipo: "Base aérea",
   },
   {
-    nombre: "Ala Aérea N.º 2 / Sáenz Peña",
+    nombre: "Ala Aérea n.º 2 / Sáenz Peña",
     longitude: -60.44,
     latitude: -26.79,
     bando: "enemigo",
     tipo: "Base aérea",
   },
   {
-    nombre: "Ala Aérea N.º 3 / Salta",
+    nombre: "Ala Aérea n.º 3 / Salta",
     longitude: -65.49,
     latitude: -24.86,
     bando: "enemigo",
     tipo: "Base aérea",
   },
   {
-    nombre: "Ala Aérea N.º 4 / Catamarca",
+    nombre: "Ala Aérea n.º 4 / Catamarca",
     longitude: -65.75,
     latitude: -28.60,
     bando: "enemigo",
     tipo: "Base aérea",
   },
   {
-    nombre: "Ala Aérea N.º 5 / Tucumán",
+    nombre: "Ala Aérea n.º 5 / Tucumán",
     longitude: -65.10,
     latitude: -26.84,
     bando: "enemigo",
     tipo: "Base aérea",
   },
   {
-    nombre: "Ala Aérea N.º 6 / Formosa",
+    nombre: "Ala Aérea n.º 6 / Formosa",
     longitude: -58.23,
     latitude: -26.21,
     bando: "enemigo",
     tipo: "Base aérea",
   },
   {
-    nombre: "Ala Aérea N.º 7 / Belén",
+    nombre: "Ala Aérea n.º 7 / Belén",
     longitude: -67.03,
     latitude: -27.65,
     bando: "enemigo",
     tipo: "Base aérea",
   },
   {
-    nombre: "Ala Aérea N.º 8 / Tartagal",
+    nombre: "Ala Aérea n.º 8 / Tartagal",
     longitude: -63.82,
     latitude: -22.52,
     bando: "enemigo",
     tipo: "Base aérea",
   },
   {
-    nombre: "Ala Aérea N.º 9 / Las Lomitas",
-    longitude: -60.59,
-    latitude: -24.71,
+    nombre: "Ala Aérea n.º 9 / Las Lomitas",
+    longitude: -60.551518,
+    latitude: -24.730022,
     bando: "enemigo",
     tipo: "Base aérea",
   },
@@ -239,29 +248,29 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
   },
   {
     nombre: "Estación radar / Las Lomitas",
-    longitude: -60.59,
-    latitude: -24.71,
+    longitude: -60.551518,
+    latitude: -24.730022,
     bando: "enemigo",
     tipo: "Estación radar",
   },
   {
     nombre: "Estación radar / Cafayate",
-    longitude: -65.98,
-    latitude: -26.07,
+    longitude: -65.925964,
+    latitude: -26.062598,
     bando: "enemigo",
     tipo: "Estación radar",
   },
   {
     nombre: "Estación radar / Orán",
-    longitude: -64.32,
-    latitude: -23.14,
+    longitude: -64.375962,
+    latitude: -23.156410,
     bando: "enemigo",
     tipo: "Estación radar",
   },
 ];
 
 const AERONAVES_PROPIAS_POR_BASE: Record<string, string[]> = {
-  "1ª Brigada Aérea / La Rioja": [
+  "1º Brigada Aérea / La Rioja": [
     "C-130J",
     "KC-130J",
     "LJ-60",
@@ -269,7 +278,7 @@ const AERONAVES_PROPIAS_POR_BASE: Record<string, string[]> = {
     "B-412",
     "UH-1Y",
   ],
-  "2ª Brigada Aérea / Villa Mercedes": [
+  "2º Brigada Aérea / Villa Mercedes": [
     "F-16C Block 40",
     "AMX A-1M",
     "T-6 Texan II",
@@ -278,7 +287,7 @@ const AERONAVES_PROPIAS_POR_BASE: Record<string, string[]> = {
     "UH-1Y",
     "DHC-6",
   ],
-  "3ª Brigada Aérea / Córdoba": [
+  "3º Brigada Aérea / Córdoba": [
     "AMX A-1M",
     "T-6 Texan II",
     "E-99M Erieye",
@@ -287,7 +296,7 @@ const AERONAVES_PROPIAS_POR_BASE: Record<string, string[]> = {
     "B-412",
     "UH-1Y",
   ],
-  "4ª Brigada Aérea / Mendoza": [
+  "4º Brigada Aérea / Mendoza": [
     "F-16C Block 40",
     "F-16D Block 42",
     "KC-135",
@@ -295,7 +304,7 @@ const AERONAVES_PROPIAS_POR_BASE: Record<string, string[]> = {
     "B-412",
     "UH-1Y",
   ],
-  "5ª Brigada Aérea / General Acha": [
+  "5º Brigada Aérea / Gral. Acha": [
     "F-16CJ Block 50",
     "IAI Harpy",
     "LJ-60 MEDEVAC",
@@ -310,28 +319,28 @@ const AERONAVES_ENEMIGAS_POR_BASE: Record<
   string,
   Array<{ nombre: string; cantidad?: number; descripcion?: string }>
 > = {
-  "Ala Aérea N.º 1 / Resistencia": [
-    { nombre: "KAI KT-1", descripcion: "Entrenamiento" },
+  "Ala Aérea n.º 1 / Resistencia": [
+    { nombre: "KAI KT-1", descripcion: "Escuadrones Aéreos Escuela 1 y 2; cantidad no indicada en la orden" },
     { nombre: "C-98A", cantidad: 2, descripcion: "Enlace" },
     { nombre: "UH-1N", cantidad: 2, descripcion: "Búsqueda y salvamento" },
   ],
-  "Ala Aérea N.º 3 / Salta": [
+  "Ala Aérea n.º 3 / Salta": [
     { nombre: "Mirage 2000-5 Mk2", cantidad: 12, descripcion: "Caza multirrol" },
     { nombre: "AS-725 Cougar", cantidad: 4, descripcion: "Asalto aéreo/BYRCOM" },
-    { nombre: "E-2C Hawkeye", cantidad: 1, descripcion: "AEW&C/C2" },
+    { nombre: "E-2C AEW&C", cantidad: 1, descripcion: "AEW&C/C2" },
     { nombre: "Falcon DA-20", cantidad: 1, descripcion: "Guerra electrónica" },
     { nombre: "CASA C-295 IVR", cantidad: 2, descripcion: "SIGINT/ELINT/C2" },
     { nombre: "C-130H", cantidad: 4, descripcion: "Transporte táctico" },
     { nombre: "ERJ-145", cantidad: 2, descripcion: "VIP/MEDEVAC" },
     { nombre: "C-98A", cantidad: 2, descripcion: "Transporte/enlace" },
   ],
-  "Ala Aérea N.º 4 / Catamarca": [
-    { nombre: "Harrier AV-8B/TAV-8B", cantidad: 14, descripcion: "Ataque y AA limitada" },
+  "Ala Aérea n.º 4 / Catamarca": [
+    { nombre: "Harrier T/AV-8B", cantidad: 14, descripcion: "Ataque y AA limitada" },
     { nombre: "C-98A", cantidad: 2, descripcion: "Transporte/enlace" },
     { nombre: "UH-1N", cantidad: 4, descripcion: "Asalto aéreo" },
-    { nombre: "Mi-28D Havoc", cantidad: 4, descripcion: "Ataque/BYRCOM" },
+    { nombre: "Mi-28D", cantidad: 4, descripcion: "Ataque/BYRCOM" },
   ],
-  "Ala Aérea N.º 5 / Tucumán": [
+  "Ala Aérea n.º 5 / Tucumán": [
     { nombre: "Mirage 2000-5 Mk2", cantidad: 8, descripcion: "Caza multirrol" },
     { nombre: "CASA C-295 IVR", cantidad: 1, descripcion: "SIGINT/ELINT/C2" },
     { nombre: "C-130H", cantidad: 6, descripcion: "Asalto aéreo/transporte" },
@@ -339,25 +348,25 @@ const AERONAVES_ENEMIGAS_POR_BASE: Record<
     { nombre: "C-98A", cantidad: 2, descripcion: "Transporte/enlace" },
     { nombre: "KC-130H", cantidad: 3, descripcion: "Reabastecimiento en vuelo" },
   ],
-  "Ala Aérea N.º 6 / Formosa": [
+  "Ala Aérea n.º 6 / Formosa": [
     { nombre: "Su-22M4", cantidad: 8, descripcion: "Ataque/GE/AA limitada" },
     { nombre: "C-98A", cantidad: 2, descripcion: "Transporte/enlace" },
     { nombre: "UH-1N", cantidad: 4, descripcion: "Asalto aéreo" },
-    { nombre: "Mi-28D Havoc", cantidad: 4, descripcion: "Ataque/BYRCOM" },
+    { nombre: "Mi-28D", cantidad: 4, descripcion: "Ataque/BYRCOM" },
     { nombre: "KC-130H", cantidad: 3, descripcion: "Reabastecimiento en vuelo" },
   ],
-  "Ala Aérea N.º 7 / Belén": [
+  "Ala Aérea n.º 7 / Belén": [
     { nombre: "Su-22M4", cantidad: 6, descripcion: "Ataque/GE/AA limitada" },
     { nombre: "C-98A", cantidad: 2, descripcion: "Transporte/enlace" },
     { nombre: "UH-1N", cantidad: 4, descripcion: "Asalto aéreo" },
   ],
-  "Ala Aérea N.º 8 / Tartagal": [
+  "Ala Aérea n.º 8 / Tartagal": [
     { nombre: "Geran-2", cantidad: 48, descripcion: "Ataque/SEAD; alcance 2.500 km" },
     { nombre: "C-98A", cantidad: 2, descripcion: "Transporte/enlace" },
     { nombre: "AS-725 Cougar", cantidad: 4, descripcion: "Asalto aéreo/BYRCOM" },
   ],
-  "Ala Aérea N.º 9 / Las Lomitas": [
-    { nombre: "Mi-28D Havoc", cantidad: 6, descripcion: "Ataque/BYRCOM" },
+  "Ala Aérea n.º 9 / Las Lomitas": [
+    { nombre: "Mi-28D", cantidad: 6, descripcion: "Ataque/BYRCOM" },
     { nombre: "UH-1N", cantidad: 4, descripcion: "Asalto aéreo" },
     { nombre: "AS-725 Cougar", cantidad: 4, descripcion: "Asalto aéreo/BYRCOM" },
   ],
@@ -367,6 +376,42 @@ const AERONAVES_ENEMIGAS_POR_BASE: Record<
   ],
 };
 
+const CANTIDADES_AERONAVES_PROPIAS: Record<string, number> = {
+  "1º Brigada Aérea / La Rioja|C-130J": 10,
+  "1º Brigada Aérea / La Rioja|KC-130J": 4,
+  "1º Brigada Aérea / La Rioja|LJ-60": 3,
+  "1º Brigada Aérea / La Rioja|DHC-6": 4,
+  "1º Brigada Aérea / La Rioja|B-412": 4,
+  "1º Brigada Aérea / La Rioja|UH-1Y": 4,
+  "2º Brigada Aérea / Villa Mercedes|F-16C Block 40": 20,
+  "2º Brigada Aérea / Villa Mercedes|AMX A-1M": 12,
+  "2º Brigada Aérea / Villa Mercedes|T-6 Texan II": 12,
+  "2º Brigada Aérea / Villa Mercedes|Hermes 450": 3,
+  "2º Brigada Aérea / Villa Mercedes|B-412": 4,
+  "2º Brigada Aérea / Villa Mercedes|UH-1Y": 4,
+  "2º Brigada Aérea / Villa Mercedes|DHC-6": 4,
+  "3º Brigada Aérea / Córdoba|AMX A-1M": 12,
+  "3º Brigada Aérea / Córdoba|T-6 Texan II": 12,
+  "3º Brigada Aérea / Córdoba|E-99M Erieye": 3,
+  "3º Brigada Aérea / Córdoba|KC-135": 3,
+  "3º Brigada Aérea / Córdoba|CH-47F": 6,
+  "3º Brigada Aérea / Córdoba|B-412": 2,
+  "3º Brigada Aérea / Córdoba|UH-1Y": 4,
+  "4º Brigada Aérea / Mendoza|F-16C Block 40": 14,
+  "4º Brigada Aérea / Mendoza|F-16D Block 42": 6,
+  "4º Brigada Aérea / Mendoza|KC-135": 3,
+  "4º Brigada Aérea / Mendoza|DHC-6": 4,
+  "4º Brigada Aérea / Mendoza|B-412": 2,
+  "4º Brigada Aérea / Mendoza|UH-1Y": 4,
+  "5º Brigada Aérea / Gral. Acha|F-16CJ Block 50": 10,
+  "5º Brigada Aérea / Gral. Acha|IAI Harpy": 36,
+  "5º Brigada Aérea / Gral. Acha|LJ-60 MEDEVAC": 3,
+  "5º Brigada Aérea / Gral. Acha|Hermes 450": 3,
+  "5º Brigada Aérea / Gral. Acha|EC-130H Compass Call": 2,
+  "5º Brigada Aérea / Gral. Acha|B-412": 2,
+  "5º Brigada Aérea / Gral. Acha|CH-47F": 6,
+};
+
 const CATALOGO_AERONAVES_PROPIAS: AeronaveCatalogo[] = Object.entries(
   AERONAVES_PROPIAS_POR_BASE
 ).flatMap(([base, aeronaves]) =>
@@ -374,6 +419,7 @@ const CATALOGO_AERONAVES_PROPIAS: AeronaveCatalogo[] = Object.entries(
     nombre,
     base,
     bando: "propio" as const,
+    cantidad: CANTIDADES_AERONAVES_PROPIAS[`${base}|${nombre}`],
   }))
 );
 
@@ -392,25 +438,25 @@ const CATALOGO_AERONAVES_ENEMIGAS: AeronaveCatalogo[] = Object.entries(
 const CATALOGO_RADARES_PROPIOS: MedioCatalogo[] = [
   {
     nombre: "TPS-77",
-    base: "1ª Brigada Aérea / La Rioja",
+    base: "1º Brigada Aérea / La Rioja",
     bando: "propio",
     alcanceKm: 555,
   },
   {
     nombre: "TPS-77",
-    base: "2ª Brigada Aérea / Villa Mercedes",
+    base: "2º Brigada Aérea / Villa Mercedes",
     bando: "propio",
     alcanceKm: 555,
   },
   {
     nombre: "TPS-77",
-    base: "3ª Brigada Aérea / Córdoba",
+    base: "3º Brigada Aérea / Córdoba",
     bando: "propio",
     alcanceKm: 555,
   },
   {
     nombre: "GM-400A",
-    base: "5ª Brigada Aérea / General Acha",
+    base: "5º Brigada Aérea / Gral. Acha",
     bando: "propio",
     alcanceKm: 593,
   },
@@ -446,37 +492,37 @@ const CATALOGO_RADARES_ENEMIGOS: MedioCatalogo[] = [
 const CATALOGO_DEFENSA_PROPIA: MedioCatalogo[] = [
   {
     nombre: "Patriot PAC-1",
-    base: "3ª Brigada Aérea / Córdoba",
+    base: "3º Brigada Aérea / Córdoba",
     bando: "propio",
     alcanceKm: 160,
   },
   {
     nombre: "Patriot PAC-1",
-    base: "4ª Brigada Aérea / Mendoza",
+    base: "4º Brigada Aérea / Mendoza",
     bando: "propio",
     alcanceKm: 160,
   },
   {
     nombre: "NASAMS",
-    base: "1ª Brigada Aérea / La Rioja",
+    base: "1º Brigada Aérea / La Rioja",
     bando: "propio",
     alcanceKm: 35,
   },
   {
     nombre: "NASAMS",
-    base: "2ª Brigada Aérea / Villa Mercedes",
+    base: "2º Brigada Aérea / Villa Mercedes",
     bando: "propio",
     alcanceKm: 35,
   },
   {
     nombre: "NASAMS",
-    base: "5ª Brigada Aérea / General Acha",
+    base: "5º Brigada Aérea / Gral. Acha",
     bando: "propio",
     alcanceKm: 35,
   },
   {
     nombre: "NASAMS",
-    base: "BAM Malargüe",
+    base: "Base Aérea Militar Malargüe",
     bando: "propio",
     alcanceKm: 35,
   },
@@ -498,191 +544,183 @@ const CATALOGO_DEFENSA_PROPIA: MedioCatalogo[] = [
 
 const CATALOGO_DEFENSA_ENEMIGA: MedioCatalogo[] = [
   {
-    nombre: "S-300 PMU-1 (SA-20)",
-    base: "Ala Aérea N.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 150,
-    descripcion: "Defensa aérea de largo alcance",
-  },
-  {
-    nombre: "Improved HAWK",
-    base: "Ala Aérea N.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 40,
-  },
-  {
-    nombre: "Pantsir-S1 (SA-22)",
-    base: "Ala Aérea N.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 12,
-  },
-  {
-    nombre: "ZSU-23-4 Shilka",
-    base: "Ala Aérea N.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-  },
-  {
-    nombre: "9K333 Verba (SA-29)",
-    base: "Ala Aérea N.º 3 / Salta",
+    nombre: "SA-29",
+    base: "Ala Aérea n.º 2 / Sáenz Peña",
     bando: "enemigo",
     alcanceKm: 6.5,
+    descripcion: "Escuela de Defensa Aérea; cantidad no indicada",
   },
   {
-    nombre: "S-300 PMU-1 (SA-20)",
-    base: "Ala Aérea N.º 4 / Catamarca",
+    nombre: "ZSU-23-2",
+    base: "Ala Aérea n.º 2 / Sáenz Peña",
     bando: "enemigo",
-    alcanceKm: 150,
+    alcanceKm: 2.5,
+    descripcion: "Escuela de Defensa Aérea; cantidad no indicada",
   },
   {
-    nombre: "Pantsir-S1 (SA-22)",
-    base: "Ala Aérea N.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 12,
-  },
-  {
-    nombre: "9K33 Osa-AK (SA-8)",
-    base: "Ala Aérea N.º 4 / Catamarca",
+    nombre: "SA-8",
+    base: "Ala Aérea n.º 2 / Sáenz Peña",
     bando: "enemigo",
     alcanceKm: 10,
+    cantidad: 5,
+    descripcion: "Escuela de Defensa Aérea",
   },
   {
-    nombre: "ZSU-23-4 Shilka",
-    base: "Ala Aérea N.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-  },
-  {
-    nombre: "9K333 Verba (SA-29)",
-    base: "Ala Aérea N.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-  },
-  {
-    nombre: "Improved HAWK",
-    base: "Ala Aérea N.º 5 / Tucumán",
-    bando: "enemigo",
-    alcanceKm: 40,
-  },
-  {
-    nombre: "ZSU-23-4 Shilka",
-    base: "Ala Aérea N.º 5 / Tucumán",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-  },
-  {
-    nombre: "9K333 Verba (SA-29)",
-    base: "Ala Aérea N.º 5 / Tucumán",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-  },
-  {
-    nombre: "Improved HAWK",
-    base: "Ala Aérea N.º 6 / Formosa",
-    bando: "enemigo",
-    alcanceKm: 40,
-  },
-  {
-    nombre: "Pantsir-S1 (SA-22)",
-    base: "Ala Aérea N.º 6 / Formosa",
-    bando: "enemigo",
-    alcanceKm: 12,
-  },
-  {
-    nombre: "ZSU-23-4 Shilka",
-    base: "Ala Aérea N.º 6 / Formosa",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-  },
-  {
-    nombre: "9K333 Verba (SA-29)",
-    base: "Ala Aérea N.º 6 / Formosa",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-  },
-  {
-    nombre: "S-300 PMU-1 (SA-20)",
-    base: "Ala Aérea N.º 7 / Belén",
+    nombre: "S-300",
+    base: "Ala Aérea n.º 3 / Salta",
     bando: "enemigo",
     alcanceKm: 150,
+    descripcion: "Cantidad no indicada en la orden",
   },
   {
-    nombre: "9K33 Osa-AK (SA-8)",
-    base: "Ala Aérea N.º 7 / Belén",
-    bando: "enemigo",
-    alcanceKm: 10,
-  },
-  {
-    nombre: "ZSU-23-4 Shilka",
-    base: "Ala Aérea N.º 7 / Belén",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-  },
-  {
-    nombre: "9K333 Verba (SA-29)",
-    base: "Ala Aérea N.º 7 / Belén",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-  },
-  {
-    nombre: "Improved HAWK",
-    base: "Ala Aérea N.º 8 / Tartagal",
+    nombre: "I-HAWK",
+    base: "Ala Aérea n.º 3 / Salta",
     bando: "enemigo",
     alcanceKm: 40,
+    cantidad: 2,
   },
   {
-    nombre: "ZSU-23-4 Shilka",
-    base: "Ala Aérea N.º 8 / Tartagal",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-  },
-  {
-    nombre: "9K333 Verba (SA-29)",
-    base: "Ala Aérea N.º 8 / Tartagal",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-  },
-  {
-    nombre: "S-300 PMU-1 (SA-20)",
-    base: "Ala Aérea N.º 9 / Las Lomitas",
-    bando: "enemigo",
-    alcanceKm: 150,
-  },
-  {
-    nombre: "Pantsir-S1 (SA-22)",
-    base: "Ala Aérea N.º 9 / Las Lomitas",
+    nombre: "Pantsir-S1",
+    base: "Ala Aérea n.º 3 / Salta",
     bando: "enemigo",
     alcanceKm: 12,
+    cantidad: 4,
   },
   {
-    nombre: "ZSU-23-4 Shilka",
-    base: "Ala Aérea N.º 9 / Las Lomitas",
+    nombre: "ZSU-23-2",
+    base: "Ala Aérea n.º 3 / Salta",
     bando: "enemigo",
     alcanceKm: 2.5,
+    descripcion: "Cantidad no indicada en la orden",
   },
   {
-    nombre: "9K333 Verba (SA-29)",
-    base: "Ala Aérea N.º 9 / Las Lomitas",
+    nombre: "SA-29",
+    base: "Ala Aérea n.º 3 / Salta",
     bando: "enemigo",
     alcanceKm: 6.5,
+    descripcion: "Cantidad no indicada en la orden",
   },
   {
-    nombre: "9K33 Osa-AK (SA-8)",
-    base: "Ala Aérea N.º 2 / Sáenz Peña",
+    nombre: "S-300",
+    base: "Ala Aérea n.º 4 / Catamarca",
+    bando: "enemigo",
+    alcanceKm: 150,
+    descripcion: "Cantidad no indicada en la orden",
+  },
+  {
+    nombre: "Pantsir SA-22",
+    base: "Ala Aérea n.º 4 / Catamarca",
+    bando: "enemigo",
+    alcanceKm: 12,
+    cantidad: 2,
+  },
+  {
+    nombre: "SA-8",
+    base: "Ala Aérea n.º 4 / Catamarca",
     bando: "enemigo",
     alcanceKm: 10,
+    cantidad: 4,
   },
   {
-    nombre: "ZSU-23-4 Shilka",
-    base: "Ala Aérea N.º 2 / Sáenz Peña",
+    nombre: "ZSU-23",
+    base: "Ala Aérea n.º 4 / Catamarca",
     bando: "enemigo",
     alcanceKm: 2.5,
+    descripcion: "Cantidad no indicada en la orden",
   },
   {
-    nombre: "9K333 Verba (SA-29)",
-    base: "Ala Aérea N.º 2 / Sáenz Peña",
+    nombre: "SA-29",
+    base: "Ala Aérea n.º 4 / Catamarca",
     bando: "enemigo",
     alcanceKm: 6.5,
+    descripcion: "Cantidad no indicada en la orden",
+  },
+  ...[
+    ["Ala Aérea n.º 5 / Tucumán", "I-HAWK", 40, undefined],
+    ["Ala Aérea n.º 5 / Tucumán", "ZSU-23", 2.5, undefined],
+    ["Ala Aérea n.º 5 / Tucumán", "SA-29", 6.5, undefined],
+    ["Ala Aérea n.º 6 / Formosa", "I-HAWK", 40, undefined],
+    ["Ala Aérea n.º 6 / Formosa", "Pantsir SA-22", 12, 4],
+    ["Ala Aérea n.º 6 / Formosa", "SA-29", 6.5, undefined],
+    ["Ala Aérea n.º 6 / Formosa", "ZSU-23", 2.5, undefined],
+    ["Ala Aérea n.º 7 / Belén", "S-300", 150, undefined],
+    ["Ala Aérea n.º 7 / Belén", "SA-8", 10, 5],
+    ["Ala Aérea n.º 7 / Belén", "SA-29", 6.5, undefined],
+    ["Ala Aérea n.º 7 / Belén", "ZSU-23", 2.5, undefined],
+    ["Ala Aérea n.º 8 / Tartagal", "I-HAWK", 40, undefined],
+    ["Ala Aérea n.º 8 / Tartagal", "SA-29", 6.5, undefined],
+    ["Ala Aérea n.º 8 / Tartagal", "ZSU-23", 2.5, undefined],
+    ["Ala Aérea n.º 9 / Las Lomitas", "S-300", 150, undefined],
+    ["Ala Aérea n.º 9 / Las Lomitas", "Pantsir SA-22", 12, 4],
+    ["Ala Aérea n.º 9 / Las Lomitas", "ZSU-23-2", 2.5, undefined],
+    ["Ala Aérea n.º 9 / Las Lomitas", "SA-29", 6.5, undefined],
+  ].map(([base, nombre, alcanceKm, cantidad]) => ({
+    nombre: nombre as string,
+    base: base as string,
+    bando: "enemigo" as const,
+    alcanceKm: alcanceKm as number,
+    cantidad: cantidad as number | undefined,
+    descripcion:
+      cantidad === undefined ? "Cantidad no indicada en la orden" : undefined,
+  })),
+];
+
+const MASCARAS_RADAR: MascaraRadar[] = [
+  {
+    id: "mascara-la-rioja",
+    nombre: "La Rioja",
+    archivo: "/data/radar/la_rioja.geojson",
+    bando: "propio",
+    base: "1º Brigada Aérea / La Rioja",
+    color: "#2563eb",
+  },
+  {
+    id: "mascara-villa-mercedes",
+    nombre: "Villa Mercedes",
+    archivo: "/data/radar/villa_mercedes.geojson",
+    bando: "propio",
+    base: "2º Brigada Aérea / Villa Mercedes",
+    color: "#0ea5e9",
+  },
+  {
+    id: "mascara-cordoba",
+    nombre: "Córdoba",
+    archivo: "/data/radar/cordoba.geojson",
+    bando: "propio",
+    base: "3º Brigada Aérea / Córdoba",
+    color: "#7c3aed",
+  },
+  {
+    id: "mascara-general-acha",
+    nombre: "General Acha",
+    archivo: "/data/radar/general_acha.geojson",
+    bando: "propio",
+    base: "5º Brigada Aérea / Gral. Acha",
+    color: "#06b6d4",
+  },
+  {
+    id: "mascara-cafayate",
+    nombre: "Cafayate",
+    archivo: "/data/radar/cafayate.geojson",
+    bando: "enemigo",
+    base: "Estación radar / Cafayate",
+    color: "#f97316",
+  },
+  {
+    id: "mascara-las-lomitas",
+    nombre: "Las Lomitas",
+    archivo: "/data/radar/las_lomitas.geojson",
+    bando: "enemigo",
+    base: "Estación radar / Las Lomitas",
+    color: "#ef4444",
+  },
+  {
+    id: "mascara-oran",
+    nombre: "Orán",
+    archivo: "/data/radar/oran.geojson",
+    bando: "enemigo",
+    base: "Estación radar / Orán",
+    color: "#dc2626",
   },
 ];
 
@@ -880,6 +918,7 @@ export default function MapEditor() {
 
   const elementosMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
   const etiquetasRef = useRef<Record<string, maplibregl.Marker>>({});
+  const oceanosRef = useRef<Record<string, maplibregl.Marker>>({});
   const basesRef = useRef<Record<string, maplibregl.Marker>>({});
 
   const [elementos, setElementos] = useState<ElementoOperacional[]>([]);
@@ -889,11 +928,20 @@ export default function MapEditor() {
     useState<VistaFuerzas>("ambas");
 
   const [mostrarRepublicas, setMostrarRepublicas] = useState(true);
+  const [mostrarEntornoGeografico, setMostrarEntornoGeografico] = useState(true);
   const [mostrarTon, setMostrarTon] = useState(true);
   const [mostrarBases, setMostrarBases] = useState(true);
   const [mostrarAeronaves, setMostrarAeronaves] = useState(true);
   const [mostrarRadares, setMostrarRadares] = useState(true);
   const [mostrarDefensa, setMostrarDefensa] = useState(true);
+
+  const [mascarasVisibles, setMascarasVisibles] = useState<
+    Record<string, boolean>
+  >(() =>
+    Object.fromEntries(
+      MASCARAS_RADAR.map((mascara) => [mascara.id, false])
+    )
+  );
 
   const [aeronavePropiaSeleccionada, setAeronavePropiaSeleccionada] =
     useState("");
@@ -1253,7 +1301,7 @@ export default function MapEditor() {
             id: "fondo-operacional",
             type: "background",
             paint: {
-              "background-color": "#f8fafc",
+              "background-color": "#dbeafe",
             },
           },
         ],
@@ -1299,6 +1347,31 @@ export default function MapEditor() {
           })),
         };
 
+        map.addSource("paises-aledanos", {
+          type: "geojson",
+          data: "/data/base/paises_aledanos.geojson",
+        });
+
+        map.addLayer({
+          id: "paises-aledanos-relleno",
+          type: "fill",
+          source: "paises-aledanos",
+          paint: {
+            "fill-color": "#ffffff",
+            "fill-opacity": 1,
+          },
+        });
+
+        map.addLayer({
+          id: "paises-aledanos-borde",
+          type: "line",
+          source: "paises-aledanos",
+          paint: {
+            "line-color": "#94a3b8",
+            "line-width": 1.2,
+          },
+        });
+
         map.addSource("republicas", {
           type: "geojson",
           data: republicasConColor,
@@ -1332,16 +1405,18 @@ export default function MapEditor() {
           ([nombre, coordenadas]) => {
             const etiqueta = document.createElement("div");
             etiqueta.textContent = NOMBRES_CORTOS[nombre] ?? nombre;
-            etiqueta.style.fontWeight = "800";
-            etiqueta.style.fontSize = "14px";
-            etiqueta.style.color = "#111827";
-            etiqueta.style.background = "rgba(255,255,255,0.78)";
-            etiqueta.style.border =
-              "1px solid rgba(15,23,42,0.35)";
-            etiqueta.style.borderRadius = "4px";
+            etiqueta.style.fontWeight = "900";
+            etiqueta.style.fontSize = "18px";
+            etiqueta.style.letterSpacing = "0.16em";
+            etiqueta.style.color = "rgba(15,23,42,0.72)";
+            etiqueta.style.background = "transparent";
+            etiqueta.style.border = "none";
             etiqueta.style.padding = "2px 6px";
             etiqueta.style.pointerEvents = "none";
             etiqueta.style.whiteSpace = "nowrap";
+            etiqueta.style.textShadow =
+              "0 1px 0 rgba(255,255,255,0.95), 0 0 8px rgba(255,255,255,0.85)";
+            etiqueta.style.transform = "translate(-50%, -50%)";
 
             const marker = new maplibregl.Marker({
               element: etiqueta,
@@ -1353,6 +1428,36 @@ export default function MapEditor() {
             etiquetasRef.current[nombre] = marker;
           }
         );
+
+        const etiquetasOceanos: Array<{
+          nombre: string;
+          coordenadas: [number, number];
+        }> = [
+          { nombre: "OCÉANO PACÍFICO", coordenadas: [-76.0, -39.0] },
+          { nombre: "OCÉANO ATLÁNTICO", coordenadas: [-50.5, -40.0] },
+        ];
+
+        etiquetasOceanos.forEach(({ nombre, coordenadas }) => {
+          const etiquetaOceano = document.createElement("div");
+          etiquetaOceano.textContent = nombre;
+          etiquetaOceano.style.fontWeight = "700";
+          etiquetaOceano.style.fontSize = "15px";
+          etiquetaOceano.style.letterSpacing = "0.22em";
+          etiquetaOceano.style.color = "rgba(30,64,175,0.58)";
+          etiquetaOceano.style.fontStyle = "italic";
+          etiquetaOceano.style.pointerEvents = "none";
+          etiquetaOceano.style.whiteSpace = "nowrap";
+          etiquetaOceano.style.textShadow = "0 1px 0 rgba(255,255,255,0.8)";
+
+          const markerOceano = new maplibregl.Marker({
+            element: etiquetaOceano,
+            anchor: "center",
+          })
+            .setLngLat(coordenadas)
+            .addTo(map);
+
+          oceanosRef.current[nombre] = markerOceano;
+        });
 
         setErrorGeoJson(null);
       } catch (error) {
@@ -1380,6 +1485,53 @@ export default function MapEditor() {
 
         basesRef.current[base.nombre] = marker;
       });
+
+      for (const mascara of MASCARAS_RADAR) {
+        try {
+          const respuestaMascara = await fetch(mascara.archivo);
+
+          if (!respuestaMascara.ok) {
+            throw new Error(
+              `No se pudo cargar ${mascara.nombre}: ${respuestaMascara.status}`
+            );
+          }
+
+          const datosMascara =
+            (await respuestaMascara.json()) as GeoJSON.FeatureCollection;
+
+          map.addSource(mascara.id, {
+            type: "geojson",
+            data: datosMascara,
+          });
+
+          map.addLayer({
+            id: `${mascara.id}-relleno`,
+            type: "fill",
+            source: mascara.id,
+            filter: ["==", ["geometry-type"], "Polygon"],
+            layout: { visibility: "none" },
+            paint: {
+              "fill-color": mascara.color,
+              "fill-opacity": 0.20,
+            },
+          });
+
+          map.addLayer({
+            id: `${mascara.id}-borde`,
+            type: "line",
+            source: mascara.id,
+            filter: ["==", ["geometry-type"], "Polygon"],
+            layout: { visibility: "none" },
+            paint: {
+              "line-color": mascara.color,
+              "line-width": 1.8,
+              "line-opacity": 0.9,
+            },
+          });
+        } catch (error) {
+          console.error(`Error en máscara ${mascara.nombre}:`, error);
+        }
+      }
 
       map.addSource("ton", {
         type: "geojson",
@@ -1453,12 +1605,16 @@ export default function MapEditor() {
       Object.values(etiquetasRef.current).forEach((marker) =>
         marker.remove()
       );
+      Object.values(oceanosRef.current).forEach((marker) =>
+        marker.remove()
+      );
       Object.values(basesRef.current).forEach((marker) =>
         marker.remove()
       );
 
       elementosMarkersRef.current = {};
       etiquetasRef.current = {};
+      oceanosRef.current = {};
       basesRef.current = {};
 
       map.remove();
@@ -1641,6 +1797,27 @@ export default function MapEditor() {
     const map = mapRef.current;
     if (!map) return;
 
+    actualizarVisibilidadCapa(
+      map,
+      "paises-aledanos-relleno",
+      mostrarEntornoGeografico
+    );
+    actualizarVisibilidadCapa(
+      map,
+      "paises-aledanos-borde",
+      mostrarEntornoGeografico
+    );
+
+    Object.values(oceanosRef.current).forEach((marker) => {
+      marker.getElement().style.display =
+        mostrarEntornoGeografico ? "block" : "none";
+    });
+  }, [mostrarEntornoGeografico]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
     actualizarVisibilidadCapa(map, "ton-relleno", mostrarTon);
     actualizarVisibilidadCapa(map, "ton-borde", mostrarTon);
   }, [mostrarTon]);
@@ -1656,6 +1833,49 @@ export default function MapEditor() {
       marker.getElement().style.display = visible ? "flex" : "none";
     });
   }, [mostrarBases, vistaFuerzas]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    MASCARAS_RADAR.forEach((mascara) => {
+      const visible =
+        Boolean(mascarasVisibles[mascara.id]) &&
+        bandoVisible(mascara.bando, vistaFuerzas);
+
+      actualizarVisibilidadCapa(
+        map,
+        `${mascara.id}-relleno`,
+        visible
+      );
+      actualizarVisibilidadCapa(
+        map,
+        `${mascara.id}-borde`,
+        visible
+      );
+    });
+  }, [mascarasVisibles, vistaFuerzas]);
+
+  function cambiarMascara(id: string, visible: boolean) {
+    setMascarasVisibles((anteriores) => ({
+      ...anteriores,
+      [id]: visible,
+    }));
+  }
+
+  function cambiarMascarasPorBando(bando: Bando, visible: boolean) {
+    setMascarasVisibles((anteriores) => {
+      const siguientes = { ...anteriores };
+
+      MASCARAS_RADAR.filter(
+        (mascara) => mascara.bando === bando
+      ).forEach((mascara) => {
+        siguientes[mascara.id] = visible;
+      });
+
+      return siguientes;
+    });
+  }
 
   return (
     <div className="flex h-screen w-screen">
@@ -1697,6 +1917,17 @@ export default function MapEditor() {
           <label className="mb-3 flex items-center gap-2">
             <input
               type="checkbox"
+              checked={mostrarEntornoGeografico}
+              onChange={(event) =>
+                setMostrarEntornoGeografico(event.target.checked)
+              }
+            />
+            Países aledaños y océanos
+          </label>
+
+          <label className="mb-3 flex items-center gap-2">
+            <input
+              type="checkbox"
               checked={mostrarTon}
               onChange={(event) =>
                 setMostrarTon(event.target.checked)
@@ -1715,6 +1946,99 @@ export default function MapEditor() {
             />
             Bases y estaciones
           </label>
+        </section>
+
+        <section className="mb-5 rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">Máscaras radar</h2>
+
+          {mostrarControlesPropios && (
+            <div className="mb-4 rounded border border-blue-700 p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <strong className="text-sm text-blue-300">Propias</strong>
+                <div className="flex gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => cambiarMascarasPorBando("propio", true)}
+                    className="rounded bg-blue-700 px-2 py-1"
+                  >
+                    Todas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => cambiarMascarasPorBando("propio", false)}
+                    className="rounded bg-slate-700 px-2 py-1"
+                  >
+                    Ninguna
+                  </button>
+                </div>
+              </div>
+
+              {MASCARAS_RADAR.filter(
+                (mascara) => mascara.bando === "propio"
+              ).map((mascara) => (
+                <label
+                  key={mascara.id}
+                  className="mb-2 flex items-center gap-2 last:mb-0"
+                >
+                  <input
+                    type="checkbox"
+                    checked={Boolean(mascarasVisibles[mascara.id])}
+                    onChange={(event) =>
+                      cambiarMascara(mascara.id, event.target.checked)
+                    }
+                  />
+                  {mascara.nombre}
+                </label>
+              ))}
+            </div>
+          )}
+
+          {mostrarControlesEnemigos && (
+            <div className="rounded border border-orange-700 p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <strong className="text-sm text-orange-300">Enemigas</strong>
+                <div className="flex gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => cambiarMascarasPorBando("enemigo", true)}
+                    className="rounded bg-orange-700 px-2 py-1"
+                  >
+                    Todas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => cambiarMascarasPorBando("enemigo", false)}
+                    className="rounded bg-slate-700 px-2 py-1"
+                  >
+                    Ninguna
+                  </button>
+                </div>
+              </div>
+
+              {MASCARAS_RADAR.filter(
+                (mascara) => mascara.bando === "enemigo"
+              ).map((mascara) => (
+                <label
+                  key={mascara.id}
+                  className="mb-2 flex items-center gap-2 last:mb-0"
+                >
+                  <input
+                    type="checkbox"
+                    checked={Boolean(mascarasVisibles[mascara.id])}
+                    onChange={(event) =>
+                      cambiarMascara(mascara.id, event.target.checked)
+                    }
+                  />
+                  {mascara.nombre}
+                </label>
+              ))}
+            </div>
+          )}
+
+          <p className="mt-3 text-xs text-slate-400">
+            Las máscaras conservan la geometría y las coordenadas originales
+            de los archivos KMZ.
+          </p>
         </section>
 
         <section className="mb-5 rounded bg-slate-900 p-4">
@@ -1787,6 +2111,9 @@ export default function MapEditor() {
                             value={indice}
                           >
                             {aeronave}
+                            {CANTIDADES_AERONAVES_PROPIAS[`${base}|${aeronave}`]
+                              ? ` — ${CANTIDADES_AERONAVES_PROPIAS[`${base}|${aeronave}`]} uds.`
+                              : ""}
                           </option>
                         );
                       })}
@@ -1927,7 +2254,7 @@ export default function MapEditor() {
                             {aeronave.nombre}
                             {aeronave.cantidad
                               ? ` — ${aeronave.cantidad} uds.`
-                              : ""}
+                              : " — cantidad no indicada"}
                           </option>
                         );
                       })}
