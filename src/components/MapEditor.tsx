@@ -11,6 +11,9 @@ type TipoElemento = "aeronave" | "radar" | "defensa";
 
 type ElementoOperacional = {
   id: string;
+  visible: boolean;
+  iconoPersonalizado?: string;
+  iconoTipo?: string;
   bando: Bando;
   tipo: TipoElemento;
   nombre: string;
@@ -896,6 +899,48 @@ function datosIconoAeronave(
   return iconos[categoria];
 }
 
+
+function obtenerImagenMedio(nombre: string): string | null {
+  const texto = nombre
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  const imagenes: Array<[string[], string]> = [
+    [["f-16cj", "block 50"], "/data/medios/f16_cj_block50.jpg"],
+    [["f-16c", "block 40"], "/data/medios/f16_cd_block4042.jpg"],
+    [["f-16d", "block 42"], "/data/medios/f16_cd_block4042.jpg"],
+    [["amx", "a-1m"], "/data/medios/amx_a1m.jpg"],
+    [["t-6", "texan"], "/data/medios/t6_texan_ii.jpg"],
+    [["iai harpy"], "/data/medios/iai_harpy.jpg"],
+    [["hermes 450"], "/data/medios/hermes_450.jpg"],
+    [["compass call"], "/data/medios/ec130h_compass_call.jpg"],
+    [["e-99", "erieye"], "/data/medios/e99_erieye.jpg"],
+    [["tps-77"], "/data/medios/tps77.jpg"],
+    [["gm-400", "gm 400"], "/data/medios/gm400_alpha.jpg"],
+    [["patriot"], "/data/medios/patriot.jpg"],
+    [["nasams"], "/data/medios/nasams.jpg"],
+    [["rbs-70", "rbs 70"], "/data/medios/rbs70.jpg"],
+    [["skyguard", "syguard", "oerlikon", "oerlinkon"], "/data/medios/skyguard_oerlikon.jpg"],
+    [["kc-130j", "kc-130 j"], "/data/medios/kc130j.jpg"],
+    [["kc-135"], "/data/medios/kc135.jpg"],
+    [["c-130j", "c-130 j"], "/data/medios/c130j.jpg"],
+    [["dhc-6", "twin otter"], "/data/medios/dhc6.jpg"],
+    [["lj-60", "lear jet 60", "learjet 60"], "/data/medios/learjet60.jpg"],
+    [["ch-47f", "ch 47f"], "/data/medios/ch47f.jpg"],
+    [["b-412", "bell 412"], "/data/medios/bell412.jpg"],
+    [["uh-1y", "uh 1y"], "/data/medios/uh1y.jpg"],
+  ];
+
+  for (const [coincidencias, archivo] of imagenes) {
+    if (coincidencias.some((coincidencia) => texto.includes(coincidencia))) {
+      return archivo;
+    }
+  }
+
+  return null;
+}
+
 function obtenerMaximoSlider(elemento: ElementoOperacional) {
   const valorActual =
     elemento.tipo === "aeronave"
@@ -942,6 +987,29 @@ export default function MapEditor() {
       MASCARAS_RADAR.map((mascara) => [mascara.id, false])
     )
   );
+
+  const [coloresMascaras, setColoresMascaras] = useState<Record<string, string>>(() =>
+    Object.fromEntries(MASCARAS_RADAR.map((mascara) => [mascara.id, mascara.color]))
+  );
+
+  const [coloresRepublicas, setColoresRepublicas] = useState<Record<string, string>>({
+    ...COLORES_REPUBLICAS,
+  });
+
+  const [basesVisibles, setBasesVisibles] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(
+      [...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [base.nombre, true])
+    )
+  );
+
+  const [nombrePersonalizado, setNombrePersonalizado] = useState("");
+  const [tipoPersonalizado, setTipoPersonalizado] = useState<TipoElemento>("aeronave");
+  const [bandoPersonalizado, setBandoPersonalizado] = useState<Bando>("propio");
+  const [basePersonalizada, setBasePersonalizada] = useState(BASES_PROPIAS[0]?.nombre ?? "");
+  const [alcancePersonalizado, setAlcancePersonalizado] = useState(0);
+  const [colorPersonalizado, setColorPersonalizado] = useState("#22c55e");
+  const [iconoTipoPersonalizado, setIconoTipoPersonalizado] = useState("personalizado");
+  const [iconoPersonalizado, setIconoPersonalizado] = useState<string | undefined>();
 
   const [aeronavePropiaSeleccionada, setAeronavePropiaSeleccionada] =
     useState("");
@@ -1068,6 +1136,7 @@ export default function MapEditor() {
 
     const nuevaAeronave: ElementoOperacional = {
       id: crearId(),
+      visible: true,
       bando: medio.bando,
       tipo: "aeronave",
       nombre: medio.nombre,
@@ -1104,6 +1173,7 @@ export default function MapEditor() {
 
     const nuevoElemento: ElementoOperacional = {
       id: crearId(),
+      visible: true,
       bando: medio.bando,
       tipo,
       nombre: medio.nombre,
@@ -1130,6 +1200,38 @@ export default function MapEditor() {
     limpiar();
   }
 
+  function agregarMedioPersonalizado() {
+    const nombre = nombrePersonalizado.trim();
+    if (!nombre) return;
+
+    const base = obtenerBase(basePersonalizada);
+    const centro = mapRef.current?.getCenter();
+
+    const nuevo: ElementoOperacional = {
+      id: crearId(),
+      visible: true,
+      bando: bandoPersonalizado,
+      tipo: tipoPersonalizado,
+      nombre,
+      baseOrigen: base?.nombre ?? "Ubicación personalizada",
+      longitude: base?.longitude ?? centro?.lng ?? -64.5,
+      latitude: base?.latitude ?? centro?.lat ?? -35.5,
+      radioCombateKm: tipoPersonalizado === "aeronave" ? alcancePersonalizado : 0,
+      alcanceKm: tipoPersonalizado === "aeronave" ? 0 : alcancePersonalizado,
+      mostrarAnillo: alcancePersonalizado > 0,
+      color: colorPersonalizado,
+      iconoPersonalizado,
+      iconoTipo: iconoTipoPersonalizado,
+      descripcion: "Medio personalizado",
+    };
+
+    setElementos((anteriores) => [...anteriores, nuevo]);
+    setSeleccionadoId(nuevo.id);
+    setNombrePersonalizado("");
+    setAlcancePersonalizado(0);
+    setIconoPersonalizado(undefined);
+  }
+
   function actualizarElemento(
     id: string,
     cambios: Partial<ElementoOperacional>
@@ -1154,15 +1256,14 @@ export default function MapEditor() {
   function crearIconoElemento(elemento: ElementoOperacional) {
     const contenedor = document.createElement("div");
 
-    contenedor.style.width = "38px";
-    contenedor.style.height = "38px";
-    contenedor.style.borderRadius =
-      elemento.tipo === "aeronave" ? "10px" : "50%";
+    contenedor.style.width = "36px";
+    contenedor.style.height = "36px";
+    contenedor.style.borderRadius = "50%";
     contenedor.style.border =
       elemento.bando === "propio"
-        ? "3px solid #dbeafe"
+        ? "3px solid white"
         : "3px solid #111827";
-    contenedor.style.boxShadow = "0 2px 8px rgba(0,0,0,0.6)";
+    contenedor.style.boxShadow = "0 2px 7px rgba(0,0,0,0.55)";
     contenedor.style.display = "flex";
     contenedor.style.alignItems = "center";
     contenedor.style.justifyContent = "center";
@@ -1179,14 +1280,14 @@ export default function MapEditor() {
       );
 
       contenedor.style.backgroundColor =
-        elemento.bando === "propio" ? "#1d4ed8" : "#ea580c";
+        elemento.bando === "propio" ? "#2563eb" : "#f97316";
       contenedor.textContent = datos.simbolo;
       contenedor.title = `${datos.etiqueta}: ${elemento.nombre}`;
     }
 
     if (elemento.tipo === "radar") {
       contenedor.style.backgroundColor =
-        elemento.bando === "propio" ? "#6d28d9" : "#d97706";
+        elemento.bando === "propio" ? "#7c3aed" : "#f59e0b";
       contenedor.textContent = "📡";
       contenedor.title = `Radar: ${elemento.nombre}`;
     }
@@ -1405,17 +1506,21 @@ export default function MapEditor() {
           ([nombre, coordenadas]) => {
             const etiqueta = document.createElement("div");
             etiqueta.textContent = NOMBRES_CORTOS[nombre] ?? nombre;
+            const nombreCorto = NOMBRES_CORTOS[nombre] ?? nombre;
             etiqueta.style.fontWeight = "900";
-            etiqueta.style.fontSize = "18px";
-            etiqueta.style.letterSpacing = "0.16em";
-            etiqueta.style.color = "rgba(15,23,42,0.72)";
+            etiqueta.style.fontSize = nombreCorto.length > 8 ? "12px" : "14px";
+            etiqueta.style.lineHeight = "1.05";
+            etiqueta.style.letterSpacing = nombreCorto.length > 8 ? "0.08em" : "0.12em";
+            etiqueta.style.color = "rgba(15,23,42,0.68)";
             etiqueta.style.background = "transparent";
             etiqueta.style.border = "none";
-            etiqueta.style.padding = "2px 6px";
+            etiqueta.style.padding = "2px 4px";
             etiqueta.style.pointerEvents = "none";
-            etiqueta.style.whiteSpace = "nowrap";
+            etiqueta.style.whiteSpace = "normal";
+            etiqueta.style.textAlign = "center";
+            etiqueta.style.width = nombreCorto.length > 8 ? "86px" : "74px";
             etiqueta.style.textShadow =
-              "0 1px 0 rgba(255,255,255,0.95), 0 0 8px rgba(255,255,255,0.85)";
+              "0 1px 0 rgba(255,255,255,0.95), 0 0 6px rgba(255,255,255,0.82)";
             etiqueta.style.transform = "translate(-50%, -50%)";
 
             const marker = new maplibregl.Marker({
@@ -1511,7 +1616,7 @@ export default function MapEditor() {
             filter: ["==", ["geometry-type"], "Polygon"],
             layout: { visibility: "none" },
             paint: {
-              "fill-color": mascara.color,
+              "fill-color": coloresMascaras[mascara.id] ?? mascara.color,
               "fill-opacity": 0.20,
             },
           });
@@ -1523,7 +1628,7 @@ export default function MapEditor() {
             filter: ["==", ["geometry-type"], "Polygon"],
             layout: { visibility: "none" },
             paint: {
-              "line-color": mascara.color,
+              "line-color": coloresMascaras[mascara.id] ?? mascara.color,
               "line-width": 1.8,
               "line-opacity": 0.9,
             },
@@ -1637,7 +1742,9 @@ export default function MapEditor() {
             : mostrarDefensa;
 
       const visible =
-        visibleTipo && bandoVisible(elemento.bando, vistaFuerzas);
+        elemento.visible &&
+        visibleTipo &&
+        bandoVisible(elemento.bando, vistaFuerzas);
 
       const markerExistente =
         elementosMarkersRef.current[elemento.id];
@@ -1655,8 +1762,27 @@ export default function MapEditor() {
             ).etiqueta
           : null;
 
+      const imagenMedio =
+        elemento.bando === "propio"
+          ? obtenerImagenMedio(elemento.nombre)
+          : null;
+
+      const bloqueImagen = imagenMedio
+        ? `
+          <div style="width:100%;height:180px;background:#020617;border-bottom:1px solid #475569;display:flex;align-items:center;justify-content:center;overflow:hidden">
+            <img
+              src="${imagenMedio}"
+              alt="${elemento.nombre}"
+              style="display:block;width:100%;height:100%;object-fit:contain;background:#020617"
+            />
+          </div>
+        `
+        : "";
+
       const popupHtml = `
-        <div style="font-family:Arial;color:#f8fafc;background:#0f172a;padding:13px;border-radius:8px;line-height:1.5;min-width:275px">
+        <div style="font-family:Arial;color:#f8fafc;background:#0f172a;border-radius:8px;line-height:1.5;min-width:300px;overflow:hidden">
+          ${bloqueImagen}
+          <div style="padding:13px">
           <div style="font-size:16px;font-weight:800;color:${
             elemento.bando === "propio" ? "#93c5fd" : "#fdba74"
           }">${elemento.nombre}</div>
@@ -1692,6 +1818,12 @@ export default function MapEditor() {
                 : "Sin definir"
             }
           </div>
+          ${
+            elemento.bando === "propio" && !imagenMedio
+              ? `<div style="margin-top:8px;font-size:11px;color:#94a3b8">Sin fotografía asociada en la presentación A3.</div>`
+              : ""
+          }
+          </div>
         </div>
       `;
 
@@ -1705,7 +1837,7 @@ export default function MapEditor() {
         markerExistente.setPopup(
           new maplibregl.Popup({
             offset: 25,
-            maxWidth: "390px",
+            maxWidth: "440px",
             className: "zeus-popup",
           }).setHTML(popupHtml)
         );
@@ -1724,7 +1856,7 @@ export default function MapEditor() {
         .setPopup(
           new maplibregl.Popup({
             offset: 25,
-            maxWidth: "390px",
+            maxWidth: "440px",
             className: "zeus-popup",
           }).setHTML(popupHtml)
         )
@@ -1828,11 +1960,13 @@ export default function MapEditor() {
       if (!marker) return;
 
       const visible =
-        mostrarBases && bandoVisible(base.bando, vistaFuerzas);
+        mostrarBases &&
+        Boolean(basesVisibles[base.nombre]) &&
+        bandoVisible(base.bando, vistaFuerzas);
 
       marker.getElement().style.display = visible ? "flex" : "none";
     });
-  }, [mostrarBases, vistaFuerzas]);
+  }, [mostrarBases, vistaFuerzas, basesVisibles]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1855,6 +1989,33 @@ export default function MapEditor() {
       );
     });
   }, [mascarasVisibles, vistaFuerzas]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+
+    MASCARAS_RADAR.forEach((mascara) => {
+      const color = coloresMascaras[mascara.id] ?? mascara.color;
+      if (map.getLayer(`${mascara.id}-relleno`)) {
+        map.setPaintProperty(`${mascara.id}-relleno`, "fill-color", color);
+      }
+      if (map.getLayer(`${mascara.id}-borde`)) {
+        map.setPaintProperty(`${mascara.id}-borde`, "line-color", color);
+      }
+    });
+  }, [coloresMascaras]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded() || !map.getLayer("republicas-relleno")) return;
+
+    const expresion: any[] = ["match", ["get", "republica"]];
+    Object.entries(coloresRepublicas).forEach(([nombre, color]) => {
+      expresion.push(nombre, color);
+    });
+    expresion.push("#94a3b8");
+    map.setPaintProperty("republicas-relleno", "fill-color", expresion as any);
+  }, [coloresRepublicas]);
 
   function cambiarMascara(id: string, visible: boolean) {
     setMascarasVisibles((anteriores) => ({
@@ -1949,6 +2110,25 @@ export default function MapEditor() {
         </section>
 
         <section className="mb-5 rounded bg-slate-900 p-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h2 className="font-semibold">Bases y estaciones visibles</h2>
+            <div className="flex gap-2 text-xs">
+              <button type="button" onClick={() => setBasesVisibles(Object.fromEntries([...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [base.nombre, true])))} className="rounded bg-slate-700 px-2 py-1">Todas</button>
+              <button type="button" onClick={() => setBasesVisibles(Object.fromEntries([...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [base.nombre, false])))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
+            </div>
+          </div>
+
+          {[...BASES_PROPIAS, ...BASES_ENEMIGAS]
+            .filter((base) => bandoVisible(base.bando, vistaFuerzas))
+            .map((base) => (
+              <label key={base.nombre} className="mb-2 flex items-start gap-2 text-sm last:mb-0">
+                <input type="checkbox" checked={Boolean(basesVisibles[base.nombre])} onChange={(event) => setBasesVisibles((anteriores) => ({ ...anteriores, [base.nombre]: event.target.checked }))} />
+                <span>{base.nombre}</span>
+              </label>
+            ))}
+        </section>
+
+        <section className="mb-5 rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">Máscaras radar</h2>
 
           {mostrarControlesPropios && (
@@ -1987,7 +2167,14 @@ export default function MapEditor() {
                       cambiarMascara(mascara.id, event.target.checked)
                     }
                   />
-                  {mascara.nombre}
+                  <span className="flex-1">{mascara.nombre}</span>
+                  <input
+                    type="color"
+                    value={coloresMascaras[mascara.id] ?? mascara.color}
+                    onChange={(event) => setColoresMascaras((anteriores) => ({ ...anteriores, [mascara.id]: event.target.value }))}
+                    className="h-7 w-9 rounded border-0 bg-transparent"
+                    title="Color de la máscara"
+                  />
                 </label>
               ))}
             </div>
@@ -2029,7 +2216,14 @@ export default function MapEditor() {
                       cambiarMascara(mascara.id, event.target.checked)
                     }
                   />
-                  {mascara.nombre}
+                  <span className="flex-1">{mascara.nombre}</span>
+                  <input
+                    type="color"
+                    value={coloresMascaras[mascara.id] ?? mascara.color}
+                    onChange={(event) => setColoresMascaras((anteriores) => ({ ...anteriores, [mascara.id]: event.target.value }))}
+                    className="h-7 w-9 rounded border-0 bg-transparent"
+                    title="Color de la máscara"
+                  />
                 </label>
               ))}
             </div>
@@ -2039,6 +2233,21 @@ export default function MapEditor() {
             Las máscaras conservan la geometría y las coordenadas originales
             de los archivos KMZ.
           </p>
+        </section>
+
+        <section className="mb-5 rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">Colores de las repúblicas</h2>
+          {Object.keys(COLORES_REPUBLICAS).map((nombre) => (
+            <label key={nombre} className="mb-2 flex items-center gap-2 text-sm last:mb-0">
+              <input
+                type="color"
+                value={coloresRepublicas[nombre]}
+                onChange={(event) => setColoresRepublicas((anteriores) => ({ ...anteriores, [nombre]: event.target.value }))}
+                className="h-7 w-9 rounded border-0 bg-transparent"
+              />
+              <span>{NOMBRES_CORTOS[nombre] ?? nombre}</span>
+            </label>
+          ))}
         </section>
 
         <section className="mb-5 rounded bg-slate-900 p-4">
@@ -2368,6 +2577,67 @@ export default function MapEditor() {
           </div>
         )}
 
+        <section className="mb-5 rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">Elementos visibles</h2>
+          {elementos.length === 0 ? (
+            <p className="text-xs text-slate-400">Todavía no agregaste medios.</p>
+          ) : (
+            elementos
+              .filter((elemento) => bandoVisible(elemento.bando, vistaFuerzas))
+              .map((elemento) => (
+                <label key={elemento.id} className="mb-2 flex items-start gap-2 text-sm last:mb-0">
+                  <input type="checkbox" checked={elemento.visible} onChange={(event) => actualizarElemento(elemento.id, { visible: event.target.checked })} />
+                  <span>{elemento.nombre} — {elemento.baseOrigen}</span>
+                </label>
+              ))
+          )}
+        </section>
+
+        <section className="mb-5 rounded border border-emerald-700 bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold text-emerald-300">Agregar medio personalizado</h2>
+
+          <input value={nombrePersonalizado} onChange={(event) => setNombrePersonalizado(event.target.value)} placeholder="Nombre del medio" className="mb-2 w-full rounded bg-slate-800 p-2" />
+
+          <div className="mb-2 grid grid-cols-2 gap-2">
+            <select value={tipoPersonalizado} onChange={(event) => setTipoPersonalizado(event.target.value as TipoElemento)} className="rounded bg-slate-800 p-2">
+              <option value="aeronave">Aeronave</option>
+              <option value="radar">Radar</option>
+              <option value="defensa">Defensa antiaérea</option>
+            </select>
+            <select value={bandoPersonalizado} onChange={(event) => { const bando = event.target.value as Bando; setBandoPersonalizado(bando); const bases = bando === "propio" ? BASES_PROPIAS : BASES_ENEMIGAS; setBasePersonalizada(bases[0]?.nombre ?? ""); }} className="rounded bg-slate-800 p-2">
+              <option value="propio">Propio</option>
+              <option value="enemigo">Enemigo</option>
+            </select>
+          </div>
+
+          <select value={basePersonalizada} onChange={(event) => setBasePersonalizada(event.target.value)} className="mb-2 w-full rounded bg-slate-800 p-2">
+            {(bandoPersonalizado === "propio" ? BASES_PROPIAS : BASES_ENEMIGAS).map((base) => (
+              <option key={base.nombre} value={base.nombre}>{base.nombre}</option>
+            ))}
+          </select>
+
+          <div className="mb-2 grid grid-cols-[1fr_64px] gap-2">
+            <input type="number" min={0} value={alcancePersonalizado} onChange={(event) => setAlcancePersonalizado(Math.max(0, Number(event.target.value)))} placeholder="Radio/alcance en km" className="rounded bg-slate-800 p-2" />
+            <input type="color" value={colorPersonalizado} onChange={(event) => setColorPersonalizado(event.target.value)} className="h-10 w-full rounded" />
+          </div>
+
+          <label className="mb-2 block text-xs text-slate-300">Icono o fotografía personalizada</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(event) => {
+              const archivo = event.target.files?.[0];
+              if (!archivo) return;
+              const lector = new FileReader();
+              lector.onload = () => setIconoPersonalizado(typeof lector.result === "string" ? lector.result : undefined);
+              lector.readAsDataURL(archivo);
+            }}
+            className="mb-3 w-full text-xs"
+          />
+
+          <button type="button" onClick={agregarMedioPersonalizado} disabled={!nombrePersonalizado.trim()} className="w-full rounded bg-emerald-700 px-3 py-2 font-semibold disabled:bg-slate-700">Agregar medio personalizado</button>
+        </section>
+
         <section className="mb-5">
           <label className="mb-2 block text-sm font-semibold">
             Elementos desplegados
@@ -2428,7 +2698,11 @@ export default function MapEditor() {
               )}
             </div>
 
-            <div>
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={seleccionado.visible} onChange={(event) => actualizarElemento(seleccionado.id, { visible: event.target.checked })} />
+              Mostrar este elemento
+            </label>
+<div>
               <label className="mb-2 block text-sm font-semibold">
                 {seleccionado.tipo === "aeronave"
                   ? "Radio de combate"
