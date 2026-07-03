@@ -1833,6 +1833,7 @@ export default function MapEditor() {
           paint: {
             "fill-color": "#a9c8e3",
             "fill-opacity": 1,
+            "fill-antialias": false,
           },
         });
 
