@@ -8,6 +8,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 type Bando = "propio" | "enemigo";
 type VistaFuerzas = "propias" | "enemigas" | "ambas";
 type TipoElemento = "aeronave" | "radar" | "defensa";
+type FuenteDistancia = "orden" | "externa" | "manual";
 
 type ElementoOperacional = {
   id: string;
@@ -26,6 +27,11 @@ type ElementoOperacional = {
   color: string;
   cantidad?: number;
   descripcion?: string;
+  terminoDistancia?: string;
+  fuenteDistancia?: FuenteDistancia;
+  referenciaDistancia?: string;
+  permiteReabastecimiento?: boolean;
+  conReabastecimiento?: boolean;
 };
 
 type BaseMilitar = {
@@ -51,6 +57,11 @@ type AeronaveCatalogo = {
   bando: Bando;
   cantidad?: number;
   descripcion?: string;
+  radioAccionKm?: number;
+  terminoDistancia?: string;
+  fuenteDistancia?: FuenteDistancia;
+  referenciaDistancia?: string;
+  permiteReabastecimiento?: boolean;
 };
 
 type MedioCatalogo = {
@@ -463,6 +474,71 @@ const CANTIDADES_AERONAVES_PROPIAS: Record<string, number> = {
   "5º Brigada Aérea / Gral. Acha|CH-47F": 6,
 };
 
+
+type DatosDistanciaAerea = {
+  km: number;
+  termino: string;
+  fuente: FuenteDistancia;
+  referencia: string;
+  permiteReabastecimiento?: boolean;
+};
+
+const COLOR_ORDEN = "#16a34a";
+const COLOR_EXTERNO = "#dc2626";
+
+const DATOS_DISTANCIA_AEREA: Record<string, DatosDistanciaAerea> = {
+  "F-16C Block 40": { km: 1370, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)", permiteReabastecimiento: true },
+  "F-16D Block 42": { km: 1370, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)", permiteReabastecimiento: true },
+  "F-16CJ Block 50": { km: 1370, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)", permiteReabastecimiento: true },
+  "AMX A-1M": { km: 889, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 480 MN", permiteReabastecimiento: true },
+  "Hermes 450": { km: 278, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 150 MN" },
+  "IAI Harpy": { km: 500, termino: "Alcance operativo de empleo único", fuente: "orden", referencia: "Orden: 500 km / 270 MN" },
+
+  "C-130J": { km: 2000, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado con carga" },
+  "KC-130J": { km: 1833, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "LJ-60": { km: 2220, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance máximo publicado" },
+  "LJ-60 MEDEVAC": { km: 2220, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance máximo publicado" },
+  "DHC-6": { km: 740, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "B-412": { km: 370, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "UH-1Y": { km: 220, termino: "Radio de combate", fuente: "externa", referencia: "Fabricante: 119 MN de radio de combate" },
+  "T-6 Texan II": { km: 830, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "E-99M Erieye": { km: 1529, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado sobre plataforma ERJ-145; la orden solo informa autonomía" },
+  "KC-135": { km: 2778, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Valor público de referencia para misión de reabastecimiento" },
+  "CH-47F": { km: 370, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Valor público de referencia" },
+  "EC-130H Compass Call": { km: 2130, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado de la plataforma" },
+
+  "KAI KT-1": { km: 650, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "C-98A": { km: 990, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado a partir de aeronave utilitaria equivalente" },
+  "UH-1N": { km: 230, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Valor público aproximado" },
+  "Mirage 2000-5 Mk2": { km: 740, termino: "Radio de combate de referencia", fuente: "externa", referencia: "Valor público aproximado", permiteReabastecimiento: true },
+  "AS-725 Cougar": { km: 430, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "E-2C AEW&C": { km: 1300, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance de traslado publicado" },
+  "Falcon DA-20": { km: 1700, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "CASA C-295 IVR": { km: 1075, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "C-130H": { km: 1900, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "ERJ-145": { km: 1529, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "Harrier T/AV-8B": { km: 556, termino: "Radio de combate de referencia", fuente: "externa", referencia: "Valor público aproximado", permiteReabastecimiento: true },
+  "Mi-28D": { km: 225, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Valor público aproximado" },
+  "KC-130H": { km: 1800, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "Su-22M4": { km: 575, termino: "Radio de combate de referencia", fuente: "externa", referencia: "Valor público aproximado" },
+  "Geran-2": { km: 2500, termino: "Alcance operativo de empleo único", fuente: "externa", referencia: "Estimación externa; no figura en la orden" },
+};
+
+function datosDistanciaAerea(nombre: string): DatosDistanciaAerea {
+  return DATOS_DISTANCIA_AEREA[nombre] ?? {
+    km: 0,
+    termino: "Radio de acción",
+    fuente: "manual",
+    referencia: "Sin valor precargado",
+  };
+}
+
+function radioAereoRepresentado(elemento: ElementoOperacional) {
+  if (elemento.tipo !== "aeronave") return elemento.alcanceKm;
+  const multiplicador = elemento.conReabastecimiento ? 2 : 1;
+  return elemento.radioCombateKm * multiplicador;
+}
+
 const CATALOGO_AERONAVES_PROPIAS: AeronaveCatalogo[] = Object.entries(
   AERONAVES_PROPIAS_POR_BASE,
 ).flatMap(([base, aeronaves]) =>
@@ -471,6 +547,11 @@ const CATALOGO_AERONAVES_PROPIAS: AeronaveCatalogo[] = Object.entries(
     base,
     bando: "propio" as const,
     cantidad: CANTIDADES_AERONAVES_PROPIAS[`${base}|${nombre}`],
+    radioAccionKm: datosDistanciaAerea(nombre).km,
+    terminoDistancia: datosDistanciaAerea(nombre).termino,
+    fuenteDistancia: datosDistanciaAerea(nombre).fuente,
+    referenciaDistancia: datosDistanciaAerea(nombre).referencia,
+    permiteReabastecimiento: datosDistanciaAerea(nombre).permiteReabastecimiento,
   })),
 );
 
@@ -483,6 +564,11 @@ const CATALOGO_AERONAVES_ENEMIGAS: AeronaveCatalogo[] = Object.entries(
     bando: "enemigo" as const,
     cantidad: medio.cantidad,
     descripcion: medio.descripcion,
+    radioAccionKm: datosDistanciaAerea(medio.nombre).km,
+    terminoDistancia: datosDistanciaAerea(medio.nombre).termino,
+    fuenteDistancia: datosDistanciaAerea(medio.nombre).fuente,
+    referenciaDistancia: datosDistanciaAerea(medio.nombre).referencia,
+    permiteReabastecimiento: datosDistanciaAerea(medio.nombre).permiteReabastecimiento,
   })),
 );
 
@@ -1308,10 +1394,7 @@ export default function MapEditor() {
   }, [catalogoIconos, busquedaIcono, bandoPersonalizado]);
 
   function crearAnillo(elemento: ElementoOperacional) {
-    const radio =
-      elemento.tipo === "aeronave"
-        ? elemento.radioCombateKm
-        : elemento.alcanceKm;
+    const radio = radioAereoRepresentado(elemento);
 
     return circle([elemento.longitude, elemento.latitude], radio, {
       steps: 128,
@@ -1403,12 +1486,17 @@ export default function MapEditor() {
       baseOrigen: medio.base,
       longitude: base.longitude,
       latitude: base.latitude,
-      radioCombateKm: 0,
+      radioCombateKm: medio.radioAccionKm ?? 0,
       alcanceKm: 0,
-      mostrarAnillo: false,
-      color: medio.bando === "propio" ? "#2563eb" : "#f97316",
+      mostrarAnillo: (medio.radioAccionKm ?? 0) > 0,
+      color: medio.fuenteDistancia === "orden" ? COLOR_ORDEN : COLOR_EXTERNO,
       cantidad: medio.cantidad,
       descripcion: medio.descripcion,
+      terminoDistancia: medio.terminoDistancia,
+      fuenteDistancia: medio.fuenteDistancia,
+      referenciaDistancia: medio.referenciaDistancia,
+      permiteReabastecimiento: medio.permiteReabastecimiento,
+      conReabastecimiento: false,
     };
 
     setElementos((anteriores) => [...anteriores, nuevaAeronave]);
@@ -2197,10 +2285,7 @@ export default function MapEditor() {
 
       const markerExistente = elementosMarkersRef.current[elemento.id];
 
-      const distanciaKm =
-        elemento.tipo === "aeronave"
-          ? elemento.radioCombateKm
-          : elemento.alcanceKm;
+      const distanciaKm = radioAereoRepresentado(elemento);
 
       const categoriaAeronave =
         elemento.tipo === "aeronave"
@@ -2253,10 +2338,17 @@ export default function MapEditor() {
           }
           <div style="margin-top:7px;padding-top:7px;border-top:1px solid #475569">
             <strong>${
-              elemento.tipo === "aeronave" ? "Radio de combate" : "Alcance"
+              elemento.tipo === "aeronave" ? (elemento.terminoDistancia ?? "Radio de acción") : "Alcance"
             }:</strong>
             ${distanciaKm > 0 ? formatearDistancia(distanciaKm) : "Sin definir"}
           </div>
+          ${elemento.tipo === "aeronave" ? `
+            <div style="margin-top:5px;color:${elemento.fuenteDistancia === "orden" ? "#86efac" : "#fca5a5"}">
+              <strong>Origen:</strong> ${elemento.fuenteDistancia === "orden" ? "Orden de instrucción" : elemento.fuenteDistancia === "externa" ? "Referencia externa / estimación" : "Manual"}
+            </div>
+            <div style="font-size:11px;color:#cbd5e1">${elemento.referenciaDistancia ?? ""}</div>
+            ${elemento.conReabastecimiento ? `<div style="margin-top:5px;color:#67e8f9"><strong>REV:</strong> activado; radio duplicado como hipótesis simplificada.</div>` : ""}
+          ` : ""}
           ${
             elemento.bando === "propio" && !imagenMedio
               ? `<div style="margin-top:8px;font-size:11px;color:#94a3b8">Sin fotografía asociada en la presentación A3.</div>`
@@ -2507,7 +2599,7 @@ export default function MapEditor() {
   return (
     <div className="flex h-screen w-screen">
       <aside className="w-[420px] overflow-y-auto bg-slate-950 p-5 text-white">
-        <h1 className="mb-5 text-xl font-bold">Editor cartográfico ZEUS</h1>
+        <h1 className="mb-5 text-xl font-bold">EJERCICIO ZEUS (TO NORTE)</h1>
 
         <section className="mb-5 rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">Fuerzas visibles</h2>
@@ -2523,6 +2615,12 @@ export default function MapEditor() {
             <option value="enemigas">Fuerzas enemigas</option>
             <option value="ambas">Fuerzas propias y enemigas</option>
           </select>
+        </section>
+
+        <section className="mb-5 rounded bg-slate-900 p-4 text-sm">
+          <h2 className="mb-2 font-semibold">Referencia de radios</h2>
+          <div className="mb-2 flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-green-600" />Valor tomado de la orden de instrucción</div>
+          <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-red-600" />Referencia externa o estimación</div>
         </section>
 
         <section className="mb-5 rounded bg-slate-900 p-4">
@@ -2568,64 +2666,43 @@ export default function MapEditor() {
         </section>
 
         <section className="mb-5 rounded bg-slate-900 p-4">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <h2 className="font-semibold">Bases y estaciones visibles</h2>
-            <div className="flex gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() =>
-                  setBasesVisibles(
-                    Object.fromEntries(
-                      [...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [
-                        base.nombre,
-                        true,
-                      ]),
-                    ),
-                  )
-                }
-                className="rounded bg-slate-700 px-2 py-1"
-              >
-                Todas
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setBasesVisibles(
-                    Object.fromEntries(
-                      [...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [
-                        base.nombre,
-                        false,
-                      ]),
-                    ),
-                  )
-                }
-                className="rounded bg-slate-700 px-2 py-1"
-              >
-                Ninguna
-              </button>
-            </div>
-          </div>
+          <h2 className="mb-3 font-semibold">Bases y estaciones visibles</h2>
 
-          {[...BASES_PROPIAS, ...BASES_ENEMIGAS]
-            .filter((base) => bandoVisible(base.bando, vistaFuerzas))
-            .map((base) => (
-              <label
-                key={base.nombre}
-                className="mb-2 flex items-start gap-2 text-sm last:mb-0"
-              >
-                <input
-                  type="checkbox"
-                  checked={Boolean(basesVisibles[base.nombre])}
-                  onChange={(event) =>
-                    setBasesVisibles((anteriores) => ({
-                      ...anteriores,
-                      [base.nombre]: event.target.checked,
-                    }))
-                  }
-                />
-                <span>{base.nombre}</span>
-              </label>
-            ))}
+          {mostrarControlesPropios && (
+            <div className="mb-4 rounded border border-blue-700 p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <strong className="text-sm text-blue-300">Propias</strong>
+                <div className="flex gap-2 text-xs">
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_PROPIAS.map((b) => [b.nombre, true]))}))} className="rounded bg-blue-700 px-2 py-1">Todas</button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_PROPIAS.map((b) => [b.nombre, false]))}))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
+                </div>
+              </div>
+              {BASES_PROPIAS.map((base) => (
+                <label key={base.nombre} className="mb-2 flex items-start gap-2 text-sm last:mb-0">
+                  <input type="checkbox" checked={Boolean(basesVisibles[base.nombre])} onChange={(event) => setBasesVisibles((a) => ({ ...a, [base.nombre]: event.target.checked }))} />
+                  <span>{base.nombre}</span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {mostrarControlesEnemigos && (
+            <div className="rounded border border-orange-700 p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <strong className="text-sm text-orange-300">Enemigas</strong>
+                <div className="flex gap-2 text-xs">
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_ENEMIGAS.map((b) => [b.nombre, true]))}))} className="rounded bg-orange-700 px-2 py-1">Todas</button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_ENEMIGAS.map((b) => [b.nombre, false]))}))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
+                </div>
+              </div>
+              {BASES_ENEMIGAS.map((base) => (
+                <label key={base.nombre} className="mb-2 flex items-start gap-2 text-sm last:mb-0">
+                  <input type="checkbox" checked={Boolean(basesVisibles[base.nombre])} onChange={(event) => setBasesVisibles((a) => ({ ...a, [base.nombre]: event.target.checked }))} />
+                  <span>{base.nombre}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="mb-5 rounded bg-slate-900 p-4">
@@ -3475,7 +3552,7 @@ export default function MapEditor() {
             <div>
               <label className="mb-2 block text-sm font-semibold">
                 {seleccionado.tipo === "aeronave"
-                  ? "Radio de combate"
+                  ? (seleccionado.terminoDistancia ?? "Radio de acción")
                   : "Alcance"}
               </label>
 
@@ -3487,7 +3564,7 @@ export default function MapEditor() {
                   <span className="rounded bg-slate-950 px-2 py-1 font-mono text-cyan-300">
                     {formatearDistancia(
                       seleccionado.tipo === "aeronave"
-                        ? seleccionado.radioCombateKm
+                        ? radioAereoRepresentado(seleccionado)
                         : seleccionado.alcanceKm,
                     )}
                   </span>
@@ -3550,6 +3627,29 @@ export default function MapEditor() {
               </div>
             </div>
 
+            {seleccionado.tipo === "aeronave" && (
+              <div className={`rounded border p-3 text-sm ${seleccionado.fuenteDistancia === "orden" ? "border-green-600 bg-green-950/40" : "border-red-600 bg-red-950/40"}`}>
+                <p className={seleccionado.fuenteDistancia === "orden" ? "text-green-300" : "text-red-300"}>
+                  <strong>Origen del valor:</strong>{" "}
+                  {seleccionado.fuenteDistancia === "orden" ? "Orden de instrucción" : seleccionado.fuenteDistancia === "externa" ? "Referencia externa / estimación" : "Carga manual"}
+                </p>
+                <p className="mt-1 text-xs text-slate-300">{seleccionado.referenciaDistancia}</p>
+                {seleccionado.permiteReabastecimiento && (
+                  <label className="mt-3 flex items-center gap-2 text-cyan-200">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(seleccionado.conReabastecimiento)}
+                      onChange={(event) => actualizarElemento(seleccionado.id, { conReabastecimiento: event.target.checked })}
+                    />
+                    Con reabastecimiento en vuelo: duplicar radio de acción
+                  </label>
+                )}
+                {seleccionado.conReabastecimiento && (
+                  <p className="mt-2 text-xs text-cyan-300">Radio representado con REV: {formatearDistancia(radioAereoRepresentado(seleccionado))}. Es una hipótesis simplificada de planeamiento.</p>
+                )}
+              </div>
+            )}
+
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -3566,7 +3666,7 @@ export default function MapEditor() {
               />
 
               {seleccionado.tipo === "aeronave"
-                ? "Mostrar radio de combate"
+                ? `Mostrar ${seleccionado.terminoDistancia ?? "radio de acción"}`
                 : "Mostrar anillo de alcance"}
             </label>
 
