@@ -1842,9 +1842,9 @@ export default function MapEditor() {
           type: "line",
           source: "paises-aledanos",
           paint: {
-            "line-color": "#dbeafe",
-            "line-width": 0,
-            "line-opacity": 0,
+            "line-color": "#a9c8e3",
+            "line-width": 3,
+            "line-opacity": 1,
           },
         });
 
