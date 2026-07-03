@@ -1831,7 +1831,7 @@ export default function MapEditor() {
           type: "fill",
           source: "paises-aledanos",
           paint: {
-            "fill-color": "#a9c8e3",
+            "fill-color": "#dbeafe",
             "fill-opacity": 1,
           },
         });
@@ -1841,7 +1841,7 @@ export default function MapEditor() {
           type: "line",
           source: "paises-aledanos",
           paint: {
-            "line-color": "#a9c8e3",
+            "line-color": "#dbeafe",
             "line-width": 0,
           },
         });
