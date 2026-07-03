@@ -1832,7 +1832,7 @@ export default function MapEditor() {
           source: "paises-aledanos",
           paint: {
             "fill-color": "#a9c8e3",
-            "fill-opacity": 1,,
+            "fill-opacity": 1,
           },
         });
 
