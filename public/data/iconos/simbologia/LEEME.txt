@@ -1,0 +1,4 @@
+Iconos extraídos de 5-GRAFICOS DE APOYO BRIEFINGS Y WARGAMING.pptx
+Formato: PNG 512x512 con fondo transparente.
+Afiliaciones: propio (azul), enemigo (rojo), neutral (verde), desconocido (amarillo).
+El archivo indice_iconos.csv relaciona cada nombre traducido con el original y la diapositiva.

@@ -1,0 +1,2602 @@
+[
+  {
+    "archivo": "instalacion__desconocido.png",
+    "nombre": "Instalación",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "instalacion__propio.png",
+    "nombre": "Instalación",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "instalacion__neutral.png",
+    "nombre": "Instalación",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "instalacion__enemigo.png",
+    "nombre": "Instalación",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_de_materias_primas__desconocido.png",
+    "nombre": "Producción y almacenamiento de materias primas",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_de_materias_primas__propio.png",
+    "nombre": "Producción y almacenamiento de materias primas",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_de_materias_primas__neutral.png",
+    "nombre": "Producción y almacenamiento de materias primas",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_de_materias_primas__enemigo.png",
+    "nombre": "Producción y almacenamiento de materias primas",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "mina__desconocido.png",
+    "nombre": "Mina",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "mina__propio.png",
+    "nombre": "Mina",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "mina__neutral.png",
+    "nombre": "Mina",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "mina__enemigo.png",
+    "nombre": "Mina",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_de_petroleo_gas_y_combustible__desconocido.png",
+    "nombre": "Producción y almacenamiento de petróleo, gas y combustible",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_de_petroleo_gas_y_combustible__propio.png",
+    "nombre": "Producción y almacenamiento de petróleo, gas y combustible",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_de_petroleo_gas_y_combustible__neutral.png",
+    "nombre": "Producción y almacenamiento de petróleo, gas y combustible",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_de_petroleo_gas_y_combustible__enemigo.png",
+    "nombre": "Producción y almacenamiento de petróleo, gas y combustible",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_nbq__desconocido.png",
+    "nombre": "Producción y almacenamiento NBQ",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_nbq__propio.png",
+    "nombre": "Producción y almacenamiento NBQ",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_nbq__neutral.png",
+    "nombre": "Producción y almacenamiento NBQ",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_nbq__enemigo.png",
+    "nombre": "Producción y almacenamiento NBQ",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_biologico_nbq__desconocido.png",
+    "nombre": "Producción y almacenamiento biológico NBQ",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_biologico_nbq__propio.png",
+    "nombre": "Producción y almacenamiento biológico NBQ",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_biologico_nbq__neutral.png",
+    "nombre": "Producción y almacenamiento biológico NBQ",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_biologico_nbq__enemigo.png",
+    "nombre": "Producción y almacenamiento biológico NBQ",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_quimico_nbq__desconocido.png",
+    "nombre": "Producción y almacenamiento químico NBQ",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_quimico_nbq__propio.png",
+    "nombre": "Producción y almacenamiento químico NBQ",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_quimico_nbq__neutral.png",
+    "nombre": "Producción y almacenamiento químico NBQ",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_quimico_nbq__enemigo.png",
+    "nombre": "Producción y almacenamiento químico NBQ",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_nuclear_nbq__desconocido.png",
+    "nombre": "Producción y almacenamiento nuclear NBQ",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_nuclear_nbq__propio.png",
+    "nombre": "Producción y almacenamiento nuclear NBQ",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_nuclear_nbq__neutral.png",
+    "nombre": "Producción y almacenamiento nuclear NBQ",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_y_almacenamiento_nuclear_nbq__enemigo.png",
+    "nombre": "Producción y almacenamiento nuclear NBQ",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "planta_de_procesamiento__desconocido.png",
+    "nombre": "Planta de procesamiento",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "planta_de_procesamiento__propio.png",
+    "nombre": "Planta de procesamiento",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "planta_de_procesamiento__neutral.png",
+    "nombre": "Planta de procesamiento",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "planta_de_procesamiento__enemigo.png",
+    "nombre": "Planta de procesamiento",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "instalacion_de_descontaminacion__desconocido.png",
+    "nombre": "Instalación de descontaminación",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "instalacion_de_descontaminacion__propio.png",
+    "nombre": "Instalación de descontaminación",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "instalacion_de_descontaminacion__neutral.png",
+    "nombre": "Instalación de descontaminación",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "instalacion_de_descontaminacion__enemigo.png",
+    "nombre": "Instalación de descontaminación",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "fabricacion_de_equipos__desconocido.png",
+    "nombre": "Fabricación de equipos",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "fabricacion_de_equipos__propio.png",
+    "nombre": "Fabricación de equipos",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "fabricacion_de_equipos__neutral.png",
+    "nombre": "Fabricación de equipos",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "fabricacion_de_equipos__enemigo.png",
+    "nombre": "Fabricación de equipos",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "instalacion_de_servicios_e_investigacion__desconocido.png",
+    "nombre": "Instalación de servicios e investigación",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "instalacion_de_servicios_e_investigacion__propio.png",
+    "nombre": "Instalación de servicios e investigación",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "instalacion_de_servicios_e_investigacion__neutral.png",
+    "nombre": "Instalación de servicios e investigación",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "instalacion_de_servicios_e_investigacion__enemigo.png",
+    "nombre": "Instalación de servicios e investigación",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "centro_de_investigacion_tecnologica__desconocido.png",
+    "nombre": "Centro de investigación tecnológica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "centro_de_investigacion_tecnologica__propio.png",
+    "nombre": "Centro de investigación tecnológica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "centro_de_investigacion_tecnologica__neutral.png",
+    "nombre": "Centro de investigación tecnológica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "centro_de_investigacion_tecnologica__enemigo.png",
+    "nombre": "Centro de investigación tecnológica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "instalacion_de_telecomunicaciones__desconocido.png",
+    "nombre": "Instalación de telecomunicaciones",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "instalacion_de_telecomunicaciones__propio.png",
+    "nombre": "Instalación de telecomunicaciones",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "instalacion_de_telecomunicaciones__neutral.png",
+    "nombre": "Instalación de telecomunicaciones",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "instalacion_de_telecomunicaciones__enemigo.png",
+    "nombre": "Instalación de telecomunicaciones",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "central_electrica__desconocido.png",
+    "nombre": "Central eléctrica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "central_electrica__propio.png",
+    "nombre": "Central eléctrica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "central_electrica__neutral.png",
+    "nombre": "Central eléctrica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "central_electrica__enemigo.png",
+    "nombre": "Central eléctrica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "central_nuclear__desconocido.png",
+    "nombre": "Central nuclear",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "central_nuclear__propio.png",
+    "nombre": "Central nuclear",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "central_nuclear__neutral.png",
+    "nombre": "Central nuclear",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "central_nuclear__enemigo.png",
+    "nombre": "Central nuclear",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "central_nuclear_sobre_barcaza__desconocido.png",
+    "nombre": "Central nuclear sobre barcaza",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "central_nuclear_sobre_barcaza__propio.png",
+    "nombre": "Central nuclear sobre barcaza",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "central_nuclear_sobre_barcaza__neutral.png",
+    "nombre": "Central nuclear sobre barcaza",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "central_nuclear_sobre_barcaza__enemigo.png",
+    "nombre": "Central nuclear sobre barcaza",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "central_hidroelectrica_o_represa__desconocido.png",
+    "nombre": "Central hidroeléctrica o represa",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "central_hidroelectrica_o_represa__propio.png",
+    "nombre": "Central hidroeléctrica o represa",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "central_hidroelectrica_o_represa__neutral.png",
+    "nombre": "Central hidroeléctrica o represa",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "central_hidroelectrica_o_represa__enemigo.png",
+    "nombre": "Central hidroeléctrica o represa",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "central_termoelectrica_de_combustibles_fosiles__desconocido.png",
+    "nombre": "Central termoeléctrica de combustibles fósiles",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "central_termoelectrica_de_combustibles_fosiles__propio.png",
+    "nombre": "Central termoeléctrica de combustibles fósiles",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "central_termoelectrica_de_combustibles_fosiles__neutral.png",
+    "nombre": "Central termoeléctrica de combustibles fósiles",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "central_termoelectrica_de_combustibles_fosiles__enemigo.png",
+    "nombre": "Central termoeléctrica de combustibles fósiles",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "servicio_publico_de_agua__desconocido.png",
+    "nombre": "Servicio público de agua",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "servicio_publico_de_agua__propio.png",
+    "nombre": "Servicio público de agua",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "servicio_publico_de_agua__neutral.png",
+    "nombre": "Servicio público de agua",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "servicio_publico_de_agua__enemigo.png",
+    "nombre": "Servicio público de agua",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "instalacion_de_material_nuclear__desconocido.png",
+    "nombre": "Instalación de material nuclear",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "instalacion_de_material_nuclear__propio.png",
+    "nombre": "Instalación de material nuclear",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "instalacion_de_material_nuclear__neutral.png",
+    "nombre": "Instalación de material nuclear",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "instalacion_de_material_nuclear__enemigo.png",
+    "nombre": "Instalación de material nuclear",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "reactor_de_energia_atomica__desconocido.png",
+    "nombre": "Reactor de energía atómica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "reactor_de_energia_atomica__propio.png",
+    "nombre": "Reactor de energía atómica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "reactor_de_energia_atomica__neutral.png",
+    "nombre": "Reactor de energía atómica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "reactor_de_energia_atomica__enemigo.png",
+    "nombre": "Reactor de energía atómica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "planta_de_produccion_de_material_nuclear__desconocido.png",
+    "nombre": "Planta de producción de material nuclear",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "planta_de_produccion_de_material_nuclear__propio.png",
+    "nombre": "Planta de producción de material nuclear",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "planta_de_produccion_de_material_nuclear__neutral.png",
+    "nombre": "Planta de producción de material nuclear",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "planta_de_produccion_de_material_nuclear__enemigo.png",
+    "nombre": "Planta de producción de material nuclear",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "planta_de_produccion_de_material_nuclear_apto_para_armas__desconocido.png",
+    "nombre": "Planta de producción de material nuclear apto para armas",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "planta_de_produccion_de_material_nuclear_apto_para_armas__propio.png",
+    "nombre": "Planta de producción de material nuclear apto para armas",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "planta_de_produccion_de_material_nuclear_apto_para_armas__neutral.png",
+    "nombre": "Planta de producción de material nuclear apto para armas",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "planta_de_produccion_de_material_nuclear_apto_para_armas__enemigo.png",
+    "nombre": "Planta de producción de material nuclear apto para armas",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "deposito_de_material_nuclear__desconocido.png",
+    "nombre": "Depósito de material nuclear",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "deposito_de_material_nuclear__propio.png",
+    "nombre": "Depósito de material nuclear",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "deposito_de_material_nuclear__neutral.png",
+    "nombre": "Depósito de material nuclear",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "deposito_de_material_nuclear__enemigo.png",
+    "nombre": "Depósito de material nuclear",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "fabrica_de_municiones__desconocido.png",
+    "nombre": "Fábrica de municiones",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "fabrica_de_municiones__propio.png",
+    "nombre": "Fábrica de municiones",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "fabrica_de_municiones__neutral.png",
+    "nombre": "Fábrica de municiones",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "fabrica_de_municiones__enemigo.png",
+    "nombre": "Fábrica de municiones",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "planta_de_ensamblaje_de_aeronaves__desconocido.png",
+    "nombre": "Planta de ensamblaje de aeronaves",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "planta_de_ensamblaje_de_aeronaves__propio.png",
+    "nombre": "Planta de ensamblaje de aeronaves",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "planta_de_ensamblaje_de_aeronaves__neutral.png",
+    "nombre": "Planta de ensamblaje de aeronaves",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "planta_de_ensamblaje_de_aeronaves__enemigo.png",
+    "nombre": "Planta de ensamblaje de aeronaves",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_de_armamento__desconocido.png",
+    "nombre": "Producción de armamento",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_de_armamento__propio.png",
+    "nombre": "Producción de armamento",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_de_armamento__neutral.png",
+    "nombre": "Producción de armamento",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_de_armamento__enemigo.png",
+    "nombre": "Producción de armamento",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_de_vehiculos_militares__desconocido.png",
+    "nombre": "Producción de vehículos militares",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_de_vehiculos_militares__propio.png",
+    "nombre": "Producción de vehículos militares",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_de_vehiculos_militares__neutral.png",
+    "nombre": "Producción de vehículos militares",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_de_vehiculos_militares__enemigo.png",
+    "nombre": "Producción de vehículos militares",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_de_equipos_de_ingenieros__desconocido.png",
+    "nombre": "Producción de equipos de ingenieros",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_de_equipos_de_ingenieros__propio.png",
+    "nombre": "Producción de equipos de ingenieros",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_de_equipos_de_ingenieros__neutral.png",
+    "nombre": "Producción de equipos de ingenieros",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_de_equipos_de_ingenieros__enemigo.png",
+    "nombre": "Producción de equipos de ingenieros",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_de_puentes__desconocido.png",
+    "nombre": "Producción de puentes",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_de_puentes__propio.png",
+    "nombre": "Producción de puentes",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_de_puentes__neutral.png",
+    "nombre": "Producción de puentes",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_de_puentes__enemigo.png",
+    "nombre": "Producción de puentes",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_de_armas_biologicas__desconocido.png",
+    "nombre": "Producción de armas biológicas",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_de_armas_biologicas__propio.png",
+    "nombre": "Producción de armas biológicas",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_de_armas_biologicas__neutral.png",
+    "nombre": "Producción de armas biológicas",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_de_armas_biologicas__enemigo.png",
+    "nombre": "Producción de armas biológicas",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "produccion_de_misiles_y_sistemas_espaciales__desconocido.png",
+    "nombre": "Producción de misiles y sistemas espaciales",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "produccion_de_misiles_y_sistemas_espaciales__propio.png",
+    "nombre": "Producción de misiles y sistemas espaciales",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "produccion_de_misiles_y_sistemas_espaciales__neutral.png",
+    "nombre": "Producción de misiles y sistemas espaciales",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "produccion_de_misiles_y_sistemas_espaciales__enemigo.png",
+    "nombre": "Producción de misiles y sistemas espaciales",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "instalacion_de_transporte__desconocido.png",
+    "nombre": "Instalación de transporte",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "instalacion_de_transporte__propio.png",
+    "nombre": "Instalación de transporte",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "instalacion_de_transporte__neutral.png",
+    "nombre": "Instalación de transporte",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "instalacion_de_transporte__enemigo.png",
+    "nombre": "Instalación de transporte",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "astillero_naval__desconocido.png",
+    "nombre": "Astillero naval",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "astillero_naval__propio.png",
+    "nombre": "Astillero naval",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "astillero_naval__neutral.png",
+    "nombre": "Astillero naval",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "astillero_naval__enemigo.png",
+    "nombre": "Astillero naval",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "conduccion_gubernamental__desconocido.png",
+    "nombre": "Conducción gubernamental",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "conduccion_gubernamental__propio.png",
+    "nombre": "Conducción gubernamental",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "conduccion_gubernamental__neutral.png",
+    "nombre": "Conducción gubernamental",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "conduccion_gubernamental__enemigo.png",
+    "nombre": "Conducción gubernamental",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "base_o_instalacion_militar__desconocido.png",
+    "nombre": "Base o instalación militar",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "base_o_instalacion_militar__propio.png",
+    "nombre": "Base o instalación militar",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "base_o_instalacion_militar__neutral.png",
+    "nombre": "Base o instalación militar",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "base_o_instalacion_militar__enemigo.png",
+    "nombre": "Base o instalación militar",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "aeropuerto_o_base_aerea__desconocido.png",
+    "nombre": "Aeropuerto o base aérea",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "aeropuerto_o_base_aerea__propio.png",
+    "nombre": "Aeropuerto o base aérea",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "aeropuerto_o_base_aerea__neutral.png",
+    "nombre": "Aeropuerto o base aérea",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "aeropuerto_o_base_aerea__enemigo.png",
+    "nombre": "Aeropuerto o base aérea",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "instalacion_medica__desconocido.png",
+    "nombre": "Instalación médica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "instalacion_medica__propio.png",
+    "nombre": "Instalación médica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "instalacion_medica__neutral.png",
+    "nombre": "Instalación médica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "instalacion_medica__enemigo.png",
+    "nombre": "Instalación médica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "hospital__desconocido.png",
+    "nombre": "Hospital",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "hospital__propio.png",
+    "nombre": "Hospital",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "hospital__neutral.png",
+    "nombre": "Hospital",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "hospital__enemigo.png",
+    "nombre": "Hospital",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "base_naval__desconocido.png",
+    "nombre": "Base naval",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "base_naval__propio.png",
+    "nombre": "Base naval",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "base_naval__neutral.png",
+    "nombre": "Base naval",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "base_naval__enemigo.png",
+    "nombre": "Base naval",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "puerto_maritimo__desconocido.png",
+    "nombre": "Puerto marítimo",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "puerto_maritimo__propio.png",
+    "nombre": "Puerto marítimo",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "puerto_maritimo__neutral.png",
+    "nombre": "Puerto marítimo",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "puerto_maritimo__enemigo.png",
+    "nombre": "Puerto marítimo",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "aviacion__desconocido.png",
+    "nombre": "Aviación",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "aviacion__propio.png",
+    "nombre": "Aviación",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "aviacion__neutral.png",
+    "nombre": "Aviación",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "aviacion__enemigo.png",
+    "nombre": "Aviación",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_fija__desconocido.png",
+    "nombre": "Ala fija",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_fija__propio.png",
+    "nombre": "Ala fija",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_fija__neutral.png",
+    "nombre": "Ala fija",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_fija__enemigo.png",
+    "nombre": "Ala fija",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_fija_utilitaria__desconocido.png",
+    "nombre": "Ala fija utilitaria",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_fija_utilitaria__propio.png",
+    "nombre": "Ala fija utilitaria",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_fija_utilitaria__neutral.png",
+    "nombre": "Ala fija utilitaria",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_fija_utilitaria__enemigo.png",
+    "nombre": "Ala fija utilitaria",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_fija_de_ataque__desconocido.png",
+    "nombre": "Ala fija de ataque",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_fija_de_ataque__propio.png",
+    "nombre": "Ala fija de ataque",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_fija_de_ataque__neutral.png",
+    "nombre": "Ala fija de ataque",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_fija_de_ataque__enemigo.png",
+    "nombre": "Ala fija de ataque",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_fija_de_reconocimiento__desconocido.png",
+    "nombre": "Ala fija de reconocimiento",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_fija_de_reconocimiento__propio.png",
+    "nombre": "Ala fija de reconocimiento",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_fija_de_reconocimiento__neutral.png",
+    "nombre": "Ala fija de reconocimiento",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_fija_de_reconocimiento__enemigo.png",
+    "nombre": "Ala fija de reconocimiento",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa__desconocido.png",
+    "nombre": "Ala rotativa",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa__propio.png",
+    "nombre": "Ala rotativa",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa__neutral.png",
+    "nombre": "Ala rotativa",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa__enemigo.png",
+    "nombre": "Ala rotativa",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_de_ataque__desconocido.png",
+    "nombre": "Ala rotativa de ataque",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_de_ataque__propio.png",
+    "nombre": "Ala rotativa de ataque",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_de_ataque__neutral.png",
+    "nombre": "Ala rotativa de ataque",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_de_ataque__enemigo.png",
+    "nombre": "Ala rotativa de ataque",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_de_exploracion__desconocido.png",
+    "nombre": "Ala rotativa de exploración",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_de_exploracion__propio.png",
+    "nombre": "Ala rotativa de exploración",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_de_exploracion__neutral.png",
+    "nombre": "Ala rotativa de exploración",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_de_exploracion__enemigo.png",
+    "nombre": "Ala rotativa de exploración",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_de_patrulla_antisubmarina__desconocido.png",
+    "nombre": "Ala rotativa de patrulla antisubmarina",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_de_patrulla_antisubmarina__propio.png",
+    "nombre": "Ala rotativa de patrulla antisubmarina",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_de_patrulla_antisubmarina__neutral.png",
+    "nombre": "Ala rotativa de patrulla antisubmarina",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_de_patrulla_antisubmarina__enemigo.png",
+    "nombre": "Ala rotativa de patrulla antisubmarina",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria__desconocido.png",
+    "nombre": "Ala rotativa utilitaria",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria__propio.png",
+    "nombre": "Ala rotativa utilitaria",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria__neutral.png",
+    "nombre": "Ala rotativa utilitaria",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria__enemigo.png",
+    "nombre": "Ala rotativa utilitaria",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_liviana__desconocido.png",
+    "nombre": "Ala rotativa utilitaria liviana",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_liviana__propio.png",
+    "nombre": "Ala rotativa utilitaria liviana",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_liviana__neutral.png",
+    "nombre": "Ala rotativa utilitaria liviana",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_liviana__enemigo.png",
+    "nombre": "Ala rotativa utilitaria liviana",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_mediana__desconocido.png",
+    "nombre": "Ala rotativa utilitaria mediana",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_mediana__propio.png",
+    "nombre": "Ala rotativa utilitaria mediana",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_mediana__neutral.png",
+    "nombre": "Ala rotativa utilitaria mediana",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_mediana__enemigo.png",
+    "nombre": "Ala rotativa utilitaria mediana",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_pesada__desconocido.png",
+    "nombre": "Ala rotativa utilitaria pesada",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_pesada__propio.png",
+    "nombre": "Ala rotativa utilitaria pesada",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_pesada__neutral.png",
+    "nombre": "Ala rotativa utilitaria pesada",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_utilitaria_pesada__enemigo.png",
+    "nombre": "Ala rotativa utilitaria pesada",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_de_comando_y_control__desconocido.png",
+    "nombre": "Ala rotativa de comando y control",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_de_comando_y_control__propio.png",
+    "nombre": "Ala rotativa de comando y control",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_de_comando_y_control__neutral.png",
+    "nombre": "Ala rotativa de comando y control",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_de_comando_y_control__enemigo.png",
+    "nombre": "Ala rotativa de comando y control",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_de_evacuacion_medica__desconocido.png",
+    "nombre": "Ala rotativa de evacuación médica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_de_evacuacion_medica__propio.png",
+    "nombre": "Ala rotativa de evacuación médica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_de_evacuacion_medica__neutral.png",
+    "nombre": "Ala rotativa de evacuación médica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_de_evacuacion_medica__enemigo.png",
+    "nombre": "Ala rotativa de evacuación médica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "ala_rotativa_de_contramedidas_de_minas__desconocido.png",
+    "nombre": "Ala rotativa de contramedidas de minas",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "ala_rotativa_de_contramedidas_de_minas__propio.png",
+    "nombre": "Ala rotativa de contramedidas de minas",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "ala_rotativa_de_contramedidas_de_minas__neutral.png",
+    "nombre": "Ala rotativa de contramedidas de minas",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "ala_rotativa_de_contramedidas_de_minas__enemigo.png",
+    "nombre": "Ala rotativa de contramedidas de minas",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "aviacion_de_busqueda_y_rescate__desconocido.png",
+    "nombre": "Aviación de búsqueda y rescate",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "aviacion_de_busqueda_y_rescate__propio.png",
+    "nombre": "Aviación de búsqueda y rescate",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "aviacion_de_busqueda_y_rescate__neutral.png",
+    "nombre": "Aviación de búsqueda y rescate",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "aviacion_de_busqueda_y_rescate__enemigo.png",
+    "nombre": "Aviación de búsqueda y rescate",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "aviacion_compuesta__desconocido.png",
+    "nombre": "Aviación compuesta",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "aviacion_compuesta__propio.png",
+    "nombre": "Aviación compuesta",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "aviacion_compuesta__neutral.png",
+    "nombre": "Aviación compuesta",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "aviacion_compuesta__enemigo.png",
+    "nombre": "Aviación compuesta",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "despegue_y_aterrizaje_vertical_o_corto__desconocido.png",
+    "nombre": "Despegue y aterrizaje vertical o corto",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "despegue_y_aterrizaje_vertical_o_corto__propio.png",
+    "nombre": "Despegue y aterrizaje vertical o corto",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "despegue_y_aterrizaje_vertical_o_corto__neutral.png",
+    "nombre": "Despegue y aterrizaje vertical o corto",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "despegue_y_aterrizaje_vertical_o_corto__enemigo.png",
+    "nombre": "Despegue y aterrizaje vertical o corto",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado__desconocido.png",
+    "nombre": "Vehículo aéreo no tripulado",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado__propio.png",
+    "nombre": "Vehículo aéreo no tripulado",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado__neutral.png",
+    "nombre": "Vehículo aéreo no tripulado",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado__enemigo.png",
+    "nombre": "Vehículo aéreo no tripulado",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado_de_ala_fija__desconocido.png",
+    "nombre": "Vehículo aéreo no tripulado de ala fija",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado_de_ala_fija__propio.png",
+    "nombre": "Vehículo aéreo no tripulado de ala fija",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado_de_ala_fija__neutral.png",
+    "nombre": "Vehículo aéreo no tripulado de ala fija",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado_de_ala_fija__enemigo.png",
+    "nombre": "Vehículo aéreo no tripulado de ala fija",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado_de_ala_rotativa__desconocido.png",
+    "nombre": "Vehículo aéreo no tripulado de ala rotativa",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado_de_ala_rotativa__propio.png",
+    "nombre": "Vehículo aéreo no tripulado de ala rotativa",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado_de_ala_rotativa__neutral.png",
+    "nombre": "Vehículo aéreo no tripulado de ala rotativa",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "vehiculo_aereo_no_tripulado_de_ala_rotativa__enemigo.png",
+    "nombre": "Vehículo aéreo no tripulado de ala rotativa",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "defensa_antiaerea__desconocido.png",
+    "nombre": "Defensa antiaérea",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "defensa_antiaerea__propio.png",
+    "nombre": "Defensa antiaérea",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "defensa_antiaerea__neutral.png",
+    "nombre": "Defensa antiaérea",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "defensa_antiaerea__enemigo.png",
+    "nombre": "Defensa antiaérea",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "defensa_antiaerea_de_corto_alcance__desconocido.png",
+    "nombre": "Defensa antiaérea de corto alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "defensa_antiaerea_de_corto_alcance__propio.png",
+    "nombre": "Defensa antiaérea de corto alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "defensa_antiaerea_de_corto_alcance__neutral.png",
+    "nombre": "Defensa antiaérea de corto alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "defensa_antiaerea_de_corto_alcance__enemigo.png",
+    "nombre": "Defensa antiaérea de corto alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "chaparral__desconocido.png",
+    "nombre": "Chaparral",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "chaparral__propio.png",
+    "nombre": "Chaparral",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "chaparral__neutral.png",
+    "nombre": "Chaparral",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "chaparral__enemigo.png",
+    "nombre": "Chaparral",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "stinger__desconocido.png",
+    "nombre": "Stinger",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "stinger__propio.png",
+    "nombre": "Stinger",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "stinger__neutral.png",
+    "nombre": "Stinger",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "stinger__enemigo.png",
+    "nombre": "Stinger",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "vulcan__desconocido.png",
+    "nombre": "Vulcan",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "vulcan__propio.png",
+    "nombre": "Vulcan",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "vulcan__neutral.png",
+    "nombre": "Vulcan",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "vulcan__enemigo.png",
+    "nombre": "Vulcan",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_de_defensa_antiaerea__desconocido.png",
+    "nombre": "Misil de defensa antiaérea",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_de_defensa_antiaerea__propio.png",
+    "nombre": "Misil de defensa antiaérea",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_de_defensa_antiaerea__neutral.png",
+    "nombre": "Misil de defensa antiaérea",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_de_defensa_antiaerea__enemigo.png",
+    "nombre": "Misil de defensa antiaérea",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_liviano_de_defensa_antiaerea__desconocido.png",
+    "nombre": "Misil liviano de defensa antiaérea",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_liviano_de_defensa_antiaerea__propio.png",
+    "nombre": "Misil liviano de defensa antiaérea",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_liviano_de_defensa_antiaerea__neutral.png",
+    "nombre": "Misil liviano de defensa antiaérea",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_liviano_de_defensa_antiaerea__enemigo.png",
+    "nombre": "Misil liviano de defensa antiaérea",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_antiaereo_avenger_motorizado__desconocido.png",
+    "nombre": "Misil antiaéreo Avenger motorizado",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_antiaereo_avenger_motorizado__propio.png",
+    "nombre": "Misil antiaéreo Avenger motorizado",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_antiaereo_avenger_motorizado__neutral.png",
+    "nombre": "Misil antiaéreo Avenger motorizado",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_antiaereo_avenger_motorizado__enemigo.png",
+    "nombre": "Misil antiaéreo Avenger motorizado",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_antiaereo_de_alcance_medio__desconocido.png",
+    "nombre": "Misil antiaéreo de alcance medio",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_antiaereo_de_alcance_medio__propio.png",
+    "nombre": "Misil antiaéreo de alcance medio",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_antiaereo_de_alcance_medio__neutral.png",
+    "nombre": "Misil antiaéreo de alcance medio",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_antiaereo_de_alcance_medio__enemigo.png",
+    "nombre": "Misil antiaéreo de alcance medio",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_antiaereo_pesado__desconocido.png",
+    "nombre": "Misil antiaéreo pesado",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_antiaereo_pesado__propio.png",
+    "nombre": "Misil antiaéreo pesado",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_antiaereo_pesado__neutral.png",
+    "nombre": "Misil antiaéreo pesado",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_antiaereo_pesado__enemigo.png",
+    "nombre": "Misil antiaéreo pesado",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_antiaereo_h_mad__desconocido.png",
+    "nombre": "Misil antiaéreo H/MAD",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_antiaereo_h_mad__propio.png",
+    "nombre": "Misil antiaéreo H/MAD",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_antiaereo_h_mad__neutral.png",
+    "nombre": "Misil antiaéreo H/MAD",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_antiaereo_h_mad__enemigo.png",
+    "nombre": "Misil antiaéreo H/MAD",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "patriot__desconocido.png",
+    "nombre": "Patriot",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "patriot__propio.png",
+    "nombre": "Patriot",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "patriot__neutral.png",
+    "nombre": "Patriot",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "patriot__enemigo.png",
+    "nombre": "Patriot",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "unidad_de_canones_antiaereos__desconocido.png",
+    "nombre": "Unidad de cañones antiaéreos",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "unidad_de_canones_antiaereos__propio.png",
+    "nombre": "Unidad de cañones antiaéreos",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "unidad_de_canones_antiaereos__neutral.png",
+    "nombre": "Unidad de cañones antiaéreos",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "unidad_de_canones_antiaereos__enemigo.png",
+    "nombre": "Unidad de cañones antiaéreos",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "defensa_antiaerea_compuesta__desconocido.png",
+    "nombre": "Defensa antiaérea compuesta",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "defensa_antiaerea_compuesta__propio.png",
+    "nombre": "Defensa antiaérea compuesta",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "defensa_antiaerea_compuesta__neutral.png",
+    "nombre": "Defensa antiaérea compuesta",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "defensa_antiaerea_compuesta__enemigo.png",
+    "nombre": "Defensa antiaérea compuesta",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "defensa_contra_misiles_de_teatro__desconocido.png",
+    "nombre": "Defensa contra misiles de teatro",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "defensa_contra_misiles_de_teatro__propio.png",
+    "nombre": "Defensa contra misiles de teatro",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "defensa_contra_misiles_de_teatro__neutral.png",
+    "nombre": "Defensa contra misiles de teatro",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "defensa_contra_misiles_de_teatro__enemigo.png",
+    "nombre": "Defensa contra misiles de teatro",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "unidad_de_adquisicion_de_blancos_antiaereos__desconocido.png",
+    "nombre": "Unidad de adquisición de blancos antiaéreos",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "unidad_de_adquisicion_de_blancos_antiaereos__propio.png",
+    "nombre": "Unidad de adquisición de blancos antiaéreos",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "unidad_de_adquisicion_de_blancos_antiaereos__neutral.png",
+    "nombre": "Unidad de adquisición de blancos antiaéreos",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "unidad_de_adquisicion_de_blancos_antiaereos__enemigo.png",
+    "nombre": "Unidad de adquisición de blancos antiaéreos",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "inteligencia_militar__desconocido.png",
+    "nombre": "Inteligencia militar",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "inteligencia_militar__propio.png",
+    "nombre": "Inteligencia militar",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "inteligencia_militar__neutral.png",
+    "nombre": "Inteligencia militar",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "inteligencia_militar__enemigo.png",
+    "nombre": "Inteligencia militar",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "explotacion_aerea__desconocido.png",
+    "nombre": "Explotación aérea",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "explotacion_aerea__propio.png",
+    "nombre": "Explotación aérea",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "explotacion_aerea__neutral.png",
+    "nombre": "Explotación aérea",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "explotacion_aerea__enemigo.png",
+    "nombre": "Explotación aérea",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "inteligencia_de_senales__desconocido.png",
+    "nombre": "Inteligencia de señales",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "inteligencia_de_senales__propio.png",
+    "nombre": "Inteligencia de señales",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "inteligencia_de_senales__neutral.png",
+    "nombre": "Inteligencia de señales",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "inteligencia_de_senales__enemigo.png",
+    "nombre": "Inteligencia de señales",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "guerra_electronica__desconocido.png",
+    "nombre": "Guerra electrónica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "guerra_electronica__propio.png",
+    "nombre": "Guerra electrónica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "guerra_electronica__neutral.png",
+    "nombre": "Guerra electrónica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "guerra_electronica__enemigo.png",
+    "nombre": "Guerra electrónica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "vehiculo_blindado_a_ruedas_de_guerra_electronica__desconocido.png",
+    "nombre": "Vehículo blindado a ruedas de guerra electrónica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "vehiculo_blindado_a_ruedas_de_guerra_electronica__propio.png",
+    "nombre": "Vehículo blindado a ruedas de guerra electrónica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "vehiculo_blindado_a_ruedas_de_guerra_electronica__neutral.png",
+    "nombre": "Vehículo blindado a ruedas de guerra electrónica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "vehiculo_blindado_a_ruedas_de_guerra_electronica__enemigo.png",
+    "nombre": "Vehículo blindado a ruedas de guerra electrónica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "radiogoniometria_de_guerra_electronica__desconocido.png",
+    "nombre": "Radiogoniometría de guerra electrónica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "radiogoniometria_de_guerra_electronica__propio.png",
+    "nombre": "Radiogoniometría de guerra electrónica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "radiogoniometria_de_guerra_electronica__neutral.png",
+    "nombre": "Radiogoniometría de guerra electrónica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "radiogoniometria_de_guerra_electronica__enemigo.png",
+    "nombre": "Radiogoniometría de guerra electrónica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "interceptacion_de_guerra_electronica__desconocido.png",
+    "nombre": "Interceptación de guerra electrónica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "interceptacion_de_guerra_electronica__propio.png",
+    "nombre": "Interceptación de guerra electrónica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "interceptacion_de_guerra_electronica__neutral.png",
+    "nombre": "Interceptación de guerra electrónica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "interceptacion_de_guerra_electronica__enemigo.png",
+    "nombre": "Interceptación de guerra electrónica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "perturbacion_de_guerra_electronica__desconocido.png",
+    "nombre": "Perturbación de guerra electrónica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "perturbacion_de_guerra_electronica__propio.png",
+    "nombre": "Perturbación de guerra electrónica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "perturbacion_de_guerra_electronica__neutral.png",
+    "nombre": "Perturbación de guerra electrónica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "perturbacion_de_guerra_electronica__enemigo.png",
+    "nombre": "Perturbación de guerra electrónica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "guerra_electronica_de_teatro__desconocido.png",
+    "nombre": "Guerra electrónica de teatro",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "guerra_electronica_de_teatro__propio.png",
+    "nombre": "Guerra electrónica de teatro",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "guerra_electronica_de_teatro__neutral.png",
+    "nombre": "Guerra electrónica de teatro",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "guerra_electronica_de_teatro__enemigo.png",
+    "nombre": "Guerra electrónica de teatro",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "guerra_electronica_de_cuerpo__desconocido.png",
+    "nombre": "Guerra electrónica de cuerpo",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "guerra_electronica_de_cuerpo__propio.png",
+    "nombre": "Guerra electrónica de cuerpo",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "guerra_electronica_de_cuerpo__neutral.png",
+    "nombre": "Guerra electrónica de cuerpo",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "guerra_electronica_de_cuerpo__enemigo.png",
+    "nombre": "Guerra electrónica de cuerpo",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "contrainteligencia__desconocido.png",
+    "nombre": "Contrainteligencia",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "contrainteligencia__propio.png",
+    "nombre": "Contrainteligencia",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "contrainteligencia__neutral.png",
+    "nombre": "Contrainteligencia",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "contrainteligencia__enemigo.png",
+    "nombre": "Contrainteligencia",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "vigilancia_de_inteligencia_militar__desconocido.png",
+    "nombre": "Vigilancia de inteligencia militar",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "vigilancia_de_inteligencia_militar__propio.png",
+    "nombre": "Vigilancia de inteligencia militar",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "vigilancia_de_inteligencia_militar__neutral.png",
+    "nombre": "Vigilancia de inteligencia militar",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "vigilancia_de_inteligencia_militar__enemigo.png",
+    "nombre": "Vigilancia de inteligencia militar",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "radar_terrestre_de_vigilancia_de_inteligencia_militar__desconocido.png",
+    "nombre": "Radar terrestre de vigilancia de inteligencia militar",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "radar_terrestre_de_vigilancia_de_inteligencia_militar__propio.png",
+    "nombre": "Radar terrestre de vigilancia de inteligencia militar",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "radar_terrestre_de_vigilancia_de_inteligencia_militar__neutral.png",
+    "nombre": "Radar terrestre de vigilancia de inteligencia militar",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "radar_terrestre_de_vigilancia_de_inteligencia_militar__enemigo.png",
+    "nombre": "Radar terrestre de vigilancia de inteligencia militar",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "sensor__desconocido.png",
+    "nombre": "Sensor",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "sensor__propio.png",
+    "nombre": "Sensor",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "sensor__neutral.png",
+    "nombre": "Sensor",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "sensor__enemigo.png",
+    "nombre": "Sensor",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "sensor_scm__desconocido.png",
+    "nombre": "Sensor SCM",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "sensor_scm__propio.png",
+    "nombre": "Sensor SCM",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "sensor_scm__neutral.png",
+    "nombre": "Sensor SCM",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "sensor_scm__enemigo.png",
+    "nombre": "Sensor SCM",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "modulo_de_estacion_terrestre__desconocido.png",
+    "nombre": "Módulo de estación terrestre",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "modulo_de_estacion_terrestre__propio.png",
+    "nombre": "Módulo de estación terrestre",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "modulo_de_estacion_terrestre__neutral.png",
+    "nombre": "Módulo de estación terrestre",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "modulo_de_estacion_terrestre__enemigo.png",
+    "nombre": "Módulo de estación terrestre",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "meteorologia__desconocido.png",
+    "nombre": "Meteorología",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "meteorologia__propio.png",
+    "nombre": "Meteorología",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "meteorologia__neutral.png",
+    "nombre": "Meteorología",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "meteorologia__enemigo.png",
+    "nombre": "Meteorología",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "explotacion_tactica__desconocido.png",
+    "nombre": "Explotación táctica",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "explotacion_tactica__propio.png",
+    "nombre": "Explotación táctica",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "explotacion_tactica__neutral.png",
+    "nombre": "Explotación táctica",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "explotacion_tactica__enemigo.png",
+    "nombre": "Explotación táctica",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "interrogatorio__desconocido.png",
+    "nombre": "Interrogatorio",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "interrogatorio__propio.png",
+    "nombre": "Interrogatorio",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "interrogatorio__neutral.png",
+    "nombre": "Interrogatorio",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "interrogatorio__enemigo.png",
+    "nombre": "Interrogatorio",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "centro_conjunto_de_inteligencia__desconocido.png",
+    "nombre": "Centro conjunto de inteligencia",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "centro_conjunto_de_inteligencia__propio.png",
+    "nombre": "Centro conjunto de inteligencia",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "centro_conjunto_de_inteligencia__neutral.png",
+    "nombre": "Centro conjunto de inteligencia",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "centro_conjunto_de_inteligencia__enemigo.png",
+    "nombre": "Centro conjunto de inteligencia",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "operaciones__desconocido.png",
+    "nombre": "Operaciones",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "operaciones__propio.png",
+    "nombre": "Operaciones",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "operaciones__neutral.png",
+    "nombre": "Operaciones",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "operaciones__enemigo.png",
+    "nombre": "Operaciones",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles__desconocido.png",
+    "nombre": "Lanzador de misiles",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles__propio.png",
+    "nombre": "Lanzador de misiles",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles__neutral.png",
+    "nombre": "Lanzador de misiles",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles__enemigo.png",
+    "nombre": "Lanzador de misiles",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos__desconocido.png",
+    "nombre": "Lanzador de misiles antiaéreos",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos__propio.png",
+    "nombre": "Lanzador de misiles antiaéreos",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos__neutral.png",
+    "nombre": "Lanzador de misiles antiaéreos",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos__enemigo.png",
+    "nombre": "Lanzador de misiles antiaéreos",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_2__desconocido.png",
+    "nombre": "Lanzador de misiles antiaéreos",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_2__propio.png",
+    "nombre": "Lanzador de misiles antiaéreos",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_2__neutral.png",
+    "nombre": "Lanzador de misiles antiaéreos",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_2__enemigo.png",
+    "nombre": "Lanzador de misiles antiaéreos",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_corto_alcance__desconocido.png",
+    "nombre": "Lanzador de misiles antiaéreos de corto alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_corto_alcance__propio.png",
+    "nombre": "Lanzador de misiles antiaéreos de corto alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_corto_alcance__neutral.png",
+    "nombre": "Lanzador de misiles antiaéreos de corto alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_corto_alcance__enemigo.png",
+    "nombre": "Lanzador de misiles antiaéreos de corto alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_alcance_medio__desconocido.png",
+    "nombre": "Lanzador de misiles antiaéreos de alcance medio",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_alcance_medio__propio.png",
+    "nombre": "Lanzador de misiles antiaéreos de alcance medio",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_alcance_medio__neutral.png",
+    "nombre": "Lanzador de misiles antiaéreos de alcance medio",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_alcance_medio__enemigo.png",
+    "nombre": "Lanzador de misiles antiaéreos de alcance medio",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_alcance_medio_2__desconocido.png",
+    "nombre": "Lanzador de misiles antiaéreos de alcance medio",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_alcance_medio_2__propio.png",
+    "nombre": "Lanzador de misiles antiaéreos de alcance medio",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_alcance_medio_2__neutral.png",
+    "nombre": "Lanzador de misiles antiaéreos de alcance medio",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_alcance_medio_2__enemigo.png",
+    "nombre": "Lanzador de misiles antiaéreos de alcance medio",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_corto_alcance_2__desconocido.png",
+    "nombre": "Lanzador de misiles antiaéreos de corto alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_corto_alcance_2__propio.png",
+    "nombre": "Lanzador de misiles antiaéreos de corto alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_corto_alcance_2__neutral.png",
+    "nombre": "Lanzador de misiles antiaéreos de corto alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_antiaereos_de_corto_alcance_2__enemigo.png",
+    "nombre": "Lanzador de misiles antiaéreos de corto alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "equipo_terrestre__desconocido.png",
+    "nombre": "Equipo terrestre",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "equipo_terrestre__propio.png",
+    "nombre": "Equipo terrestre",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "equipo_terrestre__neutral.png",
+    "nombre": "Equipo terrestre",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "equipo_terrestre__enemigo.png",
+    "nombre": "Equipo terrestre",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_2__desconocido.png",
+    "nombre": "Lanzador de misiles",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_2__propio.png",
+    "nombre": "Lanzador de misiles",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_2__neutral.png",
+    "nombre": "Lanzador de misiles",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_2__enemigo.png",
+    "nombre": "Lanzador de misiles",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_antiaereo_de_largo_alcance__desconocido.png",
+    "nombre": "Misil antiaéreo de largo alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_antiaereo_de_largo_alcance__propio.png",
+    "nombre": "Misil antiaéreo de largo alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_antiaereo_de_largo_alcance__neutral.png",
+    "nombre": "Misil antiaéreo de largo alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_antiaereo_de_largo_alcance__enemigo.png",
+    "nombre": "Misil antiaéreo de largo alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_antiaereo_de_largo_alcance_2__desconocido.png",
+    "nombre": "Misil antiaéreo de largo alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_antiaereo_de_largo_alcance_2__propio.png",
+    "nombre": "Misil antiaéreo de largo alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_antiaereo_de_largo_alcance_2__neutral.png",
+    "nombre": "Misil antiaéreo de largo alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_antiaereo_de_largo_alcance_2__enemigo.png",
+    "nombre": "Misil antiaéreo de largo alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_antiaereo_de_teatro__desconocido.png",
+    "nombre": "Misil antiaéreo de teatro",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_antiaereo_de_teatro__propio.png",
+    "nombre": "Misil antiaéreo de teatro",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_antiaereo_de_teatro__neutral.png",
+    "nombre": "Misil antiaéreo de teatro",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_antiaereo_de_teatro__enemigo.png",
+    "nombre": "Misil antiaéreo de teatro",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "misil_antiaereo_de_teatro_2__desconocido.png",
+    "nombre": "Misil antiaéreo de teatro",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "misil_antiaereo_de_teatro_2__propio.png",
+    "nombre": "Misil antiaéreo de teatro",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "misil_antiaereo_de_teatro_2__neutral.png",
+    "nombre": "Misil antiaéreo de teatro",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "misil_antiaereo_de_teatro_2__enemigo.png",
+    "nombre": "Misil antiaéreo de teatro",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie__desconocido.png",
+    "nombre": "Lanzador de misiles superficie-superficie",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie__propio.png",
+    "nombre": "Lanzador de misiles superficie-superficie",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie__neutral.png",
+    "nombre": "Lanzador de misiles superficie-superficie",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie__enemigo.png",
+    "nombre": "Lanzador de misiles superficie-superficie",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_corto_alcance__desconocido.png",
+    "nombre": "Lanzador de misiles superficie-superficie de corto alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_corto_alcance__propio.png",
+    "nombre": "Lanzador de misiles superficie-superficie de corto alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_corto_alcance__neutral.png",
+    "nombre": "Lanzador de misiles superficie-superficie de corto alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_corto_alcance__enemigo.png",
+    "nombre": "Lanzador de misiles superficie-superficie de corto alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_corto_alcance_2__desconocido.png",
+    "nombre": "Lanzador de misiles superficie-superficie de corto alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_corto_alcance_2__propio.png",
+    "nombre": "Lanzador de misiles superficie-superficie de corto alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_corto_alcance_2__neutral.png",
+    "nombre": "Lanzador de misiles superficie-superficie de corto alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_corto_alcance_2__enemigo.png",
+    "nombre": "Lanzador de misiles superficie-superficie de corto alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_2__desconocido.png",
+    "nombre": "Lanzador de misiles superficie-superficie",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_2__propio.png",
+    "nombre": "Lanzador de misiles superficie-superficie",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_2__neutral.png",
+    "nombre": "Lanzador de misiles superficie-superficie",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_2__enemigo.png",
+    "nombre": "Lanzador de misiles superficie-superficie",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_alcance_medio__desconocido.png",
+    "nombre": "Lanzador de misiles superficie-superficie de alcance medio",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_alcance_medio__propio.png",
+    "nombre": "Lanzador de misiles superficie-superficie de alcance medio",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_alcance_medio__neutral.png",
+    "nombre": "Lanzador de misiles superficie-superficie de alcance medio",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_alcance_medio__enemigo.png",
+    "nombre": "Lanzador de misiles superficie-superficie de alcance medio",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_alcance_medio_2__desconocido.png",
+    "nombre": "Lanzador de misiles superficie-superficie de alcance medio",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_alcance_medio_2__propio.png",
+    "nombre": "Lanzador de misiles superficie-superficie de alcance medio",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_alcance_medio_2__neutral.png",
+    "nombre": "Lanzador de misiles superficie-superficie de alcance medio",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_alcance_medio_2__enemigo.png",
+    "nombre": "Lanzador de misiles superficie-superficie de alcance medio",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_largo_alcance__desconocido.png",
+    "nombre": "Lanzador de misiles superficie-superficie de largo alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_largo_alcance__propio.png",
+    "nombre": "Lanzador de misiles superficie-superficie de largo alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_largo_alcance__neutral.png",
+    "nombre": "Lanzador de misiles superficie-superficie de largo alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_largo_alcance__enemigo.png",
+    "nombre": "Lanzador de misiles superficie-superficie de largo alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_largo_alcance_2__desconocido.png",
+    "nombre": "Lanzador de misiles superficie-superficie de largo alcance",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_largo_alcance_2__propio.png",
+    "nombre": "Lanzador de misiles superficie-superficie de largo alcance",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_largo_alcance_2__neutral.png",
+    "nombre": "Lanzador de misiles superficie-superficie de largo alcance",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "lanzador_de_misiles_superficie_superficie_de_largo_alcance_2__enemigo.png",
+    "nombre": "Lanzador de misiles superficie-superficie de largo alcance",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "sensor__desconocido.png",
+    "nombre": "Sensor",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "sensor__propio.png",
+    "nombre": "Sensor",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "sensor__neutral.png",
+    "nombre": "Sensor",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "sensor__enemigo.png",
+    "nombre": "Sensor",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "sensor_2__desconocido.png",
+    "nombre": "Sensor",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "sensor_2__propio.png",
+    "nombre": "Sensor",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "sensor_2__neutral.png",
+    "nombre": "Sensor",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "sensor_2__enemigo.png",
+    "nombre": "Sensor",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "sensor_emplazado__desconocido.png",
+    "nombre": "Sensor emplazado",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "sensor_emplazado__propio.png",
+    "nombre": "Sensor emplazado",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "sensor_emplazado__neutral.png",
+    "nombre": "Sensor emplazado",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "sensor_emplazado__enemigo.png",
+    "nombre": "Sensor emplazado",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "sensor_emplazado_2__desconocido.png",
+    "nombre": "Sensor emplazado",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "sensor_emplazado_2__propio.png",
+    "nombre": "Sensor emplazado",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "sensor_emplazado_2__neutral.png",
+    "nombre": "Sensor emplazado",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "sensor_emplazado_2__enemigo.png",
+    "nombre": "Sensor emplazado",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "radar__desconocido.png",
+    "nombre": "Radar",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "radar__propio.png",
+    "nombre": "Radar",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "radar__neutral.png",
+    "nombre": "Radar",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "radar__enemigo.png",
+    "nombre": "Radar",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "radar_2__desconocido.png",
+    "nombre": "Radar",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "radar_2__propio.png",
+    "nombre": "Radar",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "radar_2__neutral.png",
+    "nombre": "Radar",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "radar_2__enemigo.png",
+    "nombre": "Radar",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "laser__desconocido.png",
+    "nombre": "Láser",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "laser__propio.png",
+    "nombre": "Láser",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "laser__neutral.png",
+    "nombre": "Láser",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "laser__enemigo.png",
+    "nombre": "Láser",
+    "afiliacion": "enemigo"
+  },
+  {
+    "archivo": "laser_2__desconocido.png",
+    "nombre": "Láser",
+    "afiliacion": "desconocido"
+  },
+  {
+    "archivo": "laser_2__propio.png",
+    "nombre": "Láser",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "laser_2__neutral.png",
+    "nombre": "Láser",
+    "afiliacion": "neutral"
+  },
+  {
+    "archivo": "laser_2__enemigo.png",
+    "nombre": "Láser",
+    "afiliacion": "enemigo"
+  }
+]

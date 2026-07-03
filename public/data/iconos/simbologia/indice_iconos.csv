@@ -1,0 +1,521 @@
+﻿archivo,nombre_espanol,nombre_original,afiliacion,diapositiva
+instalacion__desconocido.png,Instalación,Installation,desconocido,6
+instalacion__propio.png,Instalación,Installation,propio,6
+instalacion__neutral.png,Instalación,Installation,neutral,6
+instalacion__enemigo.png,Instalación,Installation,enemigo,6
+produccion_y_almacenamiento_de_materias_primas__desconocido.png,Producción y almacenamiento de materias primas,Raw Material Production/Storage,desconocido,6
+produccion_y_almacenamiento_de_materias_primas__propio.png,Producción y almacenamiento de materias primas,Raw Material Production/Storage,propio,6
+produccion_y_almacenamiento_de_materias_primas__neutral.png,Producción y almacenamiento de materias primas,Raw Material Production/Storage,neutral,6
+produccion_y_almacenamiento_de_materias_primas__enemigo.png,Producción y almacenamiento de materias primas,Raw Material Production/Storage,enemigo,6
+mina__desconocido.png,Mina,Mine,desconocido,6
+mina__propio.png,Mina,Mine,propio,6
+mina__neutral.png,Mina,Mine,neutral,6
+mina__enemigo.png,Mina,Mine,enemigo,6
+produccion_y_almacenamiento_de_petroleo_gas_y_combustible__desconocido.png,"Producción y almacenamiento de petróleo, gas y combustible",Petroleum/Gas/Oil Production / Stowage,desconocido,6
+produccion_y_almacenamiento_de_petroleo_gas_y_combustible__propio.png,"Producción y almacenamiento de petróleo, gas y combustible",Petroleum/Gas/Oil Production / Stowage,propio,6
+produccion_y_almacenamiento_de_petroleo_gas_y_combustible__neutral.png,"Producción y almacenamiento de petróleo, gas y combustible",Petroleum/Gas/Oil Production / Stowage,neutral,6
+produccion_y_almacenamiento_de_petroleo_gas_y_combustible__enemigo.png,"Producción y almacenamiento de petróleo, gas y combustible",Petroleum/Gas/Oil Production / Stowage,enemigo,6
+produccion_y_almacenamiento_nbq__desconocido.png,Producción y almacenamiento NBQ,NBC Production / Stowage,desconocido,6
+produccion_y_almacenamiento_nbq__propio.png,Producción y almacenamiento NBQ,NBC Production / Stowage,propio,6
+produccion_y_almacenamiento_nbq__neutral.png,Producción y almacenamiento NBQ,NBC Production / Stowage,neutral,6
+produccion_y_almacenamiento_nbq__enemigo.png,Producción y almacenamiento NBQ,NBC Production / Stowage,enemigo,6
+produccion_y_almacenamiento_biologico_nbq__desconocido.png,Producción y almacenamiento biológico NBQ,NBC Biological Production / Stowage,desconocido,6
+produccion_y_almacenamiento_biologico_nbq__propio.png,Producción y almacenamiento biológico NBQ,NBC Biological Production / Stowage,propio,6
+produccion_y_almacenamiento_biologico_nbq__neutral.png,Producción y almacenamiento biológico NBQ,NBC Biological Production / Stowage,neutral,6
+produccion_y_almacenamiento_biologico_nbq__enemigo.png,Producción y almacenamiento biológico NBQ,NBC Biological Production / Stowage,enemigo,6
+produccion_y_almacenamiento_quimico_nbq__desconocido.png,Producción y almacenamiento químico NBQ,NBC Chemical Production / Stowage,desconocido,6
+produccion_y_almacenamiento_quimico_nbq__propio.png,Producción y almacenamiento químico NBQ,NBC Chemical Production / Stowage,propio,6
+produccion_y_almacenamiento_quimico_nbq__neutral.png,Producción y almacenamiento químico NBQ,NBC Chemical Production / Stowage,neutral,6
+produccion_y_almacenamiento_quimico_nbq__enemigo.png,Producción y almacenamiento químico NBQ,NBC Chemical Production / Stowage,enemigo,6
+produccion_y_almacenamiento_nuclear_nbq__desconocido.png,Producción y almacenamiento nuclear NBQ,NBC Nuclear Production / Stowage,desconocido,6
+produccion_y_almacenamiento_nuclear_nbq__propio.png,Producción y almacenamiento nuclear NBQ,NBC Nuclear Production / Stowage,propio,6
+produccion_y_almacenamiento_nuclear_nbq__neutral.png,Producción y almacenamiento nuclear NBQ,NBC Nuclear Production / Stowage,neutral,6
+produccion_y_almacenamiento_nuclear_nbq__enemigo.png,Producción y almacenamiento nuclear NBQ,NBC Nuclear Production / Stowage,enemigo,6
+planta_de_procesamiento__desconocido.png,Planta de procesamiento,Processing Facility,desconocido,7
+planta_de_procesamiento__propio.png,Planta de procesamiento,Processing Facility,propio,7
+planta_de_procesamiento__neutral.png,Planta de procesamiento,Processing Facility,neutral,7
+planta_de_procesamiento__enemigo.png,Planta de procesamiento,Processing Facility,enemigo,7
+instalacion_de_descontaminacion__desconocido.png,Instalación de descontaminación,Decontamination Facility,desconocido,7
+instalacion_de_descontaminacion__propio.png,Instalación de descontaminación,Decontamination Facility,propio,7
+instalacion_de_descontaminacion__neutral.png,Instalación de descontaminación,Decontamination Facility,neutral,7
+instalacion_de_descontaminacion__enemigo.png,Instalación de descontaminación,Decontamination Facility,enemigo,7
+fabricacion_de_equipos__desconocido.png,Fabricación de equipos,Equipment Manufacture,desconocido,7
+fabricacion_de_equipos__propio.png,Fabricación de equipos,Equipment Manufacture,propio,7
+fabricacion_de_equipos__neutral.png,Fabricación de equipos,Equipment Manufacture,neutral,7
+fabricacion_de_equipos__enemigo.png,Fabricación de equipos,Equipment Manufacture,enemigo,7
+instalacion_de_servicios_e_investigacion__desconocido.png,Instalación de servicios e investigación,Utility Service / Research Facility,desconocido,7
+instalacion_de_servicios_e_investigacion__propio.png,Instalación de servicios e investigación,Utility Service / Research Facility,propio,7
+instalacion_de_servicios_e_investigacion__neutral.png,Instalación de servicios e investigación,Utility Service / Research Facility,neutral,7
+instalacion_de_servicios_e_investigacion__enemigo.png,Instalación de servicios e investigación,Utility Service / Research Facility,enemigo,7
+centro_de_investigacion_tecnologica__desconocido.png,Centro de investigación tecnológica,Technological Research Facility,desconocido,7
+centro_de_investigacion_tecnologica__propio.png,Centro de investigación tecnológica,Technological Research Facility,propio,7
+centro_de_investigacion_tecnologica__neutral.png,Centro de investigación tecnológica,Technological Research Facility,neutral,7
+centro_de_investigacion_tecnologica__enemigo.png,Centro de investigación tecnológica,Technological Research Facility,enemigo,7
+instalacion_de_telecomunicaciones__desconocido.png,Instalación de telecomunicaciones,Telecommunications Facility,desconocido,7
+instalacion_de_telecomunicaciones__propio.png,Instalación de telecomunicaciones,Telecommunications Facility,propio,7
+instalacion_de_telecomunicaciones__neutral.png,Instalación de telecomunicaciones,Telecommunications Facility,neutral,7
+instalacion_de_telecomunicaciones__enemigo.png,Instalación de telecomunicaciones,Telecommunications Facility,enemigo,7
+central_electrica__desconocido.png,Central eléctrica,Electric Power Plant,desconocido,7
+central_electrica__propio.png,Central eléctrica,Electric Power Plant,propio,7
+central_electrica__neutral.png,Central eléctrica,Electric Power Plant,neutral,7
+central_electrica__enemigo.png,Central eléctrica,Electric Power Plant,enemigo,7
+central_nuclear__desconocido.png,Central nuclear,Nuclear Power Plant,desconocido,7
+central_nuclear__propio.png,Central nuclear,Nuclear Power Plant,propio,7
+central_nuclear__neutral.png,Central nuclear,Nuclear Power Plant,neutral,7
+central_nuclear__enemigo.png,Central nuclear,Nuclear Power Plant,enemigo,7
+central_nuclear_sobre_barcaza__desconocido.png,Central nuclear sobre barcaza,Nuclear Power Plant on Barge,desconocido,8
+central_nuclear_sobre_barcaza__propio.png,Central nuclear sobre barcaza,Nuclear Power Plant on Barge,propio,8
+central_nuclear_sobre_barcaza__neutral.png,Central nuclear sobre barcaza,Nuclear Power Plant on Barge,neutral,8
+central_nuclear_sobre_barcaza__enemigo.png,Central nuclear sobre barcaza,Nuclear Power Plant on Barge,enemigo,8
+central_hidroelectrica_o_represa__desconocido.png,Central hidroeléctrica o represa,Hydroelectric Power Plant / Dam,desconocido,8
+central_hidroelectrica_o_represa__propio.png,Central hidroeléctrica o represa,Hydroelectric Power Plant / Dam,propio,8
+central_hidroelectrica_o_represa__neutral.png,Central hidroeléctrica o represa,Hydroelectric Power Plant / Dam,neutral,8
+central_hidroelectrica_o_represa__enemigo.png,Central hidroeléctrica o represa,Hydroelectric Power Plant / Dam,enemigo,8
+central_termoelectrica_de_combustibles_fosiles__desconocido.png,Central termoeléctrica de combustibles fósiles,Fossil Fuel Power Plant,desconocido,8
+central_termoelectrica_de_combustibles_fosiles__propio.png,Central termoeléctrica de combustibles fósiles,Fossil Fuel Power Plant,propio,8
+central_termoelectrica_de_combustibles_fosiles__neutral.png,Central termoeléctrica de combustibles fósiles,Fossil Fuel Power Plant,neutral,8
+central_termoelectrica_de_combustibles_fosiles__enemigo.png,Central termoeléctrica de combustibles fósiles,Fossil Fuel Power Plant,enemigo,8
+servicio_publico_de_agua__desconocido.png,Servicio público de agua,Public Water Utility,desconocido,8
+servicio_publico_de_agua__propio.png,Servicio público de agua,Public Water Utility,propio,8
+servicio_publico_de_agua__neutral.png,Servicio público de agua,Public Water Utility,neutral,8
+servicio_publico_de_agua__enemigo.png,Servicio público de agua,Public Water Utility,enemigo,8
+instalacion_de_material_nuclear__desconocido.png,Instalación de material nuclear,Nuclear Material Facility,desconocido,8
+instalacion_de_material_nuclear__propio.png,Instalación de material nuclear,Nuclear Material Facility,propio,8
+instalacion_de_material_nuclear__neutral.png,Instalación de material nuclear,Nuclear Material Facility,neutral,8
+instalacion_de_material_nuclear__enemigo.png,Instalación de material nuclear,Nuclear Material Facility,enemigo,8
+reactor_de_energia_atomica__desconocido.png,Reactor de energía atómica,Atomic Energy Reactor,desconocido,8
+reactor_de_energia_atomica__propio.png,Reactor de energía atómica,Atomic Energy Reactor,propio,8
+reactor_de_energia_atomica__neutral.png,Reactor de energía atómica,Atomic Energy Reactor,neutral,8
+reactor_de_energia_atomica__enemigo.png,Reactor de energía atómica,Atomic Energy Reactor,enemigo,8
+planta_de_produccion_de_material_nuclear__desconocido.png,Planta de producción de material nuclear,Nuclear Material Production Facility,desconocido,8
+planta_de_produccion_de_material_nuclear__propio.png,Planta de producción de material nuclear,Nuclear Material Production Facility,propio,8
+planta_de_produccion_de_material_nuclear__neutral.png,Planta de producción de material nuclear,Nuclear Material Production Facility,neutral,8
+planta_de_produccion_de_material_nuclear__enemigo.png,Planta de producción de material nuclear,Nuclear Material Production Facility,enemigo,8
+planta_de_produccion_de_material_nuclear_apto_para_armas__desconocido.png,Planta de producción de material nuclear apto para armas,Nuclear Weapons Grade Production Facility,desconocido,8
+planta_de_produccion_de_material_nuclear_apto_para_armas__propio.png,Planta de producción de material nuclear apto para armas,Nuclear Weapons Grade Production Facility,propio,8
+planta_de_produccion_de_material_nuclear_apto_para_armas__neutral.png,Planta de producción de material nuclear apto para armas,Nuclear Weapons Grade Production Facility,neutral,8
+planta_de_produccion_de_material_nuclear_apto_para_armas__enemigo.png,Planta de producción de material nuclear apto para armas,Nuclear Weapons Grade Production Facility,enemigo,8
+deposito_de_material_nuclear__desconocido.png,Depósito de material nuclear,Nuclear Material Storage Facility,desconocido,9
+deposito_de_material_nuclear__propio.png,Depósito de material nuclear,Nuclear Material Storage Facility,propio,9
+deposito_de_material_nuclear__neutral.png,Depósito de material nuclear,Nuclear Material Storage Facility,neutral,9
+deposito_de_material_nuclear__enemigo.png,Depósito de material nuclear,Nuclear Material Storage Facility,enemigo,9
+fabrica_de_municiones__desconocido.png,Fábrica de municiones,Ammunition Plant,desconocido,9
+fabrica_de_municiones__propio.png,Fábrica de municiones,Ammunition Plant,propio,9
+fabrica_de_municiones__neutral.png,Fábrica de municiones,Ammunition Plant,neutral,9
+fabrica_de_municiones__enemigo.png,Fábrica de municiones,Ammunition Plant,enemigo,9
+planta_de_ensamblaje_de_aeronaves__desconocido.png,Planta de ensamblaje de aeronaves,Aircraft Assembly Plant,desconocido,9
+planta_de_ensamblaje_de_aeronaves__propio.png,Planta de ensamblaje de aeronaves,Aircraft Assembly Plant,propio,9
+planta_de_ensamblaje_de_aeronaves__neutral.png,Planta de ensamblaje de aeronaves,Aircraft Assembly Plant,neutral,9
+planta_de_ensamblaje_de_aeronaves__enemigo.png,Planta de ensamblaje de aeronaves,Aircraft Assembly Plant,enemigo,9
+produccion_de_armamento__desconocido.png,Producción de armamento,Armament Production,desconocido,9
+produccion_de_armamento__propio.png,Producción de armamento,Armament Production,propio,9
+produccion_de_armamento__neutral.png,Producción de armamento,Armament Production,neutral,9
+produccion_de_armamento__enemigo.png,Producción de armamento,Armament Production,enemigo,9
+produccion_de_vehiculos_militares__desconocido.png,Producción de vehículos militares,Military Vehicle Production,desconocido,9
+produccion_de_vehiculos_militares__propio.png,Producción de vehículos militares,Military Vehicle Production,propio,9
+produccion_de_vehiculos_militares__neutral.png,Producción de vehículos militares,Military Vehicle Production,neutral,9
+produccion_de_vehiculos_militares__enemigo.png,Producción de vehículos militares,Military Vehicle Production,enemigo,9
+produccion_de_equipos_de_ingenieros__desconocido.png,Producción de equipos de ingenieros,Engineering Equipment Production,desconocido,9
+produccion_de_equipos_de_ingenieros__propio.png,Producción de equipos de ingenieros,Engineering Equipment Production,propio,9
+produccion_de_equipos_de_ingenieros__neutral.png,Producción de equipos de ingenieros,Engineering Equipment Production,neutral,9
+produccion_de_equipos_de_ingenieros__enemigo.png,Producción de equipos de ingenieros,Engineering Equipment Production,enemigo,9
+produccion_de_puentes__desconocido.png,Producción de puentes,Bridge Production,desconocido,9
+produccion_de_puentes__propio.png,Producción de puentes,Bridge Production,propio,9
+produccion_de_puentes__neutral.png,Producción de puentes,Bridge Production,neutral,9
+produccion_de_puentes__enemigo.png,Producción de puentes,Bridge Production,enemigo,9
+produccion_de_armas_biologicas__desconocido.png,Producción de armas biológicas,Bio Warfare Production,desconocido,9
+produccion_de_armas_biologicas__propio.png,Producción de armas biológicas,Bio Warfare Production,propio,9
+produccion_de_armas_biologicas__neutral.png,Producción de armas biológicas,Bio Warfare Production,neutral,9
+produccion_de_armas_biologicas__enemigo.png,Producción de armas biológicas,Bio Warfare Production,enemigo,9
+produccion_de_misiles_y_sistemas_espaciales__desconocido.png,Producción de misiles y sistemas espaciales,Missile and Space System Production,desconocido,9
+produccion_de_misiles_y_sistemas_espaciales__propio.png,Producción de misiles y sistemas espaciales,Missile and Space System Production,propio,9
+produccion_de_misiles_y_sistemas_espaciales__neutral.png,Producción de misiles y sistemas espaciales,Missile and Space System Production,neutral,9
+produccion_de_misiles_y_sistemas_espaciales__enemigo.png,Producción de misiles y sistemas espaciales,Missile and Space System Production,enemigo,9
+instalacion_de_transporte__desconocido.png,Instalación de transporte,Transportation Facility,desconocido,10
+instalacion_de_transporte__propio.png,Instalación de transporte,Transportation Facility,propio,10
+instalacion_de_transporte__neutral.png,Instalación de transporte,Transportation Facility,neutral,10
+instalacion_de_transporte__enemigo.png,Instalación de transporte,Transportation Facility,enemigo,10
+astillero_naval__desconocido.png,Astillero naval,Navy Shipyard,desconocido,10
+astillero_naval__propio.png,Astillero naval,Navy Shipyard,propio,10
+astillero_naval__neutral.png,Astillero naval,Navy Shipyard,neutral,10
+astillero_naval__enemigo.png,Astillero naval,Navy Shipyard,enemigo,10
+conduccion_gubernamental__desconocido.png,Conducción gubernamental,Government Leadership,desconocido,10
+conduccion_gubernamental__propio.png,Conducción gubernamental,Government Leadership,propio,10
+conduccion_gubernamental__neutral.png,Conducción gubernamental,Government Leadership,neutral,10
+conduccion_gubernamental__enemigo.png,Conducción gubernamental,Government Leadership,enemigo,10
+base_o_instalacion_militar__desconocido.png,Base o instalación militar,Military Base / Facility,desconocido,10
+base_o_instalacion_militar__propio.png,Base o instalación militar,Military Base / Facility,propio,10
+base_o_instalacion_militar__neutral.png,Base o instalación militar,Military Base / Facility,neutral,10
+base_o_instalacion_militar__enemigo.png,Base o instalación militar,Military Base / Facility,enemigo,10
+aeropuerto_o_base_aerea__desconocido.png,Aeropuerto o base aérea,Airport / Airbase,desconocido,10
+aeropuerto_o_base_aerea__propio.png,Aeropuerto o base aérea,Airport / Airbase,propio,10
+aeropuerto_o_base_aerea__neutral.png,Aeropuerto o base aérea,Airport / Airbase,neutral,10
+aeropuerto_o_base_aerea__enemigo.png,Aeropuerto o base aérea,Airport / Airbase,enemigo,10
+instalacion_medica__desconocido.png,Instalación médica,Medical facility,desconocido,10
+instalacion_medica__propio.png,Instalación médica,Medical facility,propio,10
+instalacion_medica__neutral.png,Instalación médica,Medical facility,neutral,10
+instalacion_medica__enemigo.png,Instalación médica,Medical facility,enemigo,10
+hospital__desconocido.png,Hospital,Hospital,desconocido,10
+hospital__propio.png,Hospital,Hospital,propio,10
+hospital__neutral.png,Hospital,Hospital,neutral,10
+hospital__enemigo.png,Hospital,Hospital,enemigo,10
+base_naval__desconocido.png,Base naval,Naval Base,desconocido,10
+base_naval__propio.png,Base naval,Naval Base,propio,10
+base_naval__neutral.png,Base naval,Naval Base,neutral,10
+base_naval__enemigo.png,Base naval,Naval Base,enemigo,10
+puerto_maritimo__desconocido.png,Puerto marítimo,Sea Port / Harbor,desconocido,10
+puerto_maritimo__propio.png,Puerto marítimo,Sea Port / Harbor,propio,10
+puerto_maritimo__neutral.png,Puerto marítimo,Sea Port / Harbor,neutral,10
+puerto_maritimo__enemigo.png,Puerto marítimo,Sea Port / Harbor,enemigo,10
+aviacion__desconocido.png,Aviación,Aviation,desconocido,29
+aviacion__propio.png,Aviación,Aviation,propio,29
+aviacion__neutral.png,Aviación,Aviation,neutral,29
+aviacion__enemigo.png,Aviación,Aviation,enemigo,29
+ala_fija__desconocido.png,Ala fija,Fixed Wing,desconocido,29
+ala_fija__propio.png,Ala fija,Fixed Wing,propio,29
+ala_fija__neutral.png,Ala fija,Fixed Wing,neutral,29
+ala_fija__enemigo.png,Ala fija,Fixed Wing,enemigo,29
+ala_fija_utilitaria__desconocido.png,Ala fija utilitaria,Fixed Wing Utility,desconocido,29
+ala_fija_utilitaria__propio.png,Ala fija utilitaria,Fixed Wing Utility,propio,29
+ala_fija_utilitaria__neutral.png,Ala fija utilitaria,Fixed Wing Utility,neutral,29
+ala_fija_utilitaria__enemigo.png,Ala fija utilitaria,Fixed Wing Utility,enemigo,29
+ala_fija_de_ataque__desconocido.png,Ala fija de ataque,Fixed Wing Attack,desconocido,29
+ala_fija_de_ataque__propio.png,Ala fija de ataque,Fixed Wing Attack,propio,29
+ala_fija_de_ataque__neutral.png,Ala fija de ataque,Fixed Wing Attack,neutral,29
+ala_fija_de_ataque__enemigo.png,Ala fija de ataque,Fixed Wing Attack,enemigo,29
+ala_fija_de_reconocimiento__desconocido.png,Ala fija de reconocimiento,Fixed Wing Recon,desconocido,29
+ala_fija_de_reconocimiento__propio.png,Ala fija de reconocimiento,Fixed Wing Recon,propio,29
+ala_fija_de_reconocimiento__neutral.png,Ala fija de reconocimiento,Fixed Wing Recon,neutral,29
+ala_fija_de_reconocimiento__enemigo.png,Ala fija de reconocimiento,Fixed Wing Recon,enemigo,29
+ala_rotativa__desconocido.png,Ala rotativa,Rotary Wing,desconocido,29
+ala_rotativa__propio.png,Ala rotativa,Rotary Wing,propio,29
+ala_rotativa__neutral.png,Ala rotativa,Rotary Wing,neutral,29
+ala_rotativa__enemigo.png,Ala rotativa,Rotary Wing,enemigo,29
+ala_rotativa_de_ataque__desconocido.png,Ala rotativa de ataque,Rotary Wing Attack,desconocido,29
+ala_rotativa_de_ataque__propio.png,Ala rotativa de ataque,Rotary Wing Attack,propio,29
+ala_rotativa_de_ataque__neutral.png,Ala rotativa de ataque,Rotary Wing Attack,neutral,29
+ala_rotativa_de_ataque__enemigo.png,Ala rotativa de ataque,Rotary Wing Attack,enemigo,29
+ala_rotativa_de_exploracion__desconocido.png,Ala rotativa de exploración,Rotary Wing Scout,desconocido,29
+ala_rotativa_de_exploracion__propio.png,Ala rotativa de exploración,Rotary Wing Scout,propio,29
+ala_rotativa_de_exploracion__neutral.png,Ala rotativa de exploración,Rotary Wing Scout,neutral,29
+ala_rotativa_de_exploracion__enemigo.png,Ala rotativa de exploración,Rotary Wing Scout,enemigo,29
+ala_rotativa_de_patrulla_antisubmarina__desconocido.png,Ala rotativa de patrulla antisubmarina,Rotary Wing ASW Patrol,desconocido,30
+ala_rotativa_de_patrulla_antisubmarina__propio.png,Ala rotativa de patrulla antisubmarina,Rotary Wing ASW Patrol,propio,30
+ala_rotativa_de_patrulla_antisubmarina__neutral.png,Ala rotativa de patrulla antisubmarina,Rotary Wing ASW Patrol,neutral,30
+ala_rotativa_de_patrulla_antisubmarina__enemigo.png,Ala rotativa de patrulla antisubmarina,Rotary Wing ASW Patrol,enemigo,30
+ala_rotativa_utilitaria__desconocido.png,Ala rotativa utilitaria,Rotary Wing Utility,desconocido,30
+ala_rotativa_utilitaria__propio.png,Ala rotativa utilitaria,Rotary Wing Utility,propio,30
+ala_rotativa_utilitaria__neutral.png,Ala rotativa utilitaria,Rotary Wing Utility,neutral,30
+ala_rotativa_utilitaria__enemigo.png,Ala rotativa utilitaria,Rotary Wing Utility,enemigo,30
+ala_rotativa_utilitaria_liviana__desconocido.png,Ala rotativa utilitaria liviana,Rotary Wing Light Utility,desconocido,30
+ala_rotativa_utilitaria_liviana__propio.png,Ala rotativa utilitaria liviana,Rotary Wing Light Utility,propio,30
+ala_rotativa_utilitaria_liviana__neutral.png,Ala rotativa utilitaria liviana,Rotary Wing Light Utility,neutral,30
+ala_rotativa_utilitaria_liviana__enemigo.png,Ala rotativa utilitaria liviana,Rotary Wing Light Utility,enemigo,30
+ala_rotativa_utilitaria_mediana__desconocido.png,Ala rotativa utilitaria mediana,Rotary Wing Medium Utility,desconocido,30
+ala_rotativa_utilitaria_mediana__propio.png,Ala rotativa utilitaria mediana,Rotary Wing Medium Utility,propio,30
+ala_rotativa_utilitaria_mediana__neutral.png,Ala rotativa utilitaria mediana,Rotary Wing Medium Utility,neutral,30
+ala_rotativa_utilitaria_mediana__enemigo.png,Ala rotativa utilitaria mediana,Rotary Wing Medium Utility,enemigo,30
+ala_rotativa_utilitaria_pesada__desconocido.png,Ala rotativa utilitaria pesada,Rotary Wing Heavy Utility,desconocido,30
+ala_rotativa_utilitaria_pesada__propio.png,Ala rotativa utilitaria pesada,Rotary Wing Heavy Utility,propio,30
+ala_rotativa_utilitaria_pesada__neutral.png,Ala rotativa utilitaria pesada,Rotary Wing Heavy Utility,neutral,30
+ala_rotativa_utilitaria_pesada__enemigo.png,Ala rotativa utilitaria pesada,Rotary Wing Heavy Utility,enemigo,30
+ala_rotativa_de_comando_y_control__desconocido.png,Ala rotativa de comando y control,Rotary Wing C2,desconocido,30
+ala_rotativa_de_comando_y_control__propio.png,Ala rotativa de comando y control,Rotary Wing C2,propio,30
+ala_rotativa_de_comando_y_control__neutral.png,Ala rotativa de comando y control,Rotary Wing C2,neutral,30
+ala_rotativa_de_comando_y_control__enemigo.png,Ala rotativa de comando y control,Rotary Wing C2,enemigo,30
+ala_rotativa_de_evacuacion_medica__desconocido.png,Ala rotativa de evacuación médica,Rotary Wing Medivac,desconocido,30
+ala_rotativa_de_evacuacion_medica__propio.png,Ala rotativa de evacuación médica,Rotary Wing Medivac,propio,30
+ala_rotativa_de_evacuacion_medica__neutral.png,Ala rotativa de evacuación médica,Rotary Wing Medivac,neutral,30
+ala_rotativa_de_evacuacion_medica__enemigo.png,Ala rotativa de evacuación médica,Rotary Wing Medivac,enemigo,30
+ala_rotativa_de_contramedidas_de_minas__desconocido.png,Ala rotativa de contramedidas de minas,Rotary Wing Mine Counter Measure,desconocido,30
+ala_rotativa_de_contramedidas_de_minas__propio.png,Ala rotativa de contramedidas de minas,Rotary Wing Mine Counter Measure,propio,30
+ala_rotativa_de_contramedidas_de_minas__neutral.png,Ala rotativa de contramedidas de minas,Rotary Wing Mine Counter Measure,neutral,30
+ala_rotativa_de_contramedidas_de_minas__enemigo.png,Ala rotativa de contramedidas de minas,Rotary Wing Mine Counter Measure,enemigo,30
+aviacion_de_busqueda_y_rescate__desconocido.png,Aviación de búsqueda y rescate,Aviation Search and Rescue,desconocido,31
+aviacion_de_busqueda_y_rescate__propio.png,Aviación de búsqueda y rescate,Aviation Search and Rescue,propio,31
+aviacion_de_busqueda_y_rescate__neutral.png,Aviación de búsqueda y rescate,Aviation Search and Rescue,neutral,31
+aviacion_de_busqueda_y_rescate__enemigo.png,Aviación de búsqueda y rescate,Aviation Search and Rescue,enemigo,31
+aviacion_compuesta__desconocido.png,Aviación compuesta,Aviation Composite,desconocido,31
+aviacion_compuesta__propio.png,Aviación compuesta,Aviation Composite,propio,31
+aviacion_compuesta__neutral.png,Aviación compuesta,Aviation Composite,neutral,31
+aviacion_compuesta__enemigo.png,Aviación compuesta,Aviation Composite,enemigo,31
+despegue_y_aterrizaje_vertical_o_corto__desconocido.png,Despegue y aterrizaje vertical o corto,VSTOL,desconocido,31
+despegue_y_aterrizaje_vertical_o_corto__propio.png,Despegue y aterrizaje vertical o corto,VSTOL,propio,31
+despegue_y_aterrizaje_vertical_o_corto__neutral.png,Despegue y aterrizaje vertical o corto,VSTOL,neutral,31
+despegue_y_aterrizaje_vertical_o_corto__enemigo.png,Despegue y aterrizaje vertical o corto,VSTOL,enemigo,31
+vehiculo_aereo_no_tripulado__desconocido.png,Vehículo aéreo no tripulado,Unmanned Aerial Vehicle,desconocido,31
+vehiculo_aereo_no_tripulado__propio.png,Vehículo aéreo no tripulado,Unmanned Aerial Vehicle,propio,31
+vehiculo_aereo_no_tripulado__neutral.png,Vehículo aéreo no tripulado,Unmanned Aerial Vehicle,neutral,31
+vehiculo_aereo_no_tripulado__enemigo.png,Vehículo aéreo no tripulado,Unmanned Aerial Vehicle,enemigo,31
+vehiculo_aereo_no_tripulado_de_ala_fija__desconocido.png,Vehículo aéreo no tripulado de ala fija,Unmanned Aerial Vehicle Fixed Wing,desconocido,31
+vehiculo_aereo_no_tripulado_de_ala_fija__propio.png,Vehículo aéreo no tripulado de ala fija,Unmanned Aerial Vehicle Fixed Wing,propio,31
+vehiculo_aereo_no_tripulado_de_ala_fija__neutral.png,Vehículo aéreo no tripulado de ala fija,Unmanned Aerial Vehicle Fixed Wing,neutral,31
+vehiculo_aereo_no_tripulado_de_ala_fija__enemigo.png,Vehículo aéreo no tripulado de ala fija,Unmanned Aerial Vehicle Fixed Wing,enemigo,31
+vehiculo_aereo_no_tripulado_de_ala_rotativa__desconocido.png,Vehículo aéreo no tripulado de ala rotativa,Unmanned Aerial Vehicle Rotary Wing,desconocido,31
+vehiculo_aereo_no_tripulado_de_ala_rotativa__propio.png,Vehículo aéreo no tripulado de ala rotativa,Unmanned Aerial Vehicle Rotary Wing,propio,31
+vehiculo_aereo_no_tripulado_de_ala_rotativa__neutral.png,Vehículo aéreo no tripulado de ala rotativa,Unmanned Aerial Vehicle Rotary Wing,neutral,31
+vehiculo_aereo_no_tripulado_de_ala_rotativa__enemigo.png,Vehículo aéreo no tripulado de ala rotativa,Unmanned Aerial Vehicle Rotary Wing,enemigo,31
+defensa_antiaerea__desconocido.png,Defensa antiaérea,Air Defense,desconocido,32
+defensa_antiaerea__propio.png,Defensa antiaérea,Air Defense,propio,32
+defensa_antiaerea__neutral.png,Defensa antiaérea,Air Defense,neutral,32
+defensa_antiaerea__enemigo.png,Defensa antiaérea,Air Defense,enemigo,32
+defensa_antiaerea_de_corto_alcance__desconocido.png,Defensa antiaérea de corto alcance,Air Defense Short Range,desconocido,32
+defensa_antiaerea_de_corto_alcance__propio.png,Defensa antiaérea de corto alcance,Air Defense Short Range,propio,32
+defensa_antiaerea_de_corto_alcance__neutral.png,Defensa antiaérea de corto alcance,Air Defense Short Range,neutral,32
+defensa_antiaerea_de_corto_alcance__enemigo.png,Defensa antiaérea de corto alcance,Air Defense Short Range,enemigo,32
+chaparral__desconocido.png,Chaparral,Chaparral,desconocido,32
+chaparral__propio.png,Chaparral,Chaparral,propio,32
+chaparral__neutral.png,Chaparral,Chaparral,neutral,32
+chaparral__enemigo.png,Chaparral,Chaparral,enemigo,32
+stinger__desconocido.png,Stinger,Stinger,desconocido,32
+stinger__propio.png,Stinger,Stinger,propio,32
+stinger__neutral.png,Stinger,Stinger,neutral,32
+stinger__enemigo.png,Stinger,Stinger,enemigo,32
+vulcan__desconocido.png,Vulcan,Vulcan,desconocido,32
+vulcan__propio.png,Vulcan,Vulcan,propio,32
+vulcan__neutral.png,Vulcan,Vulcan,neutral,32
+vulcan__enemigo.png,Vulcan,Vulcan,enemigo,32
+misil_de_defensa_antiaerea__desconocido.png,Misil de defensa antiaérea,Air Defense Missile,desconocido,32
+misil_de_defensa_antiaerea__propio.png,Misil de defensa antiaérea,Air Defense Missile,propio,32
+misil_de_defensa_antiaerea__neutral.png,Misil de defensa antiaérea,Air Defense Missile,neutral,32
+misil_de_defensa_antiaerea__enemigo.png,Misil de defensa antiaérea,Air Defense Missile,enemigo,32
+misil_liviano_de_defensa_antiaerea__desconocido.png,Misil liviano de defensa antiaérea,Air Defense Missile Light,desconocido,32
+misil_liviano_de_defensa_antiaerea__propio.png,Misil liviano de defensa antiaérea,Air Defense Missile Light,propio,32
+misil_liviano_de_defensa_antiaerea__neutral.png,Misil liviano de defensa antiaérea,Air Defense Missile Light,neutral,32
+misil_liviano_de_defensa_antiaerea__enemigo.png,Misil liviano de defensa antiaérea,Air Defense Missile Light,enemigo,32
+misil_antiaereo_avenger_motorizado__desconocido.png,Misil antiaéreo Avenger motorizado,Avenger AD Missile Motorized,desconocido,32
+misil_antiaereo_avenger_motorizado__propio.png,Misil antiaéreo Avenger motorizado,Avenger AD Missile Motorized,propio,32
+misil_antiaereo_avenger_motorizado__neutral.png,Misil antiaéreo Avenger motorizado,Avenger AD Missile Motorized,neutral,32
+misil_antiaereo_avenger_motorizado__enemigo.png,Misil antiaéreo Avenger motorizado,Avenger AD Missile Motorized,enemigo,32
+misil_antiaereo_de_alcance_medio__desconocido.png,Misil antiaéreo de alcance medio,AD Missile Medium,desconocido,33
+misil_antiaereo_de_alcance_medio__propio.png,Misil antiaéreo de alcance medio,AD Missile Medium,propio,33
+misil_antiaereo_de_alcance_medio__neutral.png,Misil antiaéreo de alcance medio,AD Missile Medium,neutral,33
+misil_antiaereo_de_alcance_medio__enemigo.png,Misil antiaéreo de alcance medio,AD Missile Medium,enemigo,33
+misil_antiaereo_pesado__desconocido.png,Misil antiaéreo pesado,AD Missile Heavy,desconocido,33
+misil_antiaereo_pesado__propio.png,Misil antiaéreo pesado,AD Missile Heavy,propio,33
+misil_antiaereo_pesado__neutral.png,Misil antiaéreo pesado,AD Missile Heavy,neutral,33
+misil_antiaereo_pesado__enemigo.png,Misil antiaéreo pesado,AD Missile Heavy,enemigo,33
+misil_antiaereo_h_mad__desconocido.png,Misil antiaéreo H/MAD,Air Defense Missile H/MAD,desconocido,33
+misil_antiaereo_h_mad__propio.png,Misil antiaéreo H/MAD,Air Defense Missile H/MAD,propio,33
+misil_antiaereo_h_mad__neutral.png,Misil antiaéreo H/MAD,Air Defense Missile H/MAD,neutral,33
+misil_antiaereo_h_mad__enemigo.png,Misil antiaéreo H/MAD,Air Defense Missile H/MAD,enemigo,33
+patriot__desconocido.png,Patriot,Patriot,desconocido,33
+patriot__propio.png,Patriot,Patriot,propio,33
+patriot__neutral.png,Patriot,Patriot,neutral,33
+patriot__enemigo.png,Patriot,Patriot,enemigo,33
+unidad_de_canones_antiaereos__desconocido.png,Unidad de cañones antiaéreos,Air Defense Gun Unit,desconocido,33
+unidad_de_canones_antiaereos__propio.png,Unidad de cañones antiaéreos,Air Defense Gun Unit,propio,33
+unidad_de_canones_antiaereos__neutral.png,Unidad de cañones antiaéreos,Air Defense Gun Unit,neutral,33
+unidad_de_canones_antiaereos__enemigo.png,Unidad de cañones antiaéreos,Air Defense Gun Unit,enemigo,33
+defensa_antiaerea_compuesta__desconocido.png,Defensa antiaérea compuesta,Air Defense Composite,desconocido,33
+defensa_antiaerea_compuesta__propio.png,Defensa antiaérea compuesta,Air Defense Composite,propio,33
+defensa_antiaerea_compuesta__neutral.png,Defensa antiaérea compuesta,Air Defense Composite,neutral,33
+defensa_antiaerea_compuesta__enemigo.png,Defensa antiaérea compuesta,Air Defense Composite,enemigo,33
+defensa_contra_misiles_de_teatro__desconocido.png,Defensa contra misiles de teatro,Theater Missile Defense,desconocido,33
+defensa_contra_misiles_de_teatro__propio.png,Defensa contra misiles de teatro,Theater Missile Defense,propio,33
+defensa_contra_misiles_de_teatro__neutral.png,Defensa contra misiles de teatro,Theater Missile Defense,neutral,33
+defensa_contra_misiles_de_teatro__enemigo.png,Defensa contra misiles de teatro,Theater Missile Defense,enemigo,33
+unidad_de_adquisicion_de_blancos_antiaereos__desconocido.png,Unidad de adquisición de blancos antiaéreos,Air Defense Targeting Unit,desconocido,33
+unidad_de_adquisicion_de_blancos_antiaereos__propio.png,Unidad de adquisición de blancos antiaéreos,Air Defense Targeting Unit,propio,33
+unidad_de_adquisicion_de_blancos_antiaereos__neutral.png,Unidad de adquisición de blancos antiaéreos,Air Defense Targeting Unit,neutral,33
+unidad_de_adquisicion_de_blancos_antiaereos__enemigo.png,Unidad de adquisición de blancos antiaéreos,Air Defense Targeting Unit,enemigo,33
+inteligencia_militar__desconocido.png,Inteligencia militar,Military Intelligence,desconocido,42
+inteligencia_militar__propio.png,Inteligencia militar,Military Intelligence,propio,42
+inteligencia_militar__neutral.png,Inteligencia militar,Military Intelligence,neutral,42
+inteligencia_militar__enemigo.png,Inteligencia militar,Military Intelligence,enemigo,42
+explotacion_aerea__desconocido.png,Explotación aérea,Aerial Exploitation,desconocido,42
+explotacion_aerea__propio.png,Explotación aérea,Aerial Exploitation,propio,42
+explotacion_aerea__neutral.png,Explotación aérea,Aerial Exploitation,neutral,42
+explotacion_aerea__enemigo.png,Explotación aérea,Aerial Exploitation,enemigo,42
+inteligencia_de_senales__desconocido.png,Inteligencia de señales,Signals Intelligence,desconocido,42
+inteligencia_de_senales__propio.png,Inteligencia de señales,Signals Intelligence,propio,42
+inteligencia_de_senales__neutral.png,Inteligencia de señales,Signals Intelligence,neutral,42
+inteligencia_de_senales__enemigo.png,Inteligencia de señales,Signals Intelligence,enemigo,42
+guerra_electronica__desconocido.png,Guerra electrónica,Electronic Warfare,desconocido,42
+guerra_electronica__propio.png,Guerra electrónica,Electronic Warfare,propio,42
+guerra_electronica__neutral.png,Guerra electrónica,Electronic Warfare,neutral,42
+guerra_electronica__enemigo.png,Guerra electrónica,Electronic Warfare,enemigo,42
+vehiculo_blindado_a_ruedas_de_guerra_electronica__desconocido.png,Vehículo blindado a ruedas de guerra electrónica,EW Armored Wheeled Vehicle,desconocido,42
+vehiculo_blindado_a_ruedas_de_guerra_electronica__propio.png,Vehículo blindado a ruedas de guerra electrónica,EW Armored Wheeled Vehicle,propio,42
+vehiculo_blindado_a_ruedas_de_guerra_electronica__neutral.png,Vehículo blindado a ruedas de guerra electrónica,EW Armored Wheeled Vehicle,neutral,42
+vehiculo_blindado_a_ruedas_de_guerra_electronica__enemigo.png,Vehículo blindado a ruedas de guerra electrónica,EW Armored Wheeled Vehicle,enemigo,42
+radiogoniometria_de_guerra_electronica__desconocido.png,Radiogoniometría de guerra electrónica,EW Direction Finding,desconocido,42
+radiogoniometria_de_guerra_electronica__propio.png,Radiogoniometría de guerra electrónica,EW Direction Finding,propio,42
+radiogoniometria_de_guerra_electronica__neutral.png,Radiogoniometría de guerra electrónica,EW Direction Finding,neutral,42
+radiogoniometria_de_guerra_electronica__enemigo.png,Radiogoniometría de guerra electrónica,EW Direction Finding,enemigo,42
+interceptacion_de_guerra_electronica__desconocido.png,Interceptación de guerra electrónica,EW Intercept,desconocido,42
+interceptacion_de_guerra_electronica__propio.png,Interceptación de guerra electrónica,EW Intercept,propio,42
+interceptacion_de_guerra_electronica__neutral.png,Interceptación de guerra electrónica,EW Intercept,neutral,42
+interceptacion_de_guerra_electronica__enemigo.png,Interceptación de guerra electrónica,EW Intercept,enemigo,42
+perturbacion_de_guerra_electronica__desconocido.png,Perturbación de guerra electrónica,EW Jamming,desconocido,42
+perturbacion_de_guerra_electronica__propio.png,Perturbación de guerra electrónica,EW Jamming,propio,42
+perturbacion_de_guerra_electronica__neutral.png,Perturbación de guerra electrónica,EW Jamming,neutral,42
+perturbacion_de_guerra_electronica__enemigo.png,Perturbación de guerra electrónica,EW Jamming,enemigo,42
+guerra_electronica_de_teatro__desconocido.png,Guerra electrónica de teatro,EW Theater,desconocido,43
+guerra_electronica_de_teatro__propio.png,Guerra electrónica de teatro,EW Theater,propio,43
+guerra_electronica_de_teatro__neutral.png,Guerra electrónica de teatro,EW Theater,neutral,43
+guerra_electronica_de_teatro__enemigo.png,Guerra electrónica de teatro,EW Theater,enemigo,43
+guerra_electronica_de_cuerpo__desconocido.png,Guerra electrónica de cuerpo,EW Corps,desconocido,43
+guerra_electronica_de_cuerpo__propio.png,Guerra electrónica de cuerpo,EW Corps,propio,43
+guerra_electronica_de_cuerpo__neutral.png,Guerra electrónica de cuerpo,EW Corps,neutral,43
+guerra_electronica_de_cuerpo__enemigo.png,Guerra electrónica de cuerpo,EW Corps,enemigo,43
+contrainteligencia__desconocido.png,Contrainteligencia,Counter Intelligence,desconocido,43
+contrainteligencia__propio.png,Contrainteligencia,Counter Intelligence,propio,43
+contrainteligencia__neutral.png,Contrainteligencia,Counter Intelligence,neutral,43
+contrainteligencia__enemigo.png,Contrainteligencia,Counter Intelligence,enemigo,43
+vigilancia_de_inteligencia_militar__desconocido.png,Vigilancia de inteligencia militar,MI Surveillance,desconocido,43
+vigilancia_de_inteligencia_militar__propio.png,Vigilancia de inteligencia militar,MI Surveillance,propio,43
+vigilancia_de_inteligencia_militar__neutral.png,Vigilancia de inteligencia militar,MI Surveillance,neutral,43
+vigilancia_de_inteligencia_militar__enemigo.png,Vigilancia de inteligencia militar,MI Surveillance,enemigo,43
+radar_terrestre_de_vigilancia_de_inteligencia_militar__desconocido.png,Radar terrestre de vigilancia de inteligencia militar,MI Ground Surveillance Radar,desconocido,43
+radar_terrestre_de_vigilancia_de_inteligencia_militar__propio.png,Radar terrestre de vigilancia de inteligencia militar,MI Ground Surveillance Radar,propio,43
+radar_terrestre_de_vigilancia_de_inteligencia_militar__neutral.png,Radar terrestre de vigilancia de inteligencia militar,MI Ground Surveillance Radar,neutral,43
+radar_terrestre_de_vigilancia_de_inteligencia_militar__enemigo.png,Radar terrestre de vigilancia de inteligencia militar,MI Ground Surveillance Radar,enemigo,43
+sensor__desconocido.png,Sensor,Sensor,desconocido,43
+sensor__propio.png,Sensor,Sensor,propio,43
+sensor__neutral.png,Sensor,Sensor,neutral,43
+sensor__enemigo.png,Sensor,Sensor,enemigo,43
+sensor_scm__desconocido.png,Sensor SCM,SCM Sensor,desconocido,43
+sensor_scm__propio.png,Sensor SCM,SCM Sensor,propio,43
+sensor_scm__neutral.png,Sensor SCM,SCM Sensor,neutral,43
+sensor_scm__enemigo.png,Sensor SCM,SCM Sensor,enemigo,43
+modulo_de_estacion_terrestre__desconocido.png,Módulo de estación terrestre,Ground Station Module,desconocido,43
+modulo_de_estacion_terrestre__propio.png,Módulo de estación terrestre,Ground Station Module,propio,43
+modulo_de_estacion_terrestre__neutral.png,Módulo de estación terrestre,Ground Station Module,neutral,43
+modulo_de_estacion_terrestre__enemigo.png,Módulo de estación terrestre,Ground Station Module,enemigo,43
+meteorologia__desconocido.png,Meteorología,Meterology,desconocido,44
+meteorologia__propio.png,Meteorología,Meterology,propio,44
+meteorologia__neutral.png,Meteorología,Meterology,neutral,44
+meteorologia__enemigo.png,Meteorología,Meterology,enemigo,44
+explotacion_tactica__desconocido.png,Explotación táctica,Tactical Exploitation,desconocido,44
+explotacion_tactica__propio.png,Explotación táctica,Tactical Exploitation,propio,44
+explotacion_tactica__neutral.png,Explotación táctica,Tactical Exploitation,neutral,44
+explotacion_tactica__enemigo.png,Explotación táctica,Tactical Exploitation,enemigo,44
+interrogatorio__desconocido.png,Interrogatorio,Interrogation,desconocido,44
+interrogatorio__propio.png,Interrogatorio,Interrogation,propio,44
+interrogatorio__neutral.png,Interrogatorio,Interrogation,neutral,44
+interrogatorio__enemigo.png,Interrogatorio,Interrogation,enemigo,44
+centro_conjunto_de_inteligencia__desconocido.png,Centro conjunto de inteligencia,Joint Intelligence Center,desconocido,44
+centro_conjunto_de_inteligencia__propio.png,Centro conjunto de inteligencia,Joint Intelligence Center,propio,44
+centro_conjunto_de_inteligencia__neutral.png,Centro conjunto de inteligencia,Joint Intelligence Center,neutral,44
+centro_conjunto_de_inteligencia__enemigo.png,Centro conjunto de inteligencia,Joint Intelligence Center,enemigo,44
+operaciones__desconocido.png,Operaciones,Operations,desconocido,44
+operaciones__propio.png,Operaciones,Operations,propio,44
+operaciones__neutral.png,Operaciones,Operations,neutral,44
+operaciones__enemigo.png,Operaciones,Operations,enemigo,44
+lanzador_de_misiles__desconocido.png,Lanzador de misiles,Missile Launcher,desconocido,64
+lanzador_de_misiles__propio.png,Lanzador de misiles,Missile Launcher,propio,64
+lanzador_de_misiles__neutral.png,Lanzador de misiles,Missile Launcher,neutral,64
+lanzador_de_misiles__enemigo.png,Lanzador de misiles,Missile Launcher,enemigo,64
+lanzador_de_misiles_antiaereos__desconocido.png,Lanzador de misiles antiaéreos,AD Missile Launcher,desconocido,64
+lanzador_de_misiles_antiaereos__propio.png,Lanzador de misiles antiaéreos,AD Missile Launcher,propio,64
+lanzador_de_misiles_antiaereos__neutral.png,Lanzador de misiles antiaéreos,AD Missile Launcher,neutral,64
+lanzador_de_misiles_antiaereos__enemigo.png,Lanzador de misiles antiaéreos,AD Missile Launcher,enemigo,64
+lanzador_de_misiles_antiaereos_2__desconocido.png,Lanzador de misiles antiaéreos,AD Missile Launcher,desconocido,64
+lanzador_de_misiles_antiaereos_2__propio.png,Lanzador de misiles antiaéreos,AD Missile Launcher,propio,64
+lanzador_de_misiles_antiaereos_2__neutral.png,Lanzador de misiles antiaéreos,AD Missile Launcher,neutral,64
+lanzador_de_misiles_antiaereos_2__enemigo.png,Lanzador de misiles antiaéreos,AD Missile Launcher,enemigo,64
+lanzador_de_misiles_antiaereos_de_corto_alcance__desconocido.png,Lanzador de misiles antiaéreos de corto alcance,Short Range AD Missile Launcher,desconocido,64
+lanzador_de_misiles_antiaereos_de_corto_alcance__propio.png,Lanzador de misiles antiaéreos de corto alcance,Short Range AD Missile Launcher,propio,64
+lanzador_de_misiles_antiaereos_de_corto_alcance__neutral.png,Lanzador de misiles antiaéreos de corto alcance,Short Range AD Missile Launcher,neutral,64
+lanzador_de_misiles_antiaereos_de_corto_alcance__enemigo.png,Lanzador de misiles antiaéreos de corto alcance,Short Range AD Missile Launcher,enemigo,64
+lanzador_de_misiles_antiaereos_de_alcance_medio__desconocido.png,Lanzador de misiles antiaéreos de alcance medio,Medium Range AD Missile Launcher,desconocido,64
+lanzador_de_misiles_antiaereos_de_alcance_medio__propio.png,Lanzador de misiles antiaéreos de alcance medio,Medium Range AD Missile Launcher,propio,64
+lanzador_de_misiles_antiaereos_de_alcance_medio__neutral.png,Lanzador de misiles antiaéreos de alcance medio,Medium Range AD Missile Launcher,neutral,64
+lanzador_de_misiles_antiaereos_de_alcance_medio__enemigo.png,Lanzador de misiles antiaéreos de alcance medio,Medium Range AD Missile Launcher,enemigo,64
+lanzador_de_misiles_antiaereos_de_alcance_medio_2__desconocido.png,Lanzador de misiles antiaéreos de alcance medio,Medium Range AD Missile Launcher,desconocido,64
+lanzador_de_misiles_antiaereos_de_alcance_medio_2__propio.png,Lanzador de misiles antiaéreos de alcance medio,Medium Range AD Missile Launcher,propio,64
+lanzador_de_misiles_antiaereos_de_alcance_medio_2__neutral.png,Lanzador de misiles antiaéreos de alcance medio,Medium Range AD Missile Launcher,neutral,64
+lanzador_de_misiles_antiaereos_de_alcance_medio_2__enemigo.png,Lanzador de misiles antiaéreos de alcance medio,Medium Range AD Missile Launcher,enemigo,64
+lanzador_de_misiles_antiaereos_de_corto_alcance_2__desconocido.png,Lanzador de misiles antiaéreos de corto alcance,Short Range AD Missile Launcher,desconocido,64
+lanzador_de_misiles_antiaereos_de_corto_alcance_2__propio.png,Lanzador de misiles antiaéreos de corto alcance,Short Range AD Missile Launcher,propio,64
+lanzador_de_misiles_antiaereos_de_corto_alcance_2__neutral.png,Lanzador de misiles antiaéreos de corto alcance,Short Range AD Missile Launcher,neutral,64
+lanzador_de_misiles_antiaereos_de_corto_alcance_2__enemigo.png,Lanzador de misiles antiaéreos de corto alcance,Short Range AD Missile Launcher,enemigo,64
+equipo_terrestre__desconocido.png,Equipo terrestre,Ground Equipment,desconocido,64
+equipo_terrestre__propio.png,Equipo terrestre,Ground Equipment,propio,64
+equipo_terrestre__neutral.png,Equipo terrestre,Ground Equipment,neutral,64
+equipo_terrestre__enemigo.png,Equipo terrestre,Ground Equipment,enemigo,64
+lanzador_de_misiles_2__desconocido.png,Lanzador de misiles,Missile Launcher,desconocido,64
+lanzador_de_misiles_2__propio.png,Lanzador de misiles,Missile Launcher,propio,64
+lanzador_de_misiles_2__neutral.png,Lanzador de misiles,Missile Launcher,neutral,64
+lanzador_de_misiles_2__enemigo.png,Lanzador de misiles,Missile Launcher,enemigo,64
+misil_antiaereo_de_largo_alcance__desconocido.png,Misil antiaéreo de largo alcance,Long Range AD Missile,desconocido,64
+misil_antiaereo_de_largo_alcance__propio.png,Misil antiaéreo de largo alcance,Long Range AD Missile,propio,64
+misil_antiaereo_de_largo_alcance__neutral.png,Misil antiaéreo de largo alcance,Long Range AD Missile,neutral,64
+misil_antiaereo_de_largo_alcance__enemigo.png,Misil antiaéreo de largo alcance,Long Range AD Missile,enemigo,64
+misil_antiaereo_de_largo_alcance_2__desconocido.png,Misil antiaéreo de largo alcance,Long Range AD Missile,desconocido,64
+misil_antiaereo_de_largo_alcance_2__propio.png,Misil antiaéreo de largo alcance,Long Range AD Missile,propio,64
+misil_antiaereo_de_largo_alcance_2__neutral.png,Misil antiaéreo de largo alcance,Long Range AD Missile,neutral,64
+misil_antiaereo_de_largo_alcance_2__enemigo.png,Misil antiaéreo de largo alcance,Long Range AD Missile,enemigo,64
+misil_antiaereo_de_teatro__desconocido.png,Misil antiaéreo de teatro,Theater AD Missile,desconocido,65
+misil_antiaereo_de_teatro__propio.png,Misil antiaéreo de teatro,Theater AD Missile,propio,65
+misil_antiaereo_de_teatro__neutral.png,Misil antiaéreo de teatro,Theater AD Missile,neutral,65
+misil_antiaereo_de_teatro__enemigo.png,Misil antiaéreo de teatro,Theater AD Missile,enemigo,65
+misil_antiaereo_de_teatro_2__desconocido.png,Misil antiaéreo de teatro,Theater AD Missile,desconocido,65
+misil_antiaereo_de_teatro_2__propio.png,Misil antiaéreo de teatro,Theater AD Missile,propio,65
+misil_antiaereo_de_teatro_2__neutral.png,Misil antiaéreo de teatro,Theater AD Missile,neutral,65
+misil_antiaereo_de_teatro_2__enemigo.png,Misil antiaéreo de teatro,Theater AD Missile,enemigo,65
+lanzador_de_misiles_superficie_superficie__desconocido.png,Lanzador de misiles superficie-superficie,Surf to Surf Missile Launcher,desconocido,65
+lanzador_de_misiles_superficie_superficie__propio.png,Lanzador de misiles superficie-superficie,Surf to Surf Missile Launcher,propio,65
+lanzador_de_misiles_superficie_superficie__neutral.png,Lanzador de misiles superficie-superficie,Surf to Surf Missile Launcher,neutral,65
+lanzador_de_misiles_superficie_superficie__enemigo.png,Lanzador de misiles superficie-superficie,Surf to Surf Missile Launcher,enemigo,65
+lanzador_de_misiles_superficie_superficie_de_corto_alcance__desconocido.png,Lanzador de misiles superficie-superficie de corto alcance,Short Range Surf to Surf Missile Launcher,desconocido,65
+lanzador_de_misiles_superficie_superficie_de_corto_alcance__propio.png,Lanzador de misiles superficie-superficie de corto alcance,Short Range Surf to Surf Missile Launcher,propio,65
+lanzador_de_misiles_superficie_superficie_de_corto_alcance__neutral.png,Lanzador de misiles superficie-superficie de corto alcance,Short Range Surf to Surf Missile Launcher,neutral,65
+lanzador_de_misiles_superficie_superficie_de_corto_alcance__enemigo.png,Lanzador de misiles superficie-superficie de corto alcance,Short Range Surf to Surf Missile Launcher,enemigo,65
+lanzador_de_misiles_superficie_superficie_de_corto_alcance_2__desconocido.png,Lanzador de misiles superficie-superficie de corto alcance,Short Range Surf to Surf Missile Launcher,desconocido,65
+lanzador_de_misiles_superficie_superficie_de_corto_alcance_2__propio.png,Lanzador de misiles superficie-superficie de corto alcance,Short Range Surf to Surf Missile Launcher,propio,65
+lanzador_de_misiles_superficie_superficie_de_corto_alcance_2__neutral.png,Lanzador de misiles superficie-superficie de corto alcance,Short Range Surf to Surf Missile Launcher,neutral,65
+lanzador_de_misiles_superficie_superficie_de_corto_alcance_2__enemigo.png,Lanzador de misiles superficie-superficie de corto alcance,Short Range Surf to Surf Missile Launcher,enemigo,65
+lanzador_de_misiles_superficie_superficie_2__desconocido.png,Lanzador de misiles superficie-superficie,Surf to Surf Missile Launcher,desconocido,65
+lanzador_de_misiles_superficie_superficie_2__propio.png,Lanzador de misiles superficie-superficie,Surf to Surf Missile Launcher,propio,65
+lanzador_de_misiles_superficie_superficie_2__neutral.png,Lanzador de misiles superficie-superficie,Surf to Surf Missile Launcher,neutral,65
+lanzador_de_misiles_superficie_superficie_2__enemigo.png,Lanzador de misiles superficie-superficie,Surf to Surf Missile Launcher,enemigo,65
+lanzador_de_misiles_superficie_superficie_de_alcance_medio__desconocido.png,Lanzador de misiles superficie-superficie de alcance medio,Medium Range Surf to Surf Missile Launcher,desconocido,65
+lanzador_de_misiles_superficie_superficie_de_alcance_medio__propio.png,Lanzador de misiles superficie-superficie de alcance medio,Medium Range Surf to Surf Missile Launcher,propio,65
+lanzador_de_misiles_superficie_superficie_de_alcance_medio__neutral.png,Lanzador de misiles superficie-superficie de alcance medio,Medium Range Surf to Surf Missile Launcher,neutral,65
+lanzador_de_misiles_superficie_superficie_de_alcance_medio__enemigo.png,Lanzador de misiles superficie-superficie de alcance medio,Medium Range Surf to Surf Missile Launcher,enemigo,65
+lanzador_de_misiles_superficie_superficie_de_alcance_medio_2__desconocido.png,Lanzador de misiles superficie-superficie de alcance medio,Medium Range Surf to Surf Missile Launcher,desconocido,65
+lanzador_de_misiles_superficie_superficie_de_alcance_medio_2__propio.png,Lanzador de misiles superficie-superficie de alcance medio,Medium Range Surf to Surf Missile Launcher,propio,65
+lanzador_de_misiles_superficie_superficie_de_alcance_medio_2__neutral.png,Lanzador de misiles superficie-superficie de alcance medio,Medium Range Surf to Surf Missile Launcher,neutral,65
+lanzador_de_misiles_superficie_superficie_de_alcance_medio_2__enemigo.png,Lanzador de misiles superficie-superficie de alcance medio,Medium Range Surf to Surf Missile Launcher,enemigo,65
+lanzador_de_misiles_superficie_superficie_de_largo_alcance__desconocido.png,Lanzador de misiles superficie-superficie de largo alcance,Long Range Surf to Surf Missile Launcher,desconocido,65
+lanzador_de_misiles_superficie_superficie_de_largo_alcance__propio.png,Lanzador de misiles superficie-superficie de largo alcance,Long Range Surf to Surf Missile Launcher,propio,65
+lanzador_de_misiles_superficie_superficie_de_largo_alcance__neutral.png,Lanzador de misiles superficie-superficie de largo alcance,Long Range Surf to Surf Missile Launcher,neutral,65
+lanzador_de_misiles_superficie_superficie_de_largo_alcance__enemigo.png,Lanzador de misiles superficie-superficie de largo alcance,Long Range Surf to Surf Missile Launcher,enemigo,65
+lanzador_de_misiles_superficie_superficie_de_largo_alcance_2__desconocido.png,Lanzador de misiles superficie-superficie de largo alcance,Long Range Surf to Surf Missile Launcher,desconocido,65
+lanzador_de_misiles_superficie_superficie_de_largo_alcance_2__propio.png,Lanzador de misiles superficie-superficie de largo alcance,Long Range Surf to Surf Missile Launcher,propio,65
+lanzador_de_misiles_superficie_superficie_de_largo_alcance_2__neutral.png,Lanzador de misiles superficie-superficie de largo alcance,Long Range Surf to Surf Missile Launcher,neutral,65
+lanzador_de_misiles_superficie_superficie_de_largo_alcance_2__enemigo.png,Lanzador de misiles superficie-superficie de largo alcance,Long Range Surf to Surf Missile Launcher,enemigo,65
+sensor__desconocido.png,Sensor,Sensor,desconocido,88
+sensor__propio.png,Sensor,Sensor,propio,88
+sensor__neutral.png,Sensor,Sensor,neutral,88
+sensor__enemigo.png,Sensor,Sensor,enemigo,88
+sensor_2__desconocido.png,Sensor,Sensor,desconocido,88
+sensor_2__propio.png,Sensor,Sensor,propio,88
+sensor_2__neutral.png,Sensor,Sensor,neutral,88
+sensor_2__enemigo.png,Sensor,Sensor,enemigo,88
+sensor_emplazado__desconocido.png,Sensor emplazado,Emplaced Sensor,desconocido,88
+sensor_emplazado__propio.png,Sensor emplazado,Emplaced Sensor,propio,88
+sensor_emplazado__neutral.png,Sensor emplazado,Emplaced Sensor,neutral,88
+sensor_emplazado__enemigo.png,Sensor emplazado,Emplaced Sensor,enemigo,88
+sensor_emplazado_2__desconocido.png,Sensor emplazado,Emplaced Sensor,desconocido,88
+sensor_emplazado_2__propio.png,Sensor emplazado,Emplaced Sensor,propio,88
+sensor_emplazado_2__neutral.png,Sensor emplazado,Emplaced Sensor,neutral,88
+sensor_emplazado_2__enemigo.png,Sensor emplazado,Emplaced Sensor,enemigo,88
+radar__desconocido.png,Radar,Radar,desconocido,88
+radar__propio.png,Radar,Radar,propio,88
+radar__neutral.png,Radar,Radar,neutral,88
+radar__enemigo.png,Radar,Radar,enemigo,88
+radar_2__desconocido.png,Radar,Radar,desconocido,88
+radar_2__propio.png,Radar,Radar,propio,88
+radar_2__neutral.png,Radar,Radar,neutral,88
+radar_2__enemigo.png,Radar,Radar,enemigo,88
+laser__desconocido.png,Láser,Laser,desconocido,88
+laser__propio.png,Láser,Laser,propio,88
+laser__neutral.png,Láser,Laser,neutral,88
+laser__enemigo.png,Láser,Laser,enemigo,88
+laser_2__desconocido.png,Láser,Laser,desconocido,88
+laser_2__propio.png,Láser,Laser,propio,88
+laser_2__neutral.png,Láser,Laser,neutral,88
+laser_2__enemigo.png,Láser,Laser,enemigo,88
