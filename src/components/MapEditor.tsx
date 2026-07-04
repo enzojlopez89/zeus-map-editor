@@ -39,7 +39,7 @@ type BaseMilitar = {
   longitude: number;
   latitude: number;
   bando: Bando;
-  tipo: "Base aérea" | "Estación radar" | "Centro de comando";
+  tipo: "Base aérea" | "Estación radar" | "Centro de comando" | "Comunicaciones";
 };
 
 type MascaraRadar = {
@@ -71,6 +71,9 @@ type MedioCatalogo = {
   alcanceKm: number;
   cantidad?: number;
   descripcion?: string;
+  terminoDistancia?: string;
+  fuenteDistancia?: FuenteDistancia;
+  referenciaDistancia?: string;
 };
 
 type PropiedadesRepublica = {
@@ -187,6 +190,31 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -35.47,
     bando: "propio",
     tipo: "Base aérea",
+  },
+];
+
+const COAE_RIO_CUARTO: BaseMilitar = {
+  nombre: "COAe / Río Cuarto",
+  longitude: -64.261,
+  latitude: -33.085,
+  bando: "propio",
+  tipo: "Centro de comando",
+};
+
+const GRUPOS_COMUNICACIONES: BaseMilitar[] = [
+  {
+    nombre: "Grupo 1 COM / San Luis",
+    longitude: -66.356,
+    latitude: -33.274,
+    bando: "propio",
+    tipo: "Comunicaciones",
+  },
+  {
+    nombre: "Grupo 2 COM / Malargüe",
+    longitude: -69.58,
+    latitude: -35.47,
+    bando: "propio",
+    tipo: "Comunicaciones",
   },
 ];
 
@@ -680,126 +708,70 @@ const CATALOGO_DEFENSA_PROPIA: MedioCatalogo[] = [
 ];
 
 const CATALOGO_DEFENSA_ENEMIGA: MedioCatalogo[] = [
-  {
-    nombre: "SA-29",
-    base: "Ala Aérea n.º 2 / Sáenz Peña",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-    descripcion: "Escuela de Defensa Aérea; cantidad no indicada",
-  },
-  {
-    nombre: "ZSU-23-2",
-    base: "Ala Aérea n.º 2 / Sáenz Peña",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-    descripcion: "Escuela de Defensa Aérea; cantidad no indicada",
-  },
-  {
-    nombre: "SA-8",
-    base: "Ala Aérea n.º 2 / Sáenz Peña",
-    bando: "enemigo",
-    alcanceKm: 10,
-    cantidad: 5,
-    descripcion: "Escuela de Defensa Aérea",
-  },
-  {
-    nombre: "S-300",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 150,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "I-HAWK",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 40,
-    cantidad: 2,
-  },
-  {
-    nombre: "Pantsir-S1",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 12,
-    cantidad: 4,
-  },
-  {
-    nombre: "ZSU-23-2",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "SA-29",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "S-300",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 150,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "Pantsir SA-22",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 12,
-    cantidad: 2,
-  },
-  {
-    nombre: "SA-8",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 10,
-    cantidad: 4,
-  },
-  {
-    nombre: "ZSU-23",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "SA-29",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-    descripcion: "Cantidad no indicada en la orden",
-  },
   ...[
-    ["Ala Aérea n.º 5 / Tucumán", "I-HAWK", 40, undefined],
-    ["Ala Aérea n.º 5 / Tucumán", "ZSU-23", 2.5, undefined],
-    ["Ala Aérea n.º 5 / Tucumán", "SA-29", 6.5, undefined],
-    ["Ala Aérea n.º 6 / Formosa", "I-HAWK", 40, undefined],
-    ["Ala Aérea n.º 6 / Formosa", "Pantsir SA-22", 12, 4],
-    ["Ala Aérea n.º 6 / Formosa", "SA-29", 6.5, undefined],
-    ["Ala Aérea n.º 6 / Formosa", "ZSU-23", 2.5, undefined],
-    ["Ala Aérea n.º 7 / Belén", "S-300", 150, undefined],
-    ["Ala Aérea n.º 7 / Belén", "SA-8", 10, 5],
-    ["Ala Aérea n.º 7 / Belén", "SA-29", 6.5, undefined],
-    ["Ala Aérea n.º 7 / Belén", "ZSU-23", 2.5, undefined],
-    ["Ala Aérea n.º 8 / Tartagal", "I-HAWK", 40, undefined],
-    ["Ala Aérea n.º 8 / Tartagal", "SA-29", 6.5, undefined],
-    ["Ala Aérea n.º 8 / Tartagal", "ZSU-23", 2.5, undefined],
-    ["Ala Aérea n.º 9 / Las Lomitas", "S-300", 150, undefined],
-    ["Ala Aérea n.º 9 / Las Lomitas", "Pantsir SA-22", 12, 4],
-    ["Ala Aérea n.º 9 / Las Lomitas", "ZSU-23-2", 2.5, undefined],
-    ["Ala Aérea n.º 9 / Las Lomitas", "SA-29", 6.5, undefined],
-  ].map(([base, nombre, alcanceKm, cantidad]) => ({
-    nombre: nombre as string,
-    base: base as string,
-    bando: "enemigo" as const,
-    alcanceKm: alcanceKm as number,
-    cantidad: cantidad as number | undefined,
-    descripcion:
-      cantidad === undefined ? "Cantidad no indicada en la orden" : undefined,
-  })),
+    ["Ala Aérea n.º 2 / Sáenz Peña", "SA-29", 6.5, undefined, "Sistema SA-29; cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 2 / Sáenz Peña", "ZSU-23-2", 2.5, undefined, "Sistema ZSU-23-2; no se aplica el alcance del ZSU-23-4 Shilka por tratarse de otro modelo"],
+    ["Ala Aérea n.º 2 / Sáenz Peña", "SA-8 Osa-AK", 30, 5, "Radar asociado: Land Roll"],
+
+    ["Ala Aérea n.º 3 / Salta", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 3 / Salta", "Improved HAWK", 70, 2, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 3 / Salta", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 3 / Salta", "ZSU-23-2", 2.5, undefined, "Modelo indicado por la orden; distinto del ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 3 / Salta", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+
+    ["Ala Aérea n.º 4 / Catamarca", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 4 / Catamarca", "Pantsir-S1", 28, 2, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 4 / Catamarca", "SA-8 Osa-AK", 30, 4, "Radar asociado: Land Roll"],
+    ["Ala Aérea n.º 4 / Catamarca", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 4 / Catamarca", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+
+    ["Ala Aérea n.º 5 / Tucumán", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 5 / Tucumán", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 5 / Tucumán", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+
+    ["Ala Aérea n.º 6 / Formosa", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 6 / Formosa", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 6 / Formosa", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 6 / Formosa", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+
+    ["Ala Aérea n.º 7 / Belén", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 7 / Belén", "SA-8 Osa-AK", 30, 5, "Radar asociado: Land Roll"],
+    ["Ala Aérea n.º 7 / Belén", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 7 / Belén", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+
+    ["Ala Aérea n.º 8 / Tartagal", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 8 / Tartagal", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 8 / Tartagal", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+
+    ["Ala Aérea n.º 9 / Las Lomitas", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 9 / Las Lomitas", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 9 / Las Lomitas", "ZSU-23-2", 2.5, undefined, "Modelo indicado por la orden; distinto del ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 9 / Las Lomitas", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+  ].map(([base, nombre, alcanceKm, cantidad, descripcion]) => {
+    const referencias: Record<string, string> = {
+      "S-300 PMU-1": 'Dato aportado para el ejercicio: 30N6E "Flap Lid", 150 km / 81 MN',
+      "Improved HAWK": "Dato aportado para el ejercicio: AN/MPQ-46 / AN/MPQ-61, 70 km / 38 MN",
+      "Pantsir-S1": "Dato aportado para el ejercicio: 1RS2-1E, 28 km / 15 MN",
+      "SA-8 Osa-AK": "Dato aportado para el ejercicio: Land Roll, 30 km / 16 MN",
+      "ZSU-23-4 Shilka": 'Dato aportado para el ejercicio: RPK-2 "Gun Dish", 20 km / 11 MN',
+    };
+
+    return {
+      nombre: nombre as string,
+      base: base as string,
+      bando: "enemigo" as const,
+      alcanceKm: alcanceKm as number,
+      cantidad: cantidad as number | undefined,
+      descripcion: descripcion as string,
+      terminoDistancia: referencias[nombre as string]
+        ? "Alcance máximo del radar asociado"
+        : "Alcance del sistema",
+      fuenteDistancia: "externa" as const,
+      referenciaDistancia:
+        referencias[nombre as string] ??
+        "Valor externo de referencia; no especificado en la orden de instrucción",
+    };
+  }),
 ];
 
 const MASCARAS_RADAR: MascaraRadar[] = [
@@ -1259,6 +1231,8 @@ export default function MapEditor() {
   const etiquetasRef = useRef<Record<string, maplibregl.Marker>>({});
   const oceanosRef = useRef<Record<string, maplibregl.Marker>>({});
   const basesRef = useRef<Record<string, maplibregl.Marker>>({});
+  const coaeRef = useRef<maplibregl.Marker | null>(null);
+  const comunicacionesRef = useRef<Record<string, maplibregl.Marker>>({});
   const dimensionesTonRef = useRef<Record<string, maplibregl.Marker>>({});
   const medicionMarkersRef = useRef<maplibregl.Marker[]>([]);
   const modoMedicionRef = useRef(false);
@@ -1273,6 +1247,7 @@ export default function MapEditor() {
     useState(true);
   const [mostrarTon, setMostrarTon] = useState(true);
   const [mostrarBases, setMostrarBases] = useState(true);
+  const [mostrarComunicaciones, setMostrarComunicaciones] = useState(false);
   const [mostrarAeronaves, setMostrarAeronaves] = useState(true);
   const [mostrarRadares, setMostrarRadares] = useState(true);
   const [mostrarDefensa, setMostrarDefensa] = useState(true);
@@ -1532,15 +1507,23 @@ export default function MapEditor() {
       alcanceKm: medio.alcanceKm,
       mostrarAnillo: true,
       color:
-        medio.bando === "propio"
-          ? tipo === "radar"
-            ? "#7c3aed"
-            : "#dc2626"
-          : tipo === "radar"
-            ? "#f59e0b"
-            : "#991b1b",
+        medio.fuenteDistancia === "orden"
+          ? COLOR_ORDEN
+          : medio.fuenteDistancia === "externa"
+            ? COLOR_EXTERNO
+            : medio.bando === "propio"
+              ? tipo === "radar"
+                ? "#7c3aed"
+                : "#dc2626"
+              : tipo === "radar"
+                ? "#f59e0b"
+                : "#991b1b",
       cantidad: medio.cantidad,
       descripcion: medio.descripcion,
+      terminoDistancia:
+        medio.terminoDistancia ?? "Alcance máximo del sistema",
+      fuenteDistancia: medio.fuenteDistancia,
+      referenciaDistancia: medio.referenciaDistancia,
     };
 
     setElementos((anteriores) => [...anteriores, nuevoElemento]);
@@ -1831,19 +1814,21 @@ export default function MapEditor() {
           type: "fill",
           source: "paises-aledanos",
           paint: {
-            "fill-color": "#a9c8e3",
+            "fill-color": "#dbeafe",
             "fill-opacity": 1,
             "fill-antialias": false,
           },
         });
 
+        // Borde del mismo color y levemente ancho para cubrir rendijas de antialiasing
+        // entre la máscara exterior y las repúblicas cuando se activa el relieve.
         map.addLayer({
           id: "paises-aledanos-borde",
           type: "line",
           source: "paises-aledanos",
           paint: {
-            "line-color": "#a9c8e3",
-            "line-width": 10,
+            "line-color": "#dbeafe",
+            "line-width": 3,
             "line-opacity": 1,
           },
         });
@@ -1944,6 +1929,68 @@ export default function MapEditor() {
             : "Error al cargar el GeoJSON.",
         );
       }
+
+      const crearMarcadorEspecial = (
+        elemento: BaseMilitar,
+        texto: string,
+        colorFondo: string,
+      ) => {
+        const contenedor = document.createElement("div");
+        contenedor.style.width = "44px";
+        contenedor.style.height = "44px";
+        contenedor.style.display = "flex";
+        contenedor.style.alignItems = "center";
+        contenedor.style.justifyContent = "center";
+        contenedor.style.background = colorFondo;
+        contenedor.style.border = "3px solid #0f172a";
+        contenedor.style.borderRadius = "4px";
+        contenedor.style.color = "#0f172a";
+        contenedor.style.fontSize = "10px";
+        contenedor.style.fontWeight = "900";
+        contenedor.style.textAlign = "center";
+        contenedor.style.lineHeight = "1";
+        contenedor.style.boxShadow = "0 2px 6px rgba(0,0,0,0.45)";
+        contenedor.textContent = texto;
+        contenedor.title = elemento.nombre;
+        return contenedor;
+      };
+
+      const marcadorCOAe = new maplibregl.Marker({
+        element: crearMarcadorEspecial(COAE_RIO_CUARTO, "COAe", "#67e8f9"),
+        anchor: "center",
+      })
+        .setLngLat([COAE_RIO_CUARTO.longitude, COAE_RIO_CUARTO.latitude])
+        .setPopup(
+          new maplibregl.Popup({ offset: 25, maxWidth: "380px", className: "zeus-popup" }).setHTML(`
+            <div style="background:#0f172a;color:white;padding:14px">
+              <strong>COAe / Río Cuarto</strong><br />
+              Comando de Operaciones Aeroespaciales<br />
+              <em>Punto fijo propio</em>
+            </div>
+          `),
+        )
+        .addTo(map);
+      coaeRef.current = marcadorCOAe;
+
+      GRUPOS_COMUNICACIONES.forEach((grupo) => {
+        const marcador = new maplibregl.Marker({
+          element: crearMarcadorEspecial(grupo, "COM", "#67e8f9"),
+          anchor: "center",
+        })
+          .setLngLat([grupo.longitude, grupo.latitude])
+          .setPopup(
+            new maplibregl.Popup({ offset: 25, maxWidth: "380px", className: "zeus-popup" }).setHTML(`
+              <div style="background:#0f172a;color:white;padding:14px">
+                <strong>${grupo.nombre}</strong><br />
+                Grupo de Comunicaciones<br />
+                <em>Bando propio</em>
+              </div>
+            `),
+          )
+          .addTo(map);
+        marcador.getElement().style.display = "none";
+        comunicacionesRef.current[grupo.nombre] = marcador;
+      });
 
       [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
         const marker = new maplibregl.Marker({
@@ -2249,6 +2296,8 @@ export default function MapEditor() {
       Object.values(etiquetasRef.current).forEach((marker) => marker.remove());
       Object.values(oceanosRef.current).forEach((marker) => marker.remove());
       Object.values(basesRef.current).forEach((marker) => marker.remove());
+      coaeRef.current?.remove();
+      Object.values(comunicacionesRef.current).forEach((marker) => marker.remove());
       Object.values(dimensionesTonRef.current).forEach((marker) =>
         marker.remove(),
       );
@@ -2258,6 +2307,8 @@ export default function MapEditor() {
       etiquetasRef.current = {};
       oceanosRef.current = {};
       basesRef.current = {};
+      coaeRef.current = null;
+      comunicacionesRef.current = {};
       dimensionesTonRef.current = {};
       medicionMarkersRef.current = [];
 
@@ -2486,6 +2537,12 @@ export default function MapEditor() {
   }, [mostrarBases, vistaFuerzas, basesVisibles]);
 
   useEffect(() => {
+    Object.values(comunicacionesRef.current).forEach((marcador) => {
+      marcador.getElement().style.display = mostrarComunicaciones ? "flex" : "none";
+    });
+  }, [mostrarComunicaciones]);
+
+  useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
@@ -2665,6 +2722,21 @@ export default function MapEditor() {
             />
             Bases y estaciones
           </label>
+
+          <label className="mt-3 flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={mostrarComunicaciones}
+              onChange={(event) =>
+                setMostrarComunicaciones(event.target.checked)
+              }
+            />
+            Grupos de Comunicaciones
+          </label>
+
+          <p className="mt-2 text-xs text-slate-400">
+            El COAe de Río Cuarto permanece visible como punto fijo.
+          </p>
         </section>
 
         <section className="mb-5 rounded bg-slate-900 p-4">
