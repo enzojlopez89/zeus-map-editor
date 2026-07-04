@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import maplibregl from "maplibre-gl";
 import { circle, lineString, length as turfLength } from "@turf/turf";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -93,6 +93,35 @@ type IconoCatalogo = {
 };
 
 type PuntoMedicion = [number, number];
+
+type PanelId =
+  | "fuerzas"
+  | "referencia"
+  | "capas"
+  | "bases"
+  | "mascaras"
+  | "colores"
+  | "cartografia"
+  | "medicion"
+  | "visibilidad"
+  | "elementos"
+  | "personalizado"
+  | "desplegados";
+
+const ORDEN_PANELES_INICIAL: PanelId[] = [
+  "fuerzas",
+  "referencia",
+  "capas",
+  "bases",
+  "mascaras",
+  "colores",
+  "cartografia",
+  "medicion",
+  "visibilidad",
+  "elementos",
+  "personalizado",
+  "desplegados",
+];
 
 const TON_GEOJSON: GeoJSON.FeatureCollection = {
   type: "FeatureCollection",
@@ -1257,6 +1286,8 @@ export default function MapEditor() {
   const [intervaloGrilla, setIntervaloGrilla] = useState(2);
   const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(false);
   const [modoMedicion, setModoMedicion] = useState(false);
+  const [ordenPaneles, setOrdenPaneles] = useState<PanelId[]>(ORDEN_PANELES_INICIAL);
+  const panelArrastradoRef = useRef<PanelId | null>(null);
   const [puntosMedicion, setPuntosMedicion] = useState<PuntoMedicion[]>([]);
   const [distanciaMedicionKm, setDistanciaMedicionKm] = useState(0);
   const [coordenadasCursor, setCoordenadasCursor] = useState({
@@ -1705,6 +1736,100 @@ export default function MapEditor() {
   }
 
   useEffect(() => {
+    try {
+      const guardado = window.localStorage.getItem("zeus-orden-paneles");
+      if (!guardado) return;
+      const orden = JSON.parse(guardado) as PanelId[];
+      if (
+        Array.isArray(orden) &&
+        ORDEN_PANELES_INICIAL.every((id) => orden.includes(id))
+      ) {
+        setOrdenPaneles(orden);
+      }
+    } catch {
+      // Se conserva el orden inicial si el navegador no permite almacenamiento local.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "zeus-orden-paneles",
+        JSON.stringify(ordenPaneles),
+      );
+    } catch {
+      // El orden sigue funcionando durante la sesión actual.
+    }
+  }, [ordenPaneles]);
+
+  function soltarPanel(destino: PanelId) {
+    const origen = panelArrastradoRef.current;
+    panelArrastradoRef.current = null;
+    if (!origen || origen === destino) return;
+
+    setOrdenPaneles((ordenActual) => {
+      const siguiente = ordenActual.filter((id) => id !== origen);
+      const indiceDestino = siguiente.indexOf(destino);
+      siguiente.splice(indiceDestino, 0, origen);
+      return siguiente;
+    });
+  }
+
+  function propiedadesPanel(id: PanelId) {
+    return {
+      draggable: true,
+
+      style: {
+        order: ordenPaneles.indexOf(id),
+        cursor: "grab",
+        userSelect: "none" as const,
+      },
+
+      onDragStart: (event: DragEvent<HTMLElement>) => {
+        panelArrastradoRef.current = id;
+
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", id);
+
+        event.currentTarget.style.opacity = "0.55";
+        event.currentTarget.style.cursor = "grabbing";
+      },
+
+      onDragEnter: (event: DragEvent<HTMLElement>) => {
+        event.preventDefault();
+      },
+
+      onDragOver: (event: DragEvent<HTMLElement>) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+      },
+
+      onDrop: (event: DragEvent<HTMLElement>) => {
+        event.preventDefault();
+        soltarPanel(id);
+      },
+
+      onDragEnd: (event: DragEvent<HTMLElement>) => {
+        event.currentTarget.style.opacity = "1";
+        event.currentTarget.style.cursor = "grab";
+        panelArrastradoRef.current = null;
+      },
+
+      title: "Arrastrar este recuadro para cambiar su posición",
+    };
+  }
+
+  function verTodoTerritorio() {
+    mapRef.current?.fitBounds(
+      [
+        [-78, -57],
+        [-48, -19],
+      ],
+      { padding: 35, duration: 900 },
+    );
+  }
+
+  useEffect(() => {
     modoMedicionRef.current = modoMedicion;
     const map = mapRef.current;
     if (map) {
@@ -1730,13 +1855,13 @@ export default function MapEditor() {
           },
         ],
       },
-      center: [-64.5, -35.5],
-      zoom: 4,
-      minZoom: 3,
-      maxZoom: 12,
+      center: [-63.5, -38],
+      zoom: 3,
+      minZoom: 1.75,
+      maxZoom: 14,
       maxBounds: [
-        [-82, -60],
-        [-47, -18],
+        [-95, -70],
+        [-30, -5],
       ],
     });
 
@@ -2657,11 +2782,16 @@ export default function MapEditor() {
 
   return (
     <div className="flex h-screen w-screen">
-      <aside className="w-[420px] overflow-y-auto bg-slate-950 p-5 text-white">
-        <h1 className="mb-5 text-xl font-bold">EJERCICIO ZEUS (TO NORTE)</h1>
+      <aside className="flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white">
+        <h1 className="mb-2 text-xl font-bold" style={{ order: -2 }}>
+          EJERCICIO ZEUS (TO NORTE)
+        </h1>
+        <p className="mb-5 text-xs text-slate-400" style={{ order: -1 }}>
+          Arrastrá cualquier recuadro para ordenar el panel a tu gusto.
+        </p>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Fuerzas visibles</h2>
+        <section {...propiedadesPanel("fuerzas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Fuerzas visibles</h2>
 
           <select
             value={vistaFuerzas}
@@ -2676,14 +2806,14 @@ export default function MapEditor() {
           </select>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4 text-sm">
-          <h2 className="mb-2 font-semibold">Referencia de radios</h2>
+        <section {...propiedadesPanel("referencia")} className="mb-5 cursor-move rounded bg-slate-900 p-4 text-sm">
+          <h2 className="mb-2 font-semibold">↕ Referencia de radios</h2>
           <div className="mb-2 flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-green-600" />Valor tomado de la orden de instrucción</div>
           <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-red-600" />Referencia externa o estimación</div>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Capas territoriales</h2>
+        <section {...propiedadesPanel("capas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Capas territoriales</h2>
 
           <label className="mb-3 flex items-center gap-2">
             <input
@@ -2739,8 +2869,8 @@ export default function MapEditor() {
           </p>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Bases y estaciones visibles</h2>
+        <section {...propiedadesPanel("bases")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Bases y estaciones visibles</h2>
 
           {mostrarControlesPropios && (
             <div className="mb-4 rounded border border-blue-700 p-3">
@@ -2779,8 +2909,8 @@ export default function MapEditor() {
           )}
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Máscaras radar</h2>
+        <section {...propiedadesPanel("mascaras")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Máscaras radar</h2>
 
           {mostrarControlesPropios && (
             <div className="mb-4 rounded border border-blue-700 p-3">
@@ -2896,8 +3026,8 @@ export default function MapEditor() {
           </p>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Colores de las repúblicas</h2>
+        <section {...propiedadesPanel("colores")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Colores de las repúblicas</h2>
           {Object.keys(COLORES_REPUBLICAS).map((nombre) => (
             <label
               key={nombre}
@@ -2919,8 +3049,16 @@ export default function MapEditor() {
           ))}
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Cartografía y coordenadas</h2>
+        <section {...propiedadesPanel("cartografia")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Cartografía y coordenadas</h2>
+
+          <button
+            type="button"
+            onClick={verTodoTerritorio}
+            className="mb-4 w-full rounded bg-sky-700 px-3 py-2 text-sm font-semibold hover:bg-sky-600"
+          >
+            Ver todo el territorio
+          </button>
 
           <label className="mb-3 flex items-center gap-2">
             <input
@@ -2991,9 +3129,9 @@ export default function MapEditor() {
           </div>
         </section>
 
-        <section className="mb-5 rounded border border-yellow-600 bg-slate-900 p-4">
+        <section {...propiedadesPanel("medicion")} className="mb-5 cursor-move rounded border border-yellow-600 bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold text-yellow-300">
-            Medición de distancias
+            ↕ Medición de distancias
           </h2>
 
           <button
@@ -3035,8 +3173,8 @@ export default function MapEditor() {
           </p>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Visibilidad de medios</h2>
+        <section {...propiedadesPanel("visibilidad")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Visibilidad de medios</h2>
 
           <label className="mb-3 flex items-center gap-2">
             <input
@@ -3344,8 +3482,8 @@ export default function MapEditor() {
           </div>
         )}
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Elementos visibles</h2>
+        <section {...propiedadesPanel("elementos")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Elementos visibles</h2>
           {elementos.length === 0 ? (
             <p className="text-xs text-slate-400">
               Todavía no agregaste medios.
@@ -3375,9 +3513,9 @@ export default function MapEditor() {
           )}
         </section>
 
-        <section className="mb-5 rounded border border-emerald-700 bg-slate-900 p-4">
+        <section {...propiedadesPanel("personalizado")} className="mb-5 cursor-move rounded border border-emerald-700 bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold text-emerald-300">
-            Agregar medio personalizado
+            ↕ Agregar medio personalizado
           </h2>
 
           <label className="mb-1 block text-xs font-semibold text-slate-300">
@@ -3558,9 +3696,9 @@ export default function MapEditor() {
           </button>
         </section>
 
-        <section className="mb-5">
+        <section {...propiedadesPanel("desplegados")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <label className="mb-2 block text-sm font-semibold">
-            Elementos desplegados
+            ↕ Elementos desplegados
           </label>
 
           <select
