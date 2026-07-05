@@ -8,7 +8,7 @@ export type WorkspaceProfile = {
   allowedPanels: PanelId[];
 };
 
-const ALL_PANELS: PanelId[] = [
+const BASE_PANELS: PanelId[] = [
   "fuerzas",
   "referencia",
   "capas",
@@ -21,28 +21,37 @@ const ALL_PANELS: PanelId[] = [
   "elementos",
   "personalizado",
   "desplegados",
+];
+
+const ALL_PANELS: PanelId[] = [
+  ...BASE_PANELS,
   "inteligencia",
+  "operaciones",
+  "personal",
+  "logistica",
+  "comunicaciones",
+  "compartir",
 ];
 
 export const WORKSPACE_PROFILES: Record<string, WorkspaceProfile> = {
   comandante: {
     code: "comandante",
     shortName: "Comandante TON",
-    mission: "Vista general del Teatro de Operaciones Norte.",
+    mission: "Panorama consolidado de los elementos compartidos por las células.",
     accentClass: "text-amber-300",
     allowedPanels: ALL_PANELS,
   },
   jem: {
     code: "jem",
     shortName: "JEM TON",
-    mission: "Seguimiento integral y coordinación del Estado Mayor.",
+    mission: "Seguimiento integral y consolidación del Estado Mayor.",
     accentClass: "text-violet-300",
     allowedPanels: ALL_PANELS,
   },
   a1: {
     code: "a1",
     shortName: "A1 – Personal",
-    mission: "Espacio de situación de personal, sanidad y apoyo humano.",
+    mission: "Situación de personal, sanidad, reemplazos y evacuación.",
     accentClass: "text-pink-300",
     allowedPanels: [
       "capas",
@@ -52,40 +61,36 @@ export const WORKSPACE_PROFILES: Record<string, WorkspaceProfile> = {
       "visibilidad",
       "personalizado",
       "desplegados",
+      "personal",
+      "compartir",
     ],
   },
   a2: {
     code: "a2",
     shortName: "A2 – Inteligencia",
-    mission: "Amenazas, fuerzas enemigas, radares y defensa aérea.",
+    mission: "Amenazas, fuerzas enemigas, fuentes, confianza y validación.",
     accentClass: "text-red-300",
     allowedPanels: [
-      "fuerzas",
-      "referencia",
-      "capas",
-      "bases",
-      "mascaras",
-      "colores",
-      "cartografia",
-      "medicion",
-      "visibilidad",
-      "elementos",
-      "personalizado",
-      "desplegados",
+      ...BASE_PANELS,
       "inteligencia",
+      "compartir",
     ],
   },
   a3: {
     code: "a3",
     shortName: "A3 – Operaciones",
-    mission: "Planeamiento y conducción de las operaciones aéreas.",
+    mission: "Planeamiento, conducción, misiones, tareas, rutas, radios y REV.",
     accentClass: "text-cyan-300",
-    allowedPanels: ALL_PANELS,
+    allowedPanels: [
+      ...BASE_PANELS,
+      "operaciones",
+      "compartir",
+    ],
   },
   a4: {
     code: "a4",
     shortName: "A4 – Logística",
-    mission: "Bases, rutas, material, abastecimiento y sostenimiento.",
+    mission: "Combustible, armamento, material, transporte y reabastecimiento.",
     accentClass: "text-emerald-300",
     allowedPanels: [
       "capas",
@@ -95,12 +100,14 @@ export const WORKSPACE_PROFILES: Record<string, WorkspaceProfile> = {
       "visibilidad",
       "personalizado",
       "desplegados",
+      "logistica",
+      "compartir",
     ],
   },
   a5: {
     code: "a5",
     shortName: "A5 – Comunicaciones",
-    mission: "Nodos, enlaces, cobertura y medios de comunicaciones.",
+    mission: "Nodos, redes, enlaces, cobertura, cifrado y redundancia.",
     accentClass: "text-sky-300",
     allowedPanels: [
       "capas",
@@ -112,6 +119,8 @@ export const WORKSPACE_PROFILES: Record<string, WorkspaceProfile> = {
       "visibilidad",
       "personalizado",
       "desplegados",
+      "comunicaciones",
+      "compartir",
     ],
   },
 };

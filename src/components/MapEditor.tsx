@@ -44,6 +44,37 @@ export type ElementoOperacional = {
   sharedWithJem?: boolean;
   sharedWithOtherCells?: boolean;
   classification?: ClasificacionInteligencia;
+  originWorkspaceCode?: string;
+  sharedExternal?: boolean;
+  operationMission?: string;
+  operationPhase?: string;
+  operationTask?: string;
+  operationPriority?: string;
+  operationStart?: string;
+  operationEnd?: string;
+  callSign?: string;
+  operationNotes?: string;
+  personnelAssigned?: number;
+  personnelAvailable?: number;
+  personnelCasualties?: number;
+  personnelReplacements?: number;
+  medicalStatus?: string;
+  evacuationRequired?: boolean;
+  personnelNotes?: string;
+  fuelPercent?: number;
+  ammunitionPercent?: number;
+  materialStatus?: string;
+  transportAvailable?: number;
+  resupplyPriority?: string;
+  logisticsNotes?: string;
+  communicationNodeType?: string;
+  networkName?: string;
+  frequency?: string;
+  linkStatus?: string;
+  coverageKm?: number;
+  encryptionStatus?: string;
+  redundancy?: string;
+  communicationsNotes?: string;
 };
 
 type BaseMilitar = {
@@ -119,7 +150,12 @@ export type PanelId =
   | "elementos"
   | "personalizado"
   | "desplegados"
-  | "inteligencia";
+  | "inteligencia"
+  | "operaciones"
+  | "personal"
+  | "logistica"
+  | "comunicaciones"
+  | "compartir";
 
 const ORDEN_PANELES_INICIAL: PanelId[] = [
   "fuerzas",
@@ -135,6 +171,11 @@ const ORDEN_PANELES_INICIAL: PanelId[] = [
   "personalizado",
   "desplegados",
   "inteligencia",
+  "operaciones",
+  "personal",
+  "logistica",
+  "comunicaciones",
+  "compartir",
 ];
 
 export type ZeusMapWorkspaceState = {
@@ -2630,7 +2671,7 @@ export default function MapEditor({
       const marker = new maplibregl.Marker({
         element: crearIconoElemento(elemento),
         anchor: "center",
-        draggable: !readOnly,
+        draggable: !readOnly && !elemento.sharedExternal,
       })
         .setLngLat([elemento.longitude, elemento.latitude])
         .setPopup(
@@ -2647,7 +2688,7 @@ export default function MapEditor({
       });
 
       marker.on("drag", () => {
-        if (readOnly) return;
+        if (readOnly || elemento.sharedExternal) return;
         const posicion = marker.getLngLat();
 
         setElementos((anteriores) =>
@@ -3945,6 +3986,66 @@ export default function MapEditor({
           </select>
         </section>
 
+        {seleccionado?.sharedExternal && (
+          <section className="mb-5 rounded border border-amber-700 bg-amber-950/40 p-4 text-sm text-amber-200">
+            <p className="font-semibold">Elemento compartido por {seleccionado.originWorkspaceCode?.toUpperCase() ?? "otra célula"}</p>
+            <p className="mt-1 text-xs">Se muestra en la vista consolidada. No se guarda ni modifica desde este espacio.</p>
+          </section>
+        )}
+
+        {workspaceCode === "a3" && seleccionado && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("operaciones")} className="mb-5 space-y-4 rounded border border-cyan-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-cyan-300">Ficha de operaciones</h2>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Misión / efecto</span><input value={seleccionado.operationMission ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationMission: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Fase</span><input value={seleccionado.operationPhase ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationPhase: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Prioridad</span><select value={seleccionado.operationPriority ?? "normal"} onChange={(e) => actualizarElemento(seleccionado.id, { operationPriority: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="baja">Baja</option><option value="normal">Normal</option><option value="alta">Alta</option><option value="critica">Crítica</option></select></label>
+            </div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Tarea</span><input value={seleccionado.operationTask ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationTask: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <div className="grid grid-cols-2 gap-3"><label className="block text-sm"><span className="mb-1 block text-slate-300">Inicio</span><input type="datetime-local" value={seleccionado.operationStart ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationStart: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label><label className="block text-sm"><span className="mb-1 block text-slate-300">Fin</span><input type="datetime-local" value={seleccionado.operationEnd ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationEnd: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label></div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Indicativo</span><input value={seleccionado.callSign ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { callSign: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Observaciones</span><textarea rows={3} value={seleccionado.operationNotes ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationNotes: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+          </section>
+        )}
+
+        {workspaceCode === "a1" && seleccionado && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("personal")} className="mb-5 space-y-4 rounded border border-pink-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-pink-300">Situación de personal</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Asignados</span><input type="number" min="0" value={seleccionado.personnelAssigned ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { personnelAssigned: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Disponibles</span><input type="number" min="0" value={seleccionado.personnelAvailable ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { personnelAvailable: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Bajas</span><input type="number" min="0" value={seleccionado.personnelCasualties ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { personnelCasualties: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Reemplazos</span><input type="number" min="0" value={seleccionado.personnelReplacements ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { personnelReplacements: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+            </div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Estado sanitario</span><select value={seleccionado.medicalStatus ?? "normal"} onChange={(e) => actualizarElemento(seleccionado.id, { medicalStatus: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="normal">Normal</option><option value="degradado">Degradado</option><option value="critico">Crítico</option></select></label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={seleccionado.evacuationRequired ?? false} onChange={(e) => actualizarElemento(seleccionado.id, { evacuationRequired: e.target.checked })} /> Requiere evacuación sanitaria</label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Novedades</span><textarea rows={3} value={seleccionado.personnelNotes ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { personnelNotes: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+          </section>
+        )}
+
+        {workspaceCode === "a4" && seleccionado && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("logistica")} className="mb-5 space-y-4 rounded border border-emerald-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-emerald-300">Situación logística</h2>
+            <div className="grid grid-cols-2 gap-3"><label className="block text-sm"><span className="mb-1 block text-slate-300">Combustible %</span><input type="number" min="0" max="100" value={seleccionado.fuelPercent ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { fuelPercent: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label><label className="block text-sm"><span className="mb-1 block text-slate-300">Armamento %</span><input type="number" min="0" max="100" value={seleccionado.ammunitionPercent ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { ammunitionPercent: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label></div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Estado del material</span><select value={seleccionado.materialStatus ?? "operativo"} onChange={(e) => actualizarElemento(seleccionado.id, { materialStatus: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="operativo">Operativo</option><option value="degradado">Degradado</option><option value="no_operativo">No operativo</option></select></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Transportes disponibles</span><input type="number" min="0" value={seleccionado.transportAvailable ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { transportAvailable: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Prioridad de reabastecimiento</span><select value={seleccionado.resupplyPriority ?? "normal"} onChange={(e) => actualizarElemento(seleccionado.id, { resupplyPriority: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="baja">Baja</option><option value="normal">Normal</option><option value="alta">Alta</option><option value="critica">Crítica</option></select></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Observaciones logísticas</span><textarea rows={3} value={seleccionado.logisticsNotes ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { logisticsNotes: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+          </section>
+        )}
+
+        {workspaceCode === "a5" && seleccionado && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("comunicaciones")} className="mb-5 space-y-4 rounded border border-sky-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-sky-300">Situación de comunicaciones</h2>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Tipo de nodo</span><input value={seleccionado.communicationNodeType ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { communicationNodeType: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <div className="grid grid-cols-2 gap-3"><label className="block text-sm"><span className="mb-1 block text-slate-300">Red</span><input value={seleccionado.networkName ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { networkName: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label><label className="block text-sm"><span className="mb-1 block text-slate-300">Frecuencia / canal</span><input value={seleccionado.frequency ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { frequency: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label></div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Estado del enlace</span><select value={seleccionado.linkStatus ?? "operativo"} onChange={(e) => actualizarElemento(seleccionado.id, { linkStatus: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="operativo">Operativo</option><option value="degradado">Degradado</option><option value="interrumpido">Interrumpido</option></select></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Cobertura (km)</span><input type="number" min="0" value={seleccionado.coverageKm ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { coverageKm: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <div className="grid grid-cols-2 gap-3"><label className="block text-sm"><span className="mb-1 block text-slate-300">Cifrado</span><input value={seleccionado.encryptionStatus ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { encryptionStatus: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label><label className="block text-sm"><span className="mb-1 block text-slate-300">Redundancia</span><input value={seleccionado.redundancy ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { redundancy: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label></div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Observaciones</span><textarea rows={3} value={seleccionado.communicationsNotes ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { communicationsNotes: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+          </section>
+        )}
+
         {workspaceCode === "a2" && seleccionado && seleccionado.bando === "enemigo" && (
           <section {...propiedadesPanel("inteligencia")} className="mb-5 space-y-4 rounded border border-red-900 bg-slate-900 p-4">
             <h2 className="font-semibold text-red-300">Información de inteligencia</h2>
@@ -4030,6 +4131,17 @@ export default function MapEditor({
                 <p className="text-xs text-amber-300">Los elementos restringidos no serán compartidos aunque las casillas estén marcadas.</p>
               )}
             </div>
+          </section>
+        )}
+
+        {seleccionado && ["a1", "a2", "a3", "a4", "a5"].includes(workspaceCode ?? "") && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("compartir")} className="mb-5 space-y-3 rounded border border-violet-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-violet-300">Compartición del elemento</h2>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Clasificación</span><select value={seleccionado.classification ?? "uso_interno"} onChange={(e) => actualizarElemento(seleccionado.id, { classification: e.target.value as ClasificacionInteligencia })} className="w-full rounded bg-slate-800 p-2"><option value="uso_interno">Uso interno</option><option value="compartible">Compartible</option><option value="restringido">Restringido</option></select></label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={seleccionado.sharedWithCommander ?? false} onChange={(e) => actualizarElemento(seleccionado.id, { sharedWithCommander: e.target.checked })} /> Compartir con Comandante</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={seleccionado.sharedWithJem ?? false} onChange={(e) => actualizarElemento(seleccionado.id, { sharedWithJem: e.target.checked })} /> Compartir con JEM</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={seleccionado.sharedWithOtherCells ?? false} onChange={(e) => actualizarElemento(seleccionado.id, { sharedWithOtherCells: e.target.checked })} /> Compartir con otras células</label>
+            {seleccionado.classification === "restringido" && <p className="text-xs text-amber-300">La clasificación restringida anula toda compartición al guardar.</p>}
           </section>
         )}
 

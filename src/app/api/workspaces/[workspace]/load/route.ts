@@ -12,6 +12,47 @@ type RouteContext = {
   params: Promise<{ workspace: string }>;
 };
 
+type MapElementRow = {
+  id: string;
+  workspace_id: string;
+  element_type: string;
+  name: string;
+  faction: string | null;
+  longitude: number | null;
+  latitude: number | null;
+  properties: Record<string, unknown> | null;
+  is_visible: boolean;
+  classification?: string | null;
+  shared_with_commander?: boolean | null;
+  shared_with_jem?: boolean | null;
+  [key: string]: unknown;
+};
+
+function isRestricted(row: MapElementRow) {
+  const classification =
+    row.classification ?? row.properties?.classification ?? "uso_interno";
+  return classification === "restringido";
+}
+
+function isSharedFor(row: MapElementRow, workspace: string) {
+  if (isRestricted(row)) return false;
+
+  if (workspace === "comandante") {
+    return (
+      row.shared_with_commander === true ||
+      row.properties?.sharedWithCommander === true
+    );
+  }
+
+  if (workspace === "jem") {
+    return (
+      row.shared_with_jem === true || row.properties?.sharedWithJem === true
+    );
+  }
+
+  return false;
+}
+
 export async function POST(
   request: NextRequest,
   context: RouteContext,
@@ -86,7 +127,7 @@ export async function POST(
       );
     }
 
-    const { data: elements, error: elementsError } =
+    const { data: ownElements, error: elementsError } =
       await supabaseAdmin
         .from("map_elements")
         .select("*")
@@ -101,6 +142,61 @@ export async function POST(
       );
     }
 
+    let elements: Array<Record<string, unknown>> = ownElements ?? [];
+
+    if (workspace === "comandante" || workspace === "jem") {
+      const { data: allWorkspaces, error: allWorkspacesError } =
+        await supabaseAdmin
+          .from("workspaces")
+          .select("id, code")
+          .eq("is_active", true);
+
+      if (allWorkspacesError) {
+        console.error("Error cargando espacios para consolidación:", allWorkspacesError);
+      } else {
+        const otherWorkspaces = (allWorkspaces ?? []).filter(
+          (item) => item.id !== workspaceData.id,
+        );
+        const ids = otherWorkspaces.map((item) => item.id);
+        const codeById = Object.fromEntries(
+          otherWorkspaces.map((item) => [item.id, item.code]),
+        );
+
+        if (ids.length > 0) {
+          const { data: sharedRows, error: sharedError } = await supabaseAdmin
+            .from("map_elements")
+            .select("*")
+            .in("workspace_id", ids)
+            .order("created_at", { ascending: true });
+
+          if (sharedError) {
+            console.error("Error cargando elementos compartidos:", sharedError);
+          } else {
+            const sharedElements = ((sharedRows ?? []) as MapElementRow[])
+              .filter((row) => isSharedFor(row, workspace))
+              .map((row) => {
+                const originCode = codeById[row.workspace_id] ?? "desconocido";
+                const originalId = String(row.properties?.id ?? row.id);
+
+                return {
+                  ...row,
+                  origin_workspace_code: originCode,
+                  is_shared_external: true,
+                  properties: {
+                    ...(row.properties ?? {}),
+                    id: `shared-${originCode}-${originalId}`,
+                    originWorkspaceCode: originCode,
+                    sharedExternal: true,
+                  },
+                };
+              });
+
+            elements = [...elements, ...sharedElements];
+          }
+        }
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       access,
@@ -111,7 +207,7 @@ export async function POST(
         type: workspaceData.workspace_type,
       },
       mapState: mapState ?? null,
-      elements: elements ?? [],
+      elements,
     });
   } catch (error) {
     console.error("Error inesperado en load:", error);

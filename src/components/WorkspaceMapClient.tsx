@@ -48,6 +48,8 @@ type DatabaseMapElement = {
   shared_with_jem?: boolean | null;
   shared_with_other_cells?: boolean | null;
   classification?: ElementoOperacional["classification"] | null;
+  origin_workspace_code?: string | null;
+  is_shared_external?: boolean | null;
 };
 
 type LoadResponse = {
@@ -118,6 +120,8 @@ function convertirElementos(
     sharedWithJem: fila.shared_with_jem ?? fila.properties?.sharedWithJem ?? false,
     sharedWithOtherCells: fila.shared_with_other_cells ?? fila.properties?.sharedWithOtherCells ?? false,
     classification: fila.classification ?? fila.properties?.classification ?? "uso_interno",
+    originWorkspaceCode: fila.origin_workspace_code ?? fila.properties?.originWorkspaceCode,
+    sharedExternal: fila.is_shared_external ?? fila.properties?.sharedExternal ?? false,
   }));
 }
 

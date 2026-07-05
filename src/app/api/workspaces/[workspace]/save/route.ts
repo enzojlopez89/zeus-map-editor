@@ -141,8 +141,12 @@ export async function POST(
       );
     }
 
-    if (body.elements.length > 0) {
-      const filas = body.elements.map((elemento) => ({
+    const ownElements = body.elements.filter(
+      (elemento) => elemento.sharedExternal !== true,
+    );
+
+    if (ownElements.length > 0) {
+      const filas = ownElements.map((elemento) => ({
         // No se envía elemento.id a la columna id: map_elements.id es UUID.
         // Supabase genera el UUID y el identificador propio del mapa queda
         // preservado dentro de properties.id.
@@ -223,7 +227,7 @@ export async function POST(
       ok: true,
       message: "Mapa guardado correctamente.",
       version: nextVersion,
-      elementCount: body.elements.length,
+      elementCount: ownElements.length,
     });
   } catch (error) {
     console.error("Error inesperado en save:", error);
