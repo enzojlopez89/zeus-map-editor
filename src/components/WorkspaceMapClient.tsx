@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { getWorkspaceProfile } from "@/config/workspaces";
 import MapEditor, {
@@ -341,6 +342,14 @@ export default function WorkspaceMapClient({
         </div>
 
         <div className="flex items-center gap-3 text-sm">
+          {workspaceCode === "a3" && access === "edit" && (
+            <Link
+              href={`/espacio/${workspaceCode}/${token}/ppc/pcr`}
+              className="rounded bg-cyan-700 px-3 py-1.5 font-semibold text-white hover:bg-cyan-600"
+            >
+              PPC · Calcular PCR
+            </Link>
+          )}
           <span className="rounded-full bg-emerald-900 px-3 py-1 font-semibold text-emerald-200">
             {status}
           </span>

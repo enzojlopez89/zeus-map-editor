@@ -1371,10 +1371,12 @@ function obtenerMaximoSlider(elemento: ElementoOperacional) {
   return Math.max(base, Math.ceil(valorActual * 1.5));
 }
 
+const EMPTY_ELEMENTS: ElementoOperacional[] = [];
+
 export default function MapEditor({
   initialState = null,
-  initialElements = [],
-  followedElements = [],
+  initialElements = EMPTY_ELEMENTS,
+  followedElements = EMPTY_ELEMENTS,
   readOnly = false,
   onSave,
   allowedPanels = ORDEN_PANELES_INICIAL,
@@ -1414,7 +1416,13 @@ export default function MapEditor({
         unicos.set(elemento.id, elemento);
       });
 
-      return Array.from(unicos.values());
+      const siguientes = Array.from(unicos.values());
+
+      const sinCambios =
+        siguientes.length === actuales.length &&
+        siguientes.every((elemento, indice) => elemento === actuales[indice]);
+
+      return sinCambios ? actuales : siguientes;
     });
   }, [followedElements, initialElements]);
 
