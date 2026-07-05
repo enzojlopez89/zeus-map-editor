@@ -21,6 +21,7 @@ const ALL_PANELS: PanelId[] = [
   "elementos",
   "personalizado",
   "desplegados",
+  "inteligencia",
 ];
 
 export const WORKSPACE_PROFILES: Record<string, WorkspaceProfile> = {
@@ -71,6 +72,7 @@ export const WORKSPACE_PROFILES: Record<string, WorkspaceProfile> = {
       "elementos",
       "personalizado",
       "desplegados",
+      "inteligencia",
     ],
   },
   a3: {

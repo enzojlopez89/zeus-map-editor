@@ -168,6 +168,39 @@ export async function POST(
         source_color:
           typeof elemento.color === "string" ? elemento.color : null,
         is_visible: elemento.visible !== false,
+        intelligence_status:
+          typeof elemento.intelligenceStatus === "string"
+            ? elemento.intelligenceStatus
+            : "pendiente",
+        confidence_level:
+          typeof elemento.confidenceLevel === "string"
+            ? elemento.confidenceLevel
+            : "media",
+        information_date:
+          typeof elemento.informationDate === "string" && elemento.informationDate
+            ? elemento.informationDate
+            : null,
+        source_description:
+          typeof elemento.sourceDescription === "string"
+            ? elemento.sourceDescription
+            : null,
+        intelligence_notes:
+          typeof elemento.intelligenceNotes === "string"
+            ? elemento.intelligenceNotes
+            : null,
+        shared_with_commander:
+          elemento.classification !== "restringido" &&
+          elemento.sharedWithCommander === true,
+        shared_with_jem:
+          elemento.classification !== "restringido" &&
+          elemento.sharedWithJem === true,
+        shared_with_other_cells:
+          elemento.classification !== "restringido" &&
+          elemento.sharedWithOtherCells === true,
+        classification:
+          typeof elemento.classification === "string"
+            ? elemento.classification
+            : "uso_interno",
       }));
 
       const { error: insertError } = await supabaseAdmin

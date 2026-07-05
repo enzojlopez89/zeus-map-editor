@@ -39,6 +39,15 @@ type DatabaseMapElement = {
   latitude: number | null;
   properties: Partial<ElementoOperacional> | null;
   is_visible: boolean;
+  intelligence_status?: ElementoOperacional["intelligenceStatus"] | null;
+  confidence_level?: ElementoOperacional["confidenceLevel"] | null;
+  information_date?: string | null;
+  source_description?: string | null;
+  intelligence_notes?: string | null;
+  shared_with_commander?: boolean | null;
+  shared_with_jem?: boolean | null;
+  shared_with_other_cells?: boolean | null;
+  classification?: ElementoOperacional["classification"] | null;
 };
 
 type LoadResponse = {
@@ -100,6 +109,15 @@ function convertirElementos(
     alcanceKm: Number(fila.properties?.alcanceKm ?? 0),
     mostrarAnillo: Boolean(fila.properties?.mostrarAnillo ?? false),
     color: String(fila.properties?.color ?? "#ef4444"),
+    intelligenceStatus: fila.intelligence_status ?? fila.properties?.intelligenceStatus ?? "pendiente",
+    confidenceLevel: fila.confidence_level ?? fila.properties?.confidenceLevel ?? "media",
+    informationDate: fila.information_date ?? fila.properties?.informationDate,
+    sourceDescription: fila.source_description ?? fila.properties?.sourceDescription,
+    intelligenceNotes: fila.intelligence_notes ?? fila.properties?.intelligenceNotes,
+    sharedWithCommander: fila.shared_with_commander ?? fila.properties?.sharedWithCommander ?? false,
+    sharedWithJem: fila.shared_with_jem ?? fila.properties?.sharedWithJem ?? false,
+    sharedWithOtherCells: fila.shared_with_other_cells ?? fila.properties?.sharedWithOtherCells ?? false,
+    classification: fila.classification ?? fila.properties?.classification ?? "uso_interno",
   }));
 }
 
@@ -248,6 +266,7 @@ export default function WorkspaceMapClient({
         allowedPanels={workspaceProfile.allowedPanels}
         workspaceLabel={workspaceProfile.shortName}
         workspaceDescription={workspaceProfile.mission}
+        workspaceCode={workspaceCode}
       />
     </main>
   );

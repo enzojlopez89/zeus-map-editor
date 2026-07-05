@@ -9,6 +9,9 @@ type Bando = "propio" | "enemigo";
 type VistaFuerzas = "propias" | "enemigas" | "ambas";
 type TipoElemento = "aeronave" | "radar" | "defensa";
 type FuenteDistancia = "orden" | "externa" | "manual";
+type EstadoInteligencia = "pendiente" | "estimado" | "probable" | "confirmado" | "descartado";
+type NivelConfianza = "baja" | "media" | "alta";
+type ClasificacionInteligencia = "uso_interno" | "compartible" | "restringido";
 
 export type ElementoOperacional = {
   id: string;
@@ -32,6 +35,15 @@ export type ElementoOperacional = {
   referenciaDistancia?: string;
   permiteReabastecimiento?: boolean;
   conReabastecimiento?: boolean;
+  intelligenceStatus?: EstadoInteligencia;
+  confidenceLevel?: NivelConfianza;
+  informationDate?: string;
+  sourceDescription?: string;
+  intelligenceNotes?: string;
+  sharedWithCommander?: boolean;
+  sharedWithJem?: boolean;
+  sharedWithOtherCells?: boolean;
+  classification?: ClasificacionInteligencia;
 };
 
 type BaseMilitar = {
@@ -106,7 +118,8 @@ export type PanelId =
   | "visibilidad"
   | "elementos"
   | "personalizado"
-  | "desplegados";
+  | "desplegados"
+  | "inteligencia";
 
 const ORDEN_PANELES_INICIAL: PanelId[] = [
   "fuerzas",
@@ -121,6 +134,7 @@ const ORDEN_PANELES_INICIAL: PanelId[] = [
   "elementos",
   "personalizado",
   "desplegados",
+  "inteligencia",
 ];
 
 export type ZeusMapWorkspaceState = {
@@ -146,6 +160,7 @@ type MapEditorProps = {
   allowedPanels?: PanelId[];
   workspaceLabel?: string;
   workspaceDescription?: string;
+  workspaceCode?: string;
 };
 
 const TON_GEOJSON: GeoJSON.FeatureCollection = {
@@ -1285,6 +1300,7 @@ export default function MapEditor({
   allowedPanels = ORDEN_PANELES_INICIAL,
   workspaceLabel,
   workspaceDescription,
+  workspaceCode,
 }: MapEditorProps) {
   const capasIniciales = initialState?.visibleLayers ?? {};
   const ajustesIniciales = initialState?.settings ?? {};
@@ -3928,6 +3944,94 @@ export default function MapEditor({
               ))}
           </select>
         </section>
+
+        {workspaceCode === "a2" && seleccionado && seleccionado.bando === "enemigo" && (
+          <section {...propiedadesPanel("inteligencia")} className="mb-5 space-y-4 rounded border border-red-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-red-300">Información de inteligencia</h2>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Estado del dato</span>
+              <select
+                value={seleccionado.intelligenceStatus ?? "pendiente"}
+                onChange={(event) => actualizarElemento(seleccionado.id, { intelligenceStatus: event.target.value as EstadoInteligencia })}
+                className="w-full rounded bg-slate-800 p-2"
+              >
+                <option value="pendiente">Pendiente</option>
+                <option value="estimado">Estimado</option>
+                <option value="probable">Probable</option>
+                <option value="confirmado">Confirmado</option>
+                <option value="descartado">Descartado</option>
+              </select>
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Nivel de confianza</span>
+              <select
+                value={seleccionado.confidenceLevel ?? "media"}
+                onChange={(event) => actualizarElemento(seleccionado.id, { confidenceLevel: event.target.value as NivelConfianza })}
+                className="w-full rounded bg-slate-800 p-2"
+              >
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+              </select>
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Fecha y hora de la información</span>
+              <input
+                type="datetime-local"
+                value={seleccionado.informationDate ? seleccionado.informationDate.slice(0, 16) : ""}
+                onChange={(event) => actualizarElemento(seleccionado.id, { informationDate: event.target.value ? new Date(event.target.value).toISOString() : undefined })}
+                className="w-full rounded bg-slate-800 p-2"
+              />
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Fuente</span>
+              <input
+                type="text"
+                value={seleccionado.sourceDescription ?? ""}
+                onChange={(event) => actualizarElemento(seleccionado.id, { sourceDescription: event.target.value })}
+                placeholder="Descripción general de la fuente"
+                className="w-full rounded bg-slate-800 p-2"
+              />
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Observaciones de inteligencia</span>
+              <textarea
+                value={seleccionado.intelligenceNotes ?? ""}
+                onChange={(event) => actualizarElemento(seleccionado.id, { intelligenceNotes: event.target.value })}
+                rows={4}
+                className="w-full rounded bg-slate-800 p-2"
+              />
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Clasificación</span>
+              <select
+                value={seleccionado.classification ?? "uso_interno"}
+                onChange={(event) => actualizarElemento(seleccionado.id, { classification: event.target.value as ClasificacionInteligencia })}
+                className="w-full rounded bg-slate-800 p-2"
+              >
+                <option value="uso_interno">Uso interno</option>
+                <option value="compartible">Compartible</option>
+                <option value="restringido">Restringido</option>
+              </select>
+            </label>
+
+            <div className="space-y-2 rounded bg-slate-800 p-3 text-sm">
+              <p className="font-semibold">Compartir con</p>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={seleccionado.sharedWithCommander ?? false} onChange={(event) => actualizarElemento(seleccionado.id, { sharedWithCommander: event.target.checked })} /> Comandante</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={seleccionado.sharedWithJem ?? false} onChange={(event) => actualizarElemento(seleccionado.id, { sharedWithJem: event.target.checked })} /> JEM</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={seleccionado.sharedWithOtherCells ?? false} onChange={(event) => actualizarElemento(seleccionado.id, { sharedWithOtherCells: event.target.checked })} /> Otras células</label>
+              {seleccionado.classification === "restringido" && (
+                <p className="text-xs text-amber-300">Los elementos restringidos no serán compartidos aunque las casillas estén marcadas.</p>
+              )}
+            </div>
+          </section>
+        )}
 
         {seleccionado && (
           <section className="space-y-4 rounded bg-slate-900 p-4">
