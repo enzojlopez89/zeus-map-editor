@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import maplibregl from "maplibre-gl";
 import { circle, lineString, length as turfLength } from "@turf/turf";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -10,7 +10,7 @@ type VistaFuerzas = "propias" | "enemigas" | "ambas";
 type TipoElemento = "aeronave" | "radar" | "defensa";
 type FuenteDistancia = "orden" | "externa" | "manual";
 
-type ElementoOperacional = {
+export type ElementoOperacional = {
   id: string;
   visible: boolean;
   iconoPersonalizado?: string;
@@ -39,7 +39,7 @@ type BaseMilitar = {
   longitude: number;
   latitude: number;
   bando: Bando;
-  tipo: "Base aérea" | "Estación radar" | "Centro de comando";
+  tipo: "Base aérea" | "Estación radar" | "Centro de comando" | "Comunicaciones";
 };
 
 type MascaraRadar = {
@@ -71,6 +71,9 @@ type MedioCatalogo = {
   alcanceKm: number;
   cantidad?: number;
   descripcion?: string;
+  terminoDistancia?: string;
+  fuenteDistancia?: FuenteDistancia;
+  referenciaDistancia?: string;
 };
 
 type PropiedadesRepublica = {
@@ -90,6 +93,57 @@ type IconoCatalogo = {
 };
 
 type PuntoMedicion = [number, number];
+
+export type PanelId =
+  | "fuerzas"
+  | "referencia"
+  | "capas"
+  | "bases"
+  | "mascaras"
+  | "colores"
+  | "cartografia"
+  | "medicion"
+  | "visibilidad"
+  | "elementos"
+  | "personalizado"
+  | "desplegados";
+
+const ORDEN_PANELES_INICIAL: PanelId[] = [
+  "fuerzas",
+  "referencia",
+  "capas",
+  "bases",
+  "mascaras",
+  "colores",
+  "cartografia",
+  "medicion",
+  "visibilidad",
+  "elementos",
+  "personalizado",
+  "desplegados",
+];
+
+export type ZeusMapWorkspaceState = {
+  mapCenter?: { longitude: number; latitude: number };
+  zoom?: number;
+  bearing?: number;
+  pitch?: number;
+  visibleLayers?: Record<string, boolean>;
+  panelOrder?: PanelId[];
+  settings?: Record<string, unknown>;
+};
+
+export type ZeusMapSnapshot = {
+  mapState: ZeusMapWorkspaceState & { scenarioName: string };
+  elements: ElementoOperacional[];
+};
+
+type MapEditorProps = {
+  initialState?: ZeusMapWorkspaceState | null;
+  initialElements?: ElementoOperacional[];
+  readOnly?: boolean;
+  onSave?: (snapshot: ZeusMapSnapshot) => Promise<void>;
+};
 
 const TON_GEOJSON: GeoJSON.FeatureCollection = {
   type: "FeatureCollection",
@@ -187,6 +241,31 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -35.47,
     bando: "propio",
     tipo: "Base aérea",
+  },
+];
+
+const COAE_RIO_CUARTO: BaseMilitar = {
+  nombre: "COAe / Río Cuarto",
+  longitude: -64.261,
+  latitude: -33.085,
+  bando: "propio",
+  tipo: "Centro de comando",
+};
+
+const GRUPOS_COMUNICACIONES: BaseMilitar[] = [
+  {
+    nombre: "Grupo 1 COM / San Luis",
+    longitude: -66.356,
+    latitude: -33.274,
+    bando: "propio",
+    tipo: "Comunicaciones",
+  },
+  {
+    nombre: "Grupo 2 COM / Malargüe",
+    longitude: -69.58,
+    latitude: -35.47,
+    bando: "propio",
+    tipo: "Comunicaciones",
   },
 ];
 
@@ -680,126 +759,70 @@ const CATALOGO_DEFENSA_PROPIA: MedioCatalogo[] = [
 ];
 
 const CATALOGO_DEFENSA_ENEMIGA: MedioCatalogo[] = [
-  {
-    nombre: "SA-29",
-    base: "Ala Aérea n.º 2 / Sáenz Peña",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-    descripcion: "Escuela de Defensa Aérea; cantidad no indicada",
-  },
-  {
-    nombre: "ZSU-23-2",
-    base: "Ala Aérea n.º 2 / Sáenz Peña",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-    descripcion: "Escuela de Defensa Aérea; cantidad no indicada",
-  },
-  {
-    nombre: "SA-8",
-    base: "Ala Aérea n.º 2 / Sáenz Peña",
-    bando: "enemigo",
-    alcanceKm: 10,
-    cantidad: 5,
-    descripcion: "Escuela de Defensa Aérea",
-  },
-  {
-    nombre: "S-300",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 150,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "I-HAWK",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 40,
-    cantidad: 2,
-  },
-  {
-    nombre: "Pantsir-S1",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 12,
-    cantidad: 4,
-  },
-  {
-    nombre: "ZSU-23-2",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "SA-29",
-    base: "Ala Aérea n.º 3 / Salta",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "S-300",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 150,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "Pantsir SA-22",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 12,
-    cantidad: 2,
-  },
-  {
-    nombre: "SA-8",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 10,
-    cantidad: 4,
-  },
-  {
-    nombre: "ZSU-23",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 2.5,
-    descripcion: "Cantidad no indicada en la orden",
-  },
-  {
-    nombre: "SA-29",
-    base: "Ala Aérea n.º 4 / Catamarca",
-    bando: "enemigo",
-    alcanceKm: 6.5,
-    descripcion: "Cantidad no indicada en la orden",
-  },
   ...[
-    ["Ala Aérea n.º 5 / Tucumán", "I-HAWK", 40, undefined],
-    ["Ala Aérea n.º 5 / Tucumán", "ZSU-23", 2.5, undefined],
-    ["Ala Aérea n.º 5 / Tucumán", "SA-29", 6.5, undefined],
-    ["Ala Aérea n.º 6 / Formosa", "I-HAWK", 40, undefined],
-    ["Ala Aérea n.º 6 / Formosa", "Pantsir SA-22", 12, 4],
-    ["Ala Aérea n.º 6 / Formosa", "SA-29", 6.5, undefined],
-    ["Ala Aérea n.º 6 / Formosa", "ZSU-23", 2.5, undefined],
-    ["Ala Aérea n.º 7 / Belén", "S-300", 150, undefined],
-    ["Ala Aérea n.º 7 / Belén", "SA-8", 10, 5],
-    ["Ala Aérea n.º 7 / Belén", "SA-29", 6.5, undefined],
-    ["Ala Aérea n.º 7 / Belén", "ZSU-23", 2.5, undefined],
-    ["Ala Aérea n.º 8 / Tartagal", "I-HAWK", 40, undefined],
-    ["Ala Aérea n.º 8 / Tartagal", "SA-29", 6.5, undefined],
-    ["Ala Aérea n.º 8 / Tartagal", "ZSU-23", 2.5, undefined],
-    ["Ala Aérea n.º 9 / Las Lomitas", "S-300", 150, undefined],
-    ["Ala Aérea n.º 9 / Las Lomitas", "Pantsir SA-22", 12, 4],
-    ["Ala Aérea n.º 9 / Las Lomitas", "ZSU-23-2", 2.5, undefined],
-    ["Ala Aérea n.º 9 / Las Lomitas", "SA-29", 6.5, undefined],
-  ].map(([base, nombre, alcanceKm, cantidad]) => ({
-    nombre: nombre as string,
-    base: base as string,
-    bando: "enemigo" as const,
-    alcanceKm: alcanceKm as number,
-    cantidad: cantidad as number | undefined,
-    descripcion:
-      cantidad === undefined ? "Cantidad no indicada en la orden" : undefined,
-  })),
+    ["Ala Aérea n.º 2 / Sáenz Peña", "SA-29", 6.5, undefined, "Sistema SA-29; cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 2 / Sáenz Peña", "ZSU-23-2", 2.5, undefined, "Sistema ZSU-23-2; no se aplica el alcance del ZSU-23-4 Shilka por tratarse de otro modelo"],
+    ["Ala Aérea n.º 2 / Sáenz Peña", "SA-8 Osa-AK", 30, 5, "Radar asociado: Land Roll"],
+
+    ["Ala Aérea n.º 3 / Salta", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 3 / Salta", "Improved HAWK", 70, 2, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 3 / Salta", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 3 / Salta", "ZSU-23-2", 2.5, undefined, "Modelo indicado por la orden; distinto del ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 3 / Salta", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+
+    ["Ala Aérea n.º 4 / Catamarca", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 4 / Catamarca", "Pantsir-S1", 28, 2, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 4 / Catamarca", "SA-8 Osa-AK", 30, 4, "Radar asociado: Land Roll"],
+    ["Ala Aérea n.º 4 / Catamarca", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 4 / Catamarca", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+
+    ["Ala Aérea n.º 5 / Tucumán", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 5 / Tucumán", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 5 / Tucumán", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+
+    ["Ala Aérea n.º 6 / Formosa", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 6 / Formosa", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 6 / Formosa", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 6 / Formosa", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+
+    ["Ala Aérea n.º 7 / Belén", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 7 / Belén", "SA-8 Osa-AK", 30, 5, "Radar asociado: Land Roll"],
+    ["Ala Aérea n.º 7 / Belén", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 7 / Belén", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+
+    ["Ala Aérea n.º 8 / Tartagal", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 8 / Tartagal", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 8 / Tartagal", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+
+    ["Ala Aérea n.º 9 / Las Lomitas", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 9 / Las Lomitas", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 9 / Las Lomitas", "ZSU-23-2", 2.5, undefined, "Modelo indicado por la orden; distinto del ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 9 / Las Lomitas", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+  ].map(([base, nombre, alcanceKm, cantidad, descripcion]) => {
+    const referencias: Record<string, string> = {
+      "S-300 PMU-1": 'Dato aportado para el ejercicio: 30N6E "Flap Lid", 150 km / 81 MN',
+      "Improved HAWK": "Dato aportado para el ejercicio: AN/MPQ-46 / AN/MPQ-61, 70 km / 38 MN",
+      "Pantsir-S1": "Dato aportado para el ejercicio: 1RS2-1E, 28 km / 15 MN",
+      "SA-8 Osa-AK": "Dato aportado para el ejercicio: Land Roll, 30 km / 16 MN",
+      "ZSU-23-4 Shilka": 'Dato aportado para el ejercicio: RPK-2 "Gun Dish", 20 km / 11 MN',
+    };
+
+    return {
+      nombre: nombre as string,
+      base: base as string,
+      bando: "enemigo" as const,
+      alcanceKm: alcanceKm as number,
+      cantidad: cantidad as number | undefined,
+      descripcion: descripcion as string,
+      terminoDistancia: referencias[nombre as string]
+        ? "Alcance máximo del radar asociado"
+        : "Alcance del sistema",
+      fuenteDistancia: "externa" as const,
+      referenciaDistancia:
+        referencias[nombre as string] ??
+        "Valor externo de referencia; no especificado en la orden de instrucción",
+    };
+  }),
 ];
 
 const MASCARAS_RADAR: MascaraRadar[] = [
@@ -1251,7 +1274,14 @@ function obtenerMaximoSlider(elemento: ElementoOperacional) {
   return Math.max(base, Math.ceil(valorActual * 1.5));
 }
 
-export default function MapEditor() {
+export default function MapEditor({
+  initialState = null,
+  initialElements = [],
+  readOnly = false,
+  onSave,
+}: MapEditorProps) {
+  const capasIniciales = initialState?.visibleLayers ?? {};
+  const ajustesIniciales = initialState?.settings ?? {};
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
 
@@ -1259,29 +1289,36 @@ export default function MapEditor() {
   const etiquetasRef = useRef<Record<string, maplibregl.Marker>>({});
   const oceanosRef = useRef<Record<string, maplibregl.Marker>>({});
   const basesRef = useRef<Record<string, maplibregl.Marker>>({});
+  const coaeRef = useRef<maplibregl.Marker | null>(null);
+  const comunicacionesRef = useRef<Record<string, maplibregl.Marker>>({});
   const dimensionesTonRef = useRef<Record<string, maplibregl.Marker>>({});
   const medicionMarkersRef = useRef<maplibregl.Marker[]>([]);
   const modoMedicionRef = useRef(false);
 
-  const [elementos, setElementos] = useState<ElementoOperacional[]>([]);
+  const [mapReady, setMapReady] = useState(false);
+  const [mapRenderVersion, setMapRenderVersion] = useState(0);
+  const [elementos, setElementos] = useState<ElementoOperacional[]>(initialElements);
   const [seleccionadoId, setSeleccionadoId] = useState<string | null>(null);
 
-  const [vistaFuerzas, setVistaFuerzas] = useState<VistaFuerzas>("ambas");
+  const [vistaFuerzas, setVistaFuerzas] = useState<VistaFuerzas>((ajustesIniciales.vistaFuerzas as VistaFuerzas | undefined) ?? "ambas");
 
-  const [mostrarRepublicas, setMostrarRepublicas] = useState(true);
+  const [mostrarRepublicas, setMostrarRepublicas] = useState(capasIniciales.republicas ?? true);
   const [mostrarEntornoGeografico, setMostrarEntornoGeografico] =
-    useState(true);
-  const [mostrarTon, setMostrarTon] = useState(true);
-  const [mostrarBases, setMostrarBases] = useState(true);
-  const [mostrarAeronaves, setMostrarAeronaves] = useState(true);
-  const [mostrarRadares, setMostrarRadares] = useState(true);
-  const [mostrarDefensa, setMostrarDefensa] = useState(true);
-  const [mostrarRelieve, setMostrarRelieve] = useState(false);
-  const [mostrarRios, setMostrarRios] = useState(false);
-  const [mostrarGrilla, setMostrarGrilla] = useState(false);
-  const [intervaloGrilla, setIntervaloGrilla] = useState(2);
-  const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(false);
+    useState(capasIniciales.entornoGeografico ?? true);
+  const [mostrarTon, setMostrarTon] = useState(capasIniciales.ton ?? true);
+  const [mostrarBases, setMostrarBases] = useState(capasIniciales.bases ?? true);
+  const [mostrarComunicaciones, setMostrarComunicaciones] = useState(capasIniciales.comunicaciones ?? false);
+  const [mostrarAeronaves, setMostrarAeronaves] = useState(capasIniciales.aeronaves ?? true);
+  const [mostrarRadares, setMostrarRadares] = useState(capasIniciales.radares ?? true);
+  const [mostrarDefensa, setMostrarDefensa] = useState(capasIniciales.defensa ?? true);
+  const [mostrarRelieve, setMostrarRelieve] = useState(capasIniciales.relieve ?? false);
+  const [mostrarRios, setMostrarRios] = useState(capasIniciales.rios ?? false);
+  const [mostrarGrilla, setMostrarGrilla] = useState(capasIniciales.grilla ?? false);
+  const [intervaloGrilla, setIntervaloGrilla] = useState(Number(ajustesIniciales.intervaloGrilla ?? 2));
+  const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(capasIniciales.dimensionesTon ?? false);
   const [modoMedicion, setModoMedicion] = useState(false);
+  const [ordenPaneles, setOrdenPaneles] = useState<PanelId[]>(initialState?.panelOrder?.length ? initialState.panelOrder : ORDEN_PANELES_INICIAL);
+  const panelArrastradoRef = useRef<PanelId | null>(null);
   const [puntosMedicion, setPuntosMedicion] = useState<PuntoMedicion[]>([]);
   const [distanciaMedicionKm, setDistanciaMedicionKm] = useState(0);
   const [coordenadasCursor, setCoordenadasCursor] = useState({
@@ -1295,25 +1332,28 @@ export default function MapEditor() {
   const [mascarasVisibles, setMascarasVisibles] = useState<
     Record<string, boolean>
   >(() =>
-    Object.fromEntries(MASCARAS_RADAR.map((mascara) => [mascara.id, false])),
+    (ajustesIniciales.mascarasVisibles as Record<string, boolean> | undefined) ??
+      Object.fromEntries(MASCARAS_RADAR.map((mascara) => [mascara.id, false])),
   );
 
   const [coloresMascaras, setColoresMascaras] = useState<
     Record<string, string>
   >(() =>
-    Object.fromEntries(
-      MASCARAS_RADAR.map((mascara) => [mascara.id, mascara.color]),
-    ),
+    (ajustesIniciales.coloresMascaras as Record<string, string> | undefined) ??
+      Object.fromEntries(
+        MASCARAS_RADAR.map((mascara) => [mascara.id, mascara.color]),
+      ),
   );
 
   const [coloresRepublicas, setColoresRepublicas] = useState<
     Record<string, string>
-  >({
+  >((ajustesIniciales.coloresRepublicas as Record<string, string> | undefined) ?? {
     ...COLORES_REPUBLICAS,
   });
 
   const [basesVisibles, setBasesVisibles] = useState<Record<string, boolean>>(
     () =>
+      (ajustesIniciales.basesVisibles as Record<string, boolean> | undefined) ??
       Object.fromEntries(
         [...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [
           base.nombre,
@@ -1349,6 +1389,12 @@ export default function MapEditor() {
     useState("");
 
   const [errorGeoJson, setErrorGeoJson] = useState<string | null>(null);
+  const [guardandoMapa, setGuardandoMapa] = useState(false);
+  const [mensajeGuardado, setMensajeGuardado] = useState(
+    readOnly ? "Vista de solo lectura" : "Sin cambios pendientes",
+  );
+  const [cambiosPendientes, setCambiosPendientes] = useState(false);
+  const seguimientoCambiosRef = useRef(false);
 
   const seleccionado = useMemo(
     () => elementos.find((elemento) => elemento.id === seleccionadoId) ?? null,
@@ -1532,15 +1578,23 @@ export default function MapEditor() {
       alcanceKm: medio.alcanceKm,
       mostrarAnillo: true,
       color:
-        medio.bando === "propio"
-          ? tipo === "radar"
-            ? "#7c3aed"
-            : "#dc2626"
-          : tipo === "radar"
-            ? "#f59e0b"
-            : "#991b1b",
+        medio.fuenteDistancia === "orden"
+          ? COLOR_ORDEN
+          : medio.fuenteDistancia === "externa"
+            ? COLOR_EXTERNO
+            : medio.bando === "propio"
+              ? tipo === "radar"
+                ? "#7c3aed"
+                : "#dc2626"
+              : tipo === "radar"
+                ? "#f59e0b"
+                : "#991b1b",
       cantidad: medio.cantidad,
       descripcion: medio.descripcion,
+      terminoDistancia:
+        medio.terminoDistancia ?? "Alcance máximo del sistema",
+      fuenteDistancia: medio.fuenteDistancia,
+      referenciaDistancia: medio.referenciaDistancia,
     };
 
     setElementos((anteriores) => [...anteriores, nuevoElemento]);
@@ -1722,6 +1776,104 @@ export default function MapEditor() {
   }
 
   useEffect(() => {
+    if (initialState?.panelOrder?.length) return;
+    try {
+      const guardado = window.localStorage.getItem("zeus-orden-paneles");
+      if (!guardado) return;
+      const orden = JSON.parse(guardado) as PanelId[];
+      if (
+        Array.isArray(orden) &&
+        ORDEN_PANELES_INICIAL.every((id) => orden.includes(id))
+      ) {
+        setOrdenPaneles(orden);
+      }
+    } catch {
+      // Se conserva el orden inicial si el navegador no permite almacenamiento local.
+    }
+  }, []);
+
+  useEffect(() => {
+    if (readOnly) return;
+    try {
+      window.localStorage.setItem(
+        "zeus-orden-paneles",
+        JSON.stringify(ordenPaneles),
+      );
+    } catch {
+      // El orden sigue funcionando durante la sesión actual.
+    }
+  }, [ordenPaneles]);
+
+  function soltarPanel(destino: PanelId) {
+    if (readOnly) return;
+    const origen = panelArrastradoRef.current;
+    panelArrastradoRef.current = null;
+    if (!origen || origen === destino) return;
+
+    setOrdenPaneles((ordenActual) => {
+      const siguiente = ordenActual.filter((id) => id !== origen);
+      const indiceDestino = siguiente.indexOf(destino);
+      siguiente.splice(indiceDestino, 0, origen);
+      return siguiente;
+    });
+  }
+
+  function propiedadesPanel(id: PanelId) {
+    return {
+      draggable: !readOnly,
+
+      style: {
+        order: ordenPaneles.indexOf(id),
+        cursor: "grab",
+        userSelect: "none" as const,
+      },
+
+      onDragStart: (event: DragEvent<HTMLElement>) => {
+        if (readOnly) { event.preventDefault(); return; }
+        panelArrastradoRef.current = id;
+
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", id);
+
+        event.currentTarget.style.opacity = "0.55";
+        event.currentTarget.style.cursor = "grabbing";
+      },
+
+      onDragEnter: (event: DragEvent<HTMLElement>) => {
+        event.preventDefault();
+      },
+
+      onDragOver: (event: DragEvent<HTMLElement>) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+      },
+
+      onDrop: (event: DragEvent<HTMLElement>) => {
+        event.preventDefault();
+        soltarPanel(id);
+      },
+
+      onDragEnd: (event: DragEvent<HTMLElement>) => {
+        event.currentTarget.style.opacity = "1";
+        event.currentTarget.style.cursor = "grab";
+        panelArrastradoRef.current = null;
+      },
+
+      title: "Arrastrar este recuadro para cambiar su posición",
+    };
+  }
+
+  function verTodoTerritorio() {
+    mapRef.current?.fitBounds(
+      [
+        [-78, -57],
+        [-48, -19],
+      ],
+      { padding: 35, duration: 900 },
+    );
+  }
+
+  useEffect(() => {
     modoMedicionRef.current = modoMedicion;
     const map = mapRef.current;
     if (map) {
@@ -1747,13 +1899,18 @@ export default function MapEditor() {
           },
         ],
       },
-      center: [-64.5, -35.5],
-      zoom: 4,
-      minZoom: 3,
-      maxZoom: 12,
+      center: [
+        initialState?.mapCenter?.longitude ?? -63.5,
+        initialState?.mapCenter?.latitude ?? -38,
+      ],
+      zoom: initialState?.zoom ?? 3,
+      bearing: initialState?.bearing ?? 0,
+      pitch: initialState?.pitch ?? 0,
+      minZoom: 1.75,
+      maxZoom: 14,
       maxBounds: [
-        [-82, -60],
-        [-47, -18],
+        [-95, -70],
+        [-30, -5],
       ],
     });
 
@@ -1831,18 +1988,22 @@ export default function MapEditor() {
           type: "fill",
           source: "paises-aledanos",
           paint: {
-            "fill-color": "#ffffff",
+            "fill-color": "#dbeafe",
             "fill-opacity": 1,
+            "fill-antialias": false,
           },
         });
 
+        // Borde del mismo color y levemente ancho para cubrir rendijas de antialiasing
+        // entre la máscara exterior y las repúblicas cuando se activa el relieve.
         map.addLayer({
           id: "paises-aledanos-borde",
           type: "line",
           source: "paises-aledanos",
           paint: {
-            "line-color": "#94a3b8",
-            "line-width": 1.2,
+            "line-color": "#dbeafe",
+            "line-width": 3,
+            "line-opacity": 1,
           },
         });
 
@@ -1942,6 +2103,68 @@ export default function MapEditor() {
             : "Error al cargar el GeoJSON.",
         );
       }
+
+      const crearMarcadorEspecial = (
+        elemento: BaseMilitar,
+        texto: string,
+        colorFondo: string,
+      ) => {
+        const contenedor = document.createElement("div");
+        contenedor.style.width = "44px";
+        contenedor.style.height = "44px";
+        contenedor.style.display = "flex";
+        contenedor.style.alignItems = "center";
+        contenedor.style.justifyContent = "center";
+        contenedor.style.background = colorFondo;
+        contenedor.style.border = "3px solid #0f172a";
+        contenedor.style.borderRadius = "4px";
+        contenedor.style.color = "#0f172a";
+        contenedor.style.fontSize = "10px";
+        contenedor.style.fontWeight = "900";
+        contenedor.style.textAlign = "center";
+        contenedor.style.lineHeight = "1";
+        contenedor.style.boxShadow = "0 2px 6px rgba(0,0,0,0.45)";
+        contenedor.textContent = texto;
+        contenedor.title = elemento.nombre;
+        return contenedor;
+      };
+
+      const marcadorCOAe = new maplibregl.Marker({
+        element: crearMarcadorEspecial(COAE_RIO_CUARTO, "COAe", "#67e8f9"),
+        anchor: "center",
+      })
+        .setLngLat([COAE_RIO_CUARTO.longitude, COAE_RIO_CUARTO.latitude])
+        .setPopup(
+          new maplibregl.Popup({ offset: 25, maxWidth: "380px", className: "zeus-popup" }).setHTML(`
+            <div style="background:#0f172a;color:white;padding:14px">
+              <strong>COAe / Río Cuarto</strong><br />
+              Comando de Operaciones Aeroespaciales<br />
+              <em>Punto fijo propio</em>
+            </div>
+          `),
+        )
+        .addTo(map);
+      coaeRef.current = marcadorCOAe;
+
+      GRUPOS_COMUNICACIONES.forEach((grupo) => {
+        const marcador = new maplibregl.Marker({
+          element: crearMarcadorEspecial(grupo, "COM", "#67e8f9"),
+          anchor: "center",
+        })
+          .setLngLat([grupo.longitude, grupo.latitude])
+          .setPopup(
+            new maplibregl.Popup({ offset: 25, maxWidth: "380px", className: "zeus-popup" }).setHTML(`
+              <div style="background:#0f172a;color:white;padding:14px">
+                <strong>${grupo.nombre}</strong><br />
+                Grupo de Comunicaciones<br />
+                <em>Bando propio</em>
+              </div>
+            `),
+          )
+          .addTo(map);
+        marcador.getElement().style.display = "none";
+        comunicacionesRef.current[grupo.nombre] = marcador;
+      });
 
       [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
         const marker = new maplibregl.Marker({
@@ -2236,6 +2459,18 @@ export default function MapEditor() {
           "line-width": 2.5,
         },
       });
+
+      // Habilita la sincronización cuando las fuentes y capas ya existen.
+      // Se repite en el siguiente frame y al quedar el mapa inactivo porque
+      // MapLibre puede informar temporalmente que el estilo todavía está
+      // cargando recursos externos, aunque el evento load ya se haya emitido.
+      setMapReady(true);
+      requestAnimationFrame(() => {
+        setMapRenderVersion((version) => version + 1);
+      });
+      map.once("idle", () => {
+        setMapRenderVersion((version) => version + 1);
+      });
     });
 
     mapRef.current = map;
@@ -2247,6 +2482,8 @@ export default function MapEditor() {
       Object.values(etiquetasRef.current).forEach((marker) => marker.remove());
       Object.values(oceanosRef.current).forEach((marker) => marker.remove());
       Object.values(basesRef.current).forEach((marker) => marker.remove());
+      coaeRef.current?.remove();
+      Object.values(comunicacionesRef.current).forEach((marker) => marker.remove());
       Object.values(dimensionesTonRef.current).forEach((marker) =>
         marker.remove(),
       );
@@ -2256,9 +2493,12 @@ export default function MapEditor() {
       etiquetasRef.current = {};
       oceanosRef.current = {};
       basesRef.current = {};
+      coaeRef.current = null;
+      comunicacionesRef.current = {};
       dimensionesTonRef.current = {};
       medicionMarkersRef.current = [];
 
+      setMapReady(false);
       map.remove();
       mapRef.current = null;
     };
@@ -2266,8 +2506,12 @@ export default function MapEditor() {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !mapReady) return;
 
+    // Los marcadores HTML no necesitan esperar a que terminen de cargar
+    // todos los mosaicos remotos. La fuente de anillos ya fue creada antes
+    // de activar mapReady. Evitar isStyleLoaded() impide que la primera
+    // hidratación se pierda y recién aparezca al modificar un elemento.
     actualizarFuenteAnillos(elementos);
 
     elementos.forEach((elemento) => {
@@ -2374,7 +2618,7 @@ export default function MapEditor() {
       const marker = new maplibregl.Marker({
         element: crearIconoElemento(elemento),
         anchor: "center",
-        draggable: true,
+        draggable: !readOnly,
       })
         .setLngLat([elemento.longitude, elemento.latitude])
         .setPopup(
@@ -2391,6 +2635,7 @@ export default function MapEditor() {
       });
 
       marker.on("drag", () => {
+        if (readOnly) return;
         const posicion = marker.getLngLat();
 
         setElementos((anteriores) =>
@@ -2425,6 +2670,8 @@ export default function MapEditor() {
     mostrarAeronaves,
     mostrarRadares,
     mostrarDefensa,
+    mapReady,
+    mapRenderVersion,
   ]);
 
   useEffect(() => {
@@ -2437,7 +2684,7 @@ export default function MapEditor() {
     Object.values(etiquetasRef.current).forEach((marker) => {
       marker.getElement().style.display = mostrarRepublicas ? "block" : "none";
     });
-  }, [mostrarRepublicas]);
+  }, [mostrarRepublicas, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2459,7 +2706,7 @@ export default function MapEditor() {
         ? "block"
         : "none";
     });
-  }, [mostrarEntornoGeografico]);
+  }, [mostrarEntornoGeografico, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2467,7 +2714,7 @@ export default function MapEditor() {
 
     actualizarVisibilidadCapa(map, "ton-relleno", mostrarTon);
     actualizarVisibilidadCapa(map, "ton-borde", mostrarTon);
-  }, [mostrarTon]);
+  }, [mostrarTon, mapReady]);
 
   useEffect(() => {
     [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
@@ -2481,7 +2728,13 @@ export default function MapEditor() {
 
       marker.getElement().style.display = visible ? "flex" : "none";
     });
-  }, [mostrarBases, vistaFuerzas, basesVisibles]);
+  }, [mostrarBases, vistaFuerzas, basesVisibles, mapReady]);
+
+  useEffect(() => {
+    Object.values(comunicacionesRef.current).forEach((marcador) => {
+      marcador.getElement().style.display = mostrarComunicaciones ? "flex" : "none";
+    });
+  }, [mostrarComunicaciones, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2495,7 +2748,7 @@ export default function MapEditor() {
       actualizarVisibilidadCapa(map, `${mascara.id}-relleno`, visible);
       actualizarVisibilidadCapa(map, `${mascara.id}-borde`, visible);
     });
-  }, [mascarasVisibles, vistaFuerzas]);
+  }, [mascarasVisibles, vistaFuerzas, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2510,7 +2763,7 @@ export default function MapEditor() {
         map.setPaintProperty(`${mascara.id}-borde`, "line-color", color);
       }
     });
-  }, [coloresMascaras]);
+  }, [coloresMascaras, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2523,7 +2776,7 @@ export default function MapEditor() {
     });
     expresion.push("#94a3b8");
     map.setPaintProperty("republicas-relleno", "fill-color", expresion as any);
-  }, [coloresRepublicas]);
+  }, [coloresRepublicas, mapReady]);
 
   function cambiarMascara(id: string, visible: boolean) {
     setMascarasVisibles((anteriores) => ({
@@ -2550,13 +2803,13 @@ export default function MapEditor() {
     const map = mapRef.current;
     if (!map) return;
     actualizarVisibilidadCapa(map, "relieve-topografico", mostrarRelieve);
-  }, [mostrarRelieve]);
+  }, [mostrarRelieve, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
     actualizarVisibilidadCapa(map, "rios", mostrarRios);
-  }, [mostrarRios]);
+  }, [mostrarRios, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2573,14 +2826,129 @@ export default function MapEditor() {
       "grilla-coordenadas-etiquetas",
       mostrarGrilla,
     );
-  }, [mostrarGrilla, intervaloGrilla]);
+  }, [mostrarGrilla, intervaloGrilla, mapReady]);
 
   useEffect(() => {
     Object.values(dimensionesTonRef.current).forEach((marker) => {
       marker.getElement().style.display =
         mostrarTon && mostrarDimensionesTon ? "block" : "none";
     });
-  }, [mostrarTon, mostrarDimensionesTon]);
+  }, [mostrarTon, mostrarDimensionesTon, mapReady]);
+
+  function crearSnapshot(): ZeusMapSnapshot {
+    const mapa = mapRef.current;
+    const centro = mapa?.getCenter();
+
+    return {
+      mapState: {
+        scenarioName: "Escenario principal",
+        mapCenter: {
+          longitude: centro?.lng ?? initialState?.mapCenter?.longitude ?? -63.5,
+          latitude: centro?.lat ?? initialState?.mapCenter?.latitude ?? -38,
+        },
+        zoom: mapa?.getZoom() ?? initialState?.zoom ?? 3,
+        bearing: mapa?.getBearing() ?? initialState?.bearing ?? 0,
+        pitch: mapa?.getPitch() ?? initialState?.pitch ?? 0,
+        visibleLayers: {
+          republicas: mostrarRepublicas,
+          entornoGeografico: mostrarEntornoGeografico,
+          ton: mostrarTon,
+          bases: mostrarBases,
+          comunicaciones: mostrarComunicaciones,
+          aeronaves: mostrarAeronaves,
+          radares: mostrarRadares,
+          defensa: mostrarDefensa,
+          relieve: mostrarRelieve,
+          rios: mostrarRios,
+          grilla: mostrarGrilla,
+          dimensionesTon: mostrarDimensionesTon,
+        },
+        panelOrder: ordenPaneles,
+        settings: {
+          vistaFuerzas,
+          intervaloGrilla,
+          mascarasVisibles,
+          coloresMascaras,
+          coloresRepublicas,
+          basesVisibles,
+        },
+      },
+      elements: elementos,
+    };
+  }
+
+  async function guardarMapaCompleto() {
+    if (readOnly || !onSave || guardandoMapa) return;
+
+    setGuardandoMapa(true);
+    setMensajeGuardado("Guardando cambios...");
+
+    try {
+      await onSave(crearSnapshot());
+      setCambiosPendientes(false);
+      setMensajeGuardado(
+        `Cambios guardados a las ${new Date().toLocaleTimeString("es-AR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+      );
+    } catch (error) {
+      console.error("Error guardando el mapa:", error);
+      setMensajeGuardado("No se pudieron guardar los cambios");
+      throw error;
+    } finally {
+      setGuardandoMapa(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!seguimientoCambiosRef.current) {
+      seguimientoCambiosRef.current = true;
+      return;
+    }
+
+    if (!readOnly) {
+      setCambiosPendientes(true);
+      setMensajeGuardado("Cambios sin guardar");
+    }
+  }, [
+    elementos,
+    vistaFuerzas,
+    mostrarRepublicas,
+    mostrarEntornoGeografico,
+    mostrarTon,
+    mostrarBases,
+    mostrarComunicaciones,
+    mostrarAeronaves,
+    mostrarRadares,
+    mostrarDefensa,
+    mostrarRelieve,
+    mostrarRios,
+    mostrarGrilla,
+    intervaloGrilla,
+    mostrarDimensionesTon,
+    ordenPaneles,
+    mascarasVisibles,
+    coloresMascaras,
+    coloresRepublicas,
+    basesVisibles,
+    readOnly,
+  ]);
+
+  useEffect(() => {
+    const mapa = mapRef.current;
+    if (!mapa || readOnly) return;
+
+    const marcarCambio = () => {
+      setCambiosPendientes(true);
+      setMensajeGuardado("Cambios sin guardar");
+    };
+
+    mapa.on("moveend", marcarCambio);
+    return () => {
+      mapa.off("moveend", marcarCambio);
+    };
+  }, [readOnly]);
 
   function borrarMedicion() {
     setPuntosMedicion([]);
@@ -2598,11 +2966,36 @@ export default function MapEditor() {
 
   return (
     <div className="flex h-screen w-screen">
-      <aside className="w-[420px] overflow-y-auto bg-slate-950 p-5 text-white">
-        <h1 className="mb-5 text-xl font-bold">EJERCICIO ZEUS (TO NORTE)</h1>
+      <aside className={`flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white ${readOnly ? "workspace-readonly" : ""}`}>
+        <h1 className="mb-2 text-xl font-bold" style={{ order: -2 }}>
+          EJERCICIO ZEUS (TO NORTE)
+        </h1>
+        <p className="mb-3 text-xs text-slate-400" style={{ order: -1 }}>
+          {readOnly
+            ? "Podés consultar el mapa y navegar, pero no modificarlo."
+            : "Arrastrá cualquier recuadro para ordenar el panel a tu gusto."}
+        </p>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Fuerzas visibles</h2>
+        <div className="sticky top-0 z-20 mb-4 rounded-lg border border-slate-700 bg-slate-950/95 p-3 shadow-lg" style={{ order: -1 }}>
+          <div className="flex items-center justify-between gap-2">
+            <span className={`text-xs font-semibold ${cambiosPendientes ? "text-amber-300" : "text-emerald-300"}`}>
+              {mensajeGuardado}
+            </span>
+            {!readOnly && onSave && (
+              <button
+                type="button"
+                onClick={() => void guardarMapaCompleto()}
+                disabled={guardandoMapa}
+                className="rounded bg-cyan-700 px-3 py-2 text-xs font-bold hover:bg-cyan-600 disabled:opacity-50"
+              >
+                {guardandoMapa ? "Guardando..." : "Guardar cambios"}
+              </button>
+            )}
+          </div>
+        </div>
+
+        <section {...propiedadesPanel("fuerzas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Fuerzas visibles</h2>
 
           <select
             value={vistaFuerzas}
@@ -2617,14 +3010,14 @@ export default function MapEditor() {
           </select>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4 text-sm">
-          <h2 className="mb-2 font-semibold">Referencia de radios</h2>
+        <section {...propiedadesPanel("referencia")} className="mb-5 cursor-move rounded bg-slate-900 p-4 text-sm">
+          <h2 className="mb-2 font-semibold">↕ Referencia de radios</h2>
           <div className="mb-2 flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-green-600" />Valor tomado de la orden de instrucción</div>
           <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-red-600" />Referencia externa o estimación</div>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Capas territoriales</h2>
+        <section {...propiedadesPanel("capas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Capas territoriales</h2>
 
           <label className="mb-3 flex items-center gap-2">
             <input
@@ -2663,10 +3056,25 @@ export default function MapEditor() {
             />
             Bases y estaciones
           </label>
+
+          <label className="mt-3 flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={mostrarComunicaciones}
+              onChange={(event) =>
+                setMostrarComunicaciones(event.target.checked)
+              }
+            />
+            Grupos de Comunicaciones
+          </label>
+
+          <p className="mt-2 text-xs text-slate-400">
+            El COAe de Río Cuarto permanece visible como punto fijo.
+          </p>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Bases y estaciones visibles</h2>
+        <section {...propiedadesPanel("bases")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Bases y estaciones visibles</h2>
 
           {mostrarControlesPropios && (
             <div className="mb-4 rounded border border-blue-700 p-3">
@@ -2705,8 +3113,8 @@ export default function MapEditor() {
           )}
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Máscaras radar</h2>
+        <section {...propiedadesPanel("mascaras")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Máscaras radar</h2>
 
           {mostrarControlesPropios && (
             <div className="mb-4 rounded border border-blue-700 p-3">
@@ -2822,8 +3230,8 @@ export default function MapEditor() {
           </p>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Colores de las repúblicas</h2>
+        <section {...propiedadesPanel("colores")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Colores de las repúblicas</h2>
           {Object.keys(COLORES_REPUBLICAS).map((nombre) => (
             <label
               key={nombre}
@@ -2845,8 +3253,16 @@ export default function MapEditor() {
           ))}
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Cartografía y coordenadas</h2>
+        <section {...propiedadesPanel("cartografia")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Cartografía y coordenadas</h2>
+
+          <button
+            type="button"
+            onClick={verTodoTerritorio}
+            className="mb-4 w-full rounded bg-sky-700 px-3 py-2 text-sm font-semibold hover:bg-sky-600"
+          >
+            Ver todo el territorio
+          </button>
 
           <label className="mb-3 flex items-center gap-2">
             <input
@@ -2917,9 +3333,9 @@ export default function MapEditor() {
           </div>
         </section>
 
-        <section className="mb-5 rounded border border-yellow-600 bg-slate-900 p-4">
+        <section {...propiedadesPanel("medicion")} className="mb-5 cursor-move rounded border border-yellow-600 bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold text-yellow-300">
-            Medición de distancias
+            ↕ Medición de distancias
           </h2>
 
           <button
@@ -2961,8 +3377,8 @@ export default function MapEditor() {
           </p>
         </section>
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Visibilidad de medios</h2>
+        <section {...propiedadesPanel("visibilidad")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Visibilidad de medios</h2>
 
           <label className="mb-3 flex items-center gap-2">
             <input
@@ -3270,8 +3686,8 @@ export default function MapEditor() {
           </div>
         )}
 
-        <section className="mb-5 rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">Elementos visibles</h2>
+        <section {...propiedadesPanel("elementos")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">↕ Elementos visibles</h2>
           {elementos.length === 0 ? (
             <p className="text-xs text-slate-400">
               Todavía no agregaste medios.
@@ -3301,9 +3717,9 @@ export default function MapEditor() {
           )}
         </section>
 
-        <section className="mb-5 rounded border border-emerald-700 bg-slate-900 p-4">
+        <section {...propiedadesPanel("personalizado")} className="mb-5 cursor-move rounded border border-emerald-700 bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold text-emerald-300">
-            Agregar medio personalizado
+            ↕ Agregar medio personalizado
           </h2>
 
           <label className="mb-1 block text-xs font-semibold text-slate-300">
@@ -3484,9 +3900,9 @@ export default function MapEditor() {
           </button>
         </section>
 
-        <section className="mb-5">
+        <section {...propiedadesPanel("desplegados")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <label className="mb-2 block text-sm font-semibold">
-            Elementos desplegados
+            ↕ Elementos desplegados
           </label>
 
           <select
@@ -3731,6 +4147,14 @@ export default function MapEditor() {
         .zeus-popup .maplibregl-popup-close-button:hover {
           background: #334155;
           border-radius: 6px;
+        }
+
+        .workspace-readonly input,
+        .workspace-readonly select,
+        .workspace-readonly button,
+        .workspace-readonly [draggable="true"] {
+          pointer-events: none !important;
+          opacity: 0.72;
         }
       `}</style>
     </div>
