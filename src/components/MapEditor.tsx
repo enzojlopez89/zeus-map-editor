@@ -92,6 +92,7 @@ type MascaraRadar = {
   bando: Bando;
   base: string;
   color: string;
+  categoria?: "radar" | "defensa_antiaerea";
 };
 
 type AeronaveCatalogo = {
@@ -941,6 +942,42 @@ const MASCARAS_RADAR: MascaraRadar[] = [
     base: "Estación radar / Orán",
     color: "#dc2626",
   },
+  {
+    id: "mascara-s300-alfa",
+    categoria: "defensa_antiaerea",
+    nombre: "S-300 PMU-1 ALFA – Ala Aérea n.º 7 / Belén",
+    archivo: "/data/defensa-s300/s300_alfa.geojson",
+    bando: "enemigo",
+    base: "Ala Aérea n.º 7 / Belén",
+    color: "#b91c1c",
+  },
+  {
+    id: "mascara-s300-bravo",
+    categoria: "defensa_antiaerea",
+    nombre: "S-300 PMU-1 BRAVO – Ala Aérea n.º 4 / Catamarca",
+    archivo: "/data/defensa-s300/s300_bravo.geojson",
+    bando: "enemigo",
+    base: "Ala Aérea n.º 4 / Catamarca",
+    color: "#991b1b",
+  },
+  {
+    id: "mascara-s300-charly",
+    categoria: "defensa_antiaerea",
+    nombre: "S-300 PMU-1 CHARLY – Ala Aérea n.º 3 / Salta",
+    archivo: "/data/defensa-s300/s300_charly.geojson",
+    bando: "enemigo",
+    base: "Ala Aérea n.º 3 / Salta",
+    color: "#ef4444",
+  },
+  {
+    id: "mascara-s300-delta",
+    categoria: "defensa_antiaerea",
+    nombre: "S-300 PMU-1 DELTA – Ala Aérea n.º 9 / Las Lomitas",
+    archivo: "/data/defensa-s300/s300_delta.geojson",
+    bando: "enemigo",
+    base: "Ala Aérea n.º 9 / Las Lomitas",
+    color: "#dc2626",
+  },
 ];
 
 function obtenerColorRepublica(nombre: string) {
@@ -1395,7 +1432,12 @@ export default function MapEditor({
     Record<string, boolean>
   >(() =>
     (ajustesIniciales.mascarasVisibles as Record<string, boolean> | undefined) ??
-      Object.fromEntries(MASCARAS_RADAR.map((mascara) => [mascara.id, false])),
+      Object.fromEntries(
+        MASCARAS_RADAR.map((mascara) => [
+          mascara.id,
+          mascara.categoria === "defensa_antiaerea",
+        ]),
+      ),
   );
 
   const [coloresMascaras, setColoresMascaras] = useState<
@@ -1518,6 +1560,23 @@ export default function MapEditor({
   }
 
   function debeMostrarAnillo(elemento: ElementoOperacional) {
+    // Para los S-300, la cobertura proveniente del KMZ reemplaza visualmente
+    // al círculo nominal cuando está activa. Así no se confunden ambas capas.
+    if (
+      elemento.tipo === "defensa" &&
+      elemento.nombre.toUpperCase().includes("S-300")
+    ) {
+      const mascaraAsociada = MASCARAS_RADAR.find(
+        (mascara) =>
+          mascara.categoria === "defensa_antiaerea" &&
+          mascara.base === elemento.baseOrigen,
+      );
+
+      if (mascaraAsociada && mascarasVisibles[mascaraAsociada.id]) {
+        return false;
+      }
+    }
+
     if (!elemento.mostrarAnillo) return false;
     if (!bandoVisible(elemento.bando, vistaFuerzas)) return false;
     if (elemento.tipo === "aeronave" && elemento.radioCombateKm <= 0) {
@@ -1638,7 +1697,9 @@ export default function MapEditor({
       latitude: base.latitude,
       radioCombateKm: 0,
       alcanceKm: medio.alcanceKm,
-      mostrarAnillo: true,
+      mostrarAnillo: !(
+        tipo === "defensa" && medio.nombre.toUpperCase().includes("S-300")
+      ),
       color:
         medio.fuenteDistancia === "orden"
           ? COLOR_ORDEN
@@ -1660,6 +1721,22 @@ export default function MapEditor({
     };
 
     setElementos((anteriores) => [...anteriores, nuevoElemento]);
+
+    if (tipo === "defensa" && medio.nombre.toUpperCase().includes("S-300")) {
+      const mascaraAsociada = MASCARAS_RADAR.find(
+        (mascara) =>
+          mascara.categoria === "defensa_antiaerea" &&
+          mascara.base === medio.base,
+      );
+
+      if (mascaraAsociada) {
+        setMascarasVisibles((anteriores) => ({
+          ...anteriores,
+          [mascaraAsociada.id]: true,
+        }));
+      }
+    }
+
     setSeleccionadoId(nuevoElemento.id);
     limpiar();
   }
@@ -2275,7 +2352,8 @@ export default function MapEditor({
             layout: { visibility: "none" },
             paint: {
               "fill-color": coloresMascaras[mascara.id] ?? mascara.color,
-              "fill-opacity": 0.2,
+              "fill-opacity":
+                mascara.categoria === "defensa_antiaerea" ? 0.3 : 0.2,
             },
           });
 
@@ -2287,8 +2365,9 @@ export default function MapEditor({
             layout: { visibility: "none" },
             paint: {
               "line-color": coloresMascaras[mascara.id] ?? mascara.color,
-              "line-width": 1.8,
-              "line-opacity": 0.9,
+              "line-width":
+                mascara.categoria === "defensa_antiaerea" ? 2.8 : 1.8,
+              "line-opacity": 0.95,
             },
           });
         } catch (error) {
@@ -2797,8 +2876,18 @@ export default function MapEditor({
         Boolean(mascarasVisibles[mascara.id]) &&
         bandoVisible(mascara.bando, vistaFuerzas);
 
-      actualizarVisibilidadCapa(map, `${mascara.id}-relleno`, visible);
-      actualizarVisibilidadCapa(map, `${mascara.id}-borde`, visible);
+      const capaRelleno = `${mascara.id}-relleno`;
+      const capaBorde = `${mascara.id}-borde`;
+
+      actualizarVisibilidadCapa(map, capaRelleno, visible);
+      actualizarVisibilidadCapa(map, capaBorde, visible);
+
+      // Las coberturas S-300 deben quedar por encima de los círculos nominales
+      // y del relieve; de otro modo el anillo circular las tapa visualmente.
+      if (visible && mascara.categoria === "defensa_antiaerea") {
+        if (map.getLayer(capaRelleno)) map.moveLayer(capaRelleno);
+        if (map.getLayer(capaBorde)) map.moveLayer(capaBorde);
+      }
     });
   }, [mascarasVisibles, vistaFuerzas, mapReady]);
 
@@ -3177,7 +3266,7 @@ export default function MapEditor({
         </section>
 
         <section {...propiedadesPanel("mascaras")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
-          <h2 className="mb-3 font-semibold">↕ Máscaras radar</h2>
+          <h2 className="mb-3 font-semibold">↕ Coberturas y máscaras</h2>
 
           {mostrarControlesPropios && (
             <div className="mb-4 rounded border border-blue-700 p-3">
@@ -3236,7 +3325,7 @@ export default function MapEditor({
           {mostrarControlesEnemigos && (
             <div className="rounded border border-orange-700 p-3">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <strong className="text-sm text-orange-300">Enemigas</strong>
+                <strong className="text-sm text-orange-300">Radar enemigas</strong>
                 <div className="flex gap-2 text-xs">
                   <button
                     type="button"
@@ -3256,7 +3345,9 @@ export default function MapEditor({
               </div>
 
               {MASCARAS_RADAR.filter(
-                (mascara) => mascara.bando === "enemigo",
+                (mascara) =>
+                  mascara.bando === "enemigo" &&
+                  mascara.categoria !== "defensa_antiaerea",
               ).map((mascara) => (
                 <label
                   key={mascara.id}
@@ -3287,9 +3378,73 @@ export default function MapEditor({
             </div>
           )}
 
+          {mostrarControlesEnemigos && (
+            <div className="mt-4 rounded border border-red-700 p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div>
+                  <strong className="text-sm text-red-300">Sistemas de defensa antiaérea enemigos</strong>
+                  <p className="mt-1 text-xs text-slate-400">Coberturas reales importadas de los KMZ. Al activarlas se oculta el círculo nominal del S-300 para mostrar claramente la geometría irregular condicionada por el terreno.</p>
+                </div>
+                <div className="flex gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      MASCARAS_RADAR.filter((mascara) => mascara.categoria === "defensa_antiaerea").forEach((mascara) =>
+                        cambiarMascara(mascara.id, true),
+                      )
+                    }
+                    className="rounded bg-red-700 px-2 py-1"
+                  >
+                    Todas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      MASCARAS_RADAR.filter((mascara) => mascara.categoria === "defensa_antiaerea").forEach((mascara) =>
+                        cambiarMascara(mascara.id, false),
+                      )
+                    }
+                    className="rounded bg-slate-700 px-2 py-1"
+                  >
+                    Ninguna
+                  </button>
+                </div>
+              </div>
+
+              {MASCARAS_RADAR.filter(
+                (mascara) => mascara.categoria === "defensa_antiaerea",
+              ).map((mascara) => (
+                <label
+                  key={mascara.id}
+                  className="mb-2 flex items-center gap-2 last:mb-0"
+                >
+                  <input
+                    type="checkbox"
+                    checked={Boolean(mascarasVisibles[mascara.id])}
+                    onChange={(event) =>
+                      cambiarMascara(mascara.id, event.target.checked)
+                    }
+                  />
+                  <span className="flex-1">{mascara.nombre}</span>
+                  <input
+                    type="color"
+                    value={coloresMascaras[mascara.id] ?? mascara.color}
+                    onChange={(event) =>
+                      setColoresMascaras((anteriores) => ({
+                        ...anteriores,
+                        [mascara.id]: event.target.value,
+                      }))
+                    }
+                    className="h-7 w-9 rounded border-0 bg-transparent"
+                    title="Color de la cobertura"
+                  />
+                </label>
+              ))}
+            </div>
+          )}
+
           <p className="mt-3 text-xs text-slate-400">
-            Las máscaras conservan la geometría y las coordenadas originales de
-            los archivos KMZ.
+            Las máscaras radar conservan sus archivos originales. La cobertura ALFA del S-300 fue corregida y trasladada al emplazamiento de Belén.
           </p>
         </section>
 
@@ -4304,7 +4459,7 @@ export default function MapEditor({
               />
 
               {seleccionado.tipo === "aeronave"
-                ? `Mostrar ${seleccionado.terminoDistancia ?? "radio de acción"}`
+                ? `Mostrar alcance nominal circular (${seleccionado.terminoDistancia ?? "radio de acción"})`
                 : "Mostrar anillo de alcance"}
             </label>
 
