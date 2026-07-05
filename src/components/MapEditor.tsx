@@ -10,7 +10,7 @@ type VistaFuerzas = "propias" | "enemigas" | "ambas";
 type TipoElemento = "aeronave" | "radar" | "defensa";
 type FuenteDistancia = "orden" | "externa" | "manual";
 
-type ElementoOperacional = {
+export type ElementoOperacional = {
   id: string;
   visible: boolean;
   iconoPersonalizado?: string;
@@ -94,7 +94,11 @@ type IconoCatalogo = {
 
 type PuntoMedicion = [number, number];
 
+<<<<<<< HEAD
 type PanelId =
+=======
+export type PanelId =
+>>>>>>> desarrollo-multiespacio
   | "fuerzas"
   | "referencia"
   | "capas"
@@ -123,6 +127,31 @@ const ORDEN_PANELES_INICIAL: PanelId[] = [
   "desplegados",
 ];
 
+<<<<<<< HEAD
+=======
+export type ZeusMapWorkspaceState = {
+  mapCenter?: { longitude: number; latitude: number };
+  zoom?: number;
+  bearing?: number;
+  pitch?: number;
+  visibleLayers?: Record<string, boolean>;
+  panelOrder?: PanelId[];
+  settings?: Record<string, unknown>;
+};
+
+export type ZeusMapSnapshot = {
+  mapState: ZeusMapWorkspaceState & { scenarioName: string };
+  elements: ElementoOperacional[];
+};
+
+type MapEditorProps = {
+  initialState?: ZeusMapWorkspaceState | null;
+  initialElements?: ElementoOperacional[];
+  readOnly?: boolean;
+  onSave?: (snapshot: ZeusMapSnapshot) => Promise<void>;
+};
+
+>>>>>>> desarrollo-multiespacio
 const TON_GEOJSON: GeoJSON.FeatureCollection = {
   type: "FeatureCollection",
   features: [
@@ -1252,7 +1281,14 @@ function obtenerMaximoSlider(elemento: ElementoOperacional) {
   return Math.max(base, Math.ceil(valorActual * 1.5));
 }
 
-export default function MapEditor() {
+export default function MapEditor({
+  initialState = null,
+  initialElements = [],
+  readOnly = false,
+  onSave,
+}: MapEditorProps) {
+  const capasIniciales = initialState?.visibleLayers ?? {};
+  const ajustesIniciales = initialState?.settings ?? {};
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
 
@@ -1266,13 +1302,16 @@ export default function MapEditor() {
   const medicionMarkersRef = useRef<maplibregl.Marker[]>([]);
   const modoMedicionRef = useRef(false);
 
-  const [elementos, setElementos] = useState<ElementoOperacional[]>([]);
+  const [mapReady, setMapReady] = useState(false);
+  const [mapRenderVersion, setMapRenderVersion] = useState(0);
+  const [elementos, setElementos] = useState<ElementoOperacional[]>(initialElements);
   const [seleccionadoId, setSeleccionadoId] = useState<string | null>(null);
 
-  const [vistaFuerzas, setVistaFuerzas] = useState<VistaFuerzas>("ambas");
+  const [vistaFuerzas, setVistaFuerzas] = useState<VistaFuerzas>((ajustesIniciales.vistaFuerzas as VistaFuerzas | undefined) ?? "ambas");
 
-  const [mostrarRepublicas, setMostrarRepublicas] = useState(true);
+  const [mostrarRepublicas, setMostrarRepublicas] = useState(capasIniciales.republicas ?? true);
   const [mostrarEntornoGeografico, setMostrarEntornoGeografico] =
+<<<<<<< HEAD
     useState(true);
   const [mostrarTon, setMostrarTon] = useState(true);
   const [mostrarBases, setMostrarBases] = useState(true);
@@ -1287,6 +1326,22 @@ export default function MapEditor() {
   const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(false);
   const [modoMedicion, setModoMedicion] = useState(false);
   const [ordenPaneles, setOrdenPaneles] = useState<PanelId[]>(ORDEN_PANELES_INICIAL);
+=======
+    useState(capasIniciales.entornoGeografico ?? true);
+  const [mostrarTon, setMostrarTon] = useState(capasIniciales.ton ?? true);
+  const [mostrarBases, setMostrarBases] = useState(capasIniciales.bases ?? true);
+  const [mostrarComunicaciones, setMostrarComunicaciones] = useState(capasIniciales.comunicaciones ?? false);
+  const [mostrarAeronaves, setMostrarAeronaves] = useState(capasIniciales.aeronaves ?? true);
+  const [mostrarRadares, setMostrarRadares] = useState(capasIniciales.radares ?? true);
+  const [mostrarDefensa, setMostrarDefensa] = useState(capasIniciales.defensa ?? true);
+  const [mostrarRelieve, setMostrarRelieve] = useState(capasIniciales.relieve ?? false);
+  const [mostrarRios, setMostrarRios] = useState(capasIniciales.rios ?? false);
+  const [mostrarGrilla, setMostrarGrilla] = useState(capasIniciales.grilla ?? false);
+  const [intervaloGrilla, setIntervaloGrilla] = useState(Number(ajustesIniciales.intervaloGrilla ?? 2));
+  const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(capasIniciales.dimensionesTon ?? false);
+  const [modoMedicion, setModoMedicion] = useState(false);
+  const [ordenPaneles, setOrdenPaneles] = useState<PanelId[]>(initialState?.panelOrder?.length ? initialState.panelOrder : ORDEN_PANELES_INICIAL);
+>>>>>>> desarrollo-multiespacio
   const panelArrastradoRef = useRef<PanelId | null>(null);
   const [puntosMedicion, setPuntosMedicion] = useState<PuntoMedicion[]>([]);
   const [distanciaMedicionKm, setDistanciaMedicionKm] = useState(0);
@@ -1301,25 +1356,28 @@ export default function MapEditor() {
   const [mascarasVisibles, setMascarasVisibles] = useState<
     Record<string, boolean>
   >(() =>
-    Object.fromEntries(MASCARAS_RADAR.map((mascara) => [mascara.id, false])),
+    (ajustesIniciales.mascarasVisibles as Record<string, boolean> | undefined) ??
+      Object.fromEntries(MASCARAS_RADAR.map((mascara) => [mascara.id, false])),
   );
 
   const [coloresMascaras, setColoresMascaras] = useState<
     Record<string, string>
   >(() =>
-    Object.fromEntries(
-      MASCARAS_RADAR.map((mascara) => [mascara.id, mascara.color]),
-    ),
+    (ajustesIniciales.coloresMascaras as Record<string, string> | undefined) ??
+      Object.fromEntries(
+        MASCARAS_RADAR.map((mascara) => [mascara.id, mascara.color]),
+      ),
   );
 
   const [coloresRepublicas, setColoresRepublicas] = useState<
     Record<string, string>
-  >({
+  >((ajustesIniciales.coloresRepublicas as Record<string, string> | undefined) ?? {
     ...COLORES_REPUBLICAS,
   });
 
   const [basesVisibles, setBasesVisibles] = useState<Record<string, boolean>>(
     () =>
+      (ajustesIniciales.basesVisibles as Record<string, boolean> | undefined) ??
       Object.fromEntries(
         [...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [
           base.nombre,
@@ -1355,6 +1413,12 @@ export default function MapEditor() {
     useState("");
 
   const [errorGeoJson, setErrorGeoJson] = useState<string | null>(null);
+  const [guardandoMapa, setGuardandoMapa] = useState(false);
+  const [mensajeGuardado, setMensajeGuardado] = useState(
+    readOnly ? "Vista de solo lectura" : "Sin cambios pendientes",
+  );
+  const [cambiosPendientes, setCambiosPendientes] = useState(false);
+  const seguimientoCambiosRef = useRef(false);
 
   const seleccionado = useMemo(
     () => elementos.find((elemento) => elemento.id === seleccionadoId) ?? null,
@@ -1736,6 +1800,10 @@ export default function MapEditor() {
   }
 
   useEffect(() => {
+<<<<<<< HEAD
+=======
+    if (initialState?.panelOrder?.length) return;
+>>>>>>> desarrollo-multiespacio
     try {
       const guardado = window.localStorage.getItem("zeus-orden-paneles");
       if (!guardado) return;
@@ -1752,6 +1820,10 @@ export default function MapEditor() {
   }, []);
 
   useEffect(() => {
+<<<<<<< HEAD
+=======
+    if (readOnly) return;
+>>>>>>> desarrollo-multiespacio
     try {
       window.localStorage.setItem(
         "zeus-orden-paneles",
@@ -1763,6 +1835,10 @@ export default function MapEditor() {
   }, [ordenPaneles]);
 
   function soltarPanel(destino: PanelId) {
+<<<<<<< HEAD
+=======
+    if (readOnly) return;
+>>>>>>> desarrollo-multiespacio
     const origen = panelArrastradoRef.current;
     panelArrastradoRef.current = null;
     if (!origen || origen === destino) return;
@@ -1777,7 +1853,11 @@ export default function MapEditor() {
 
   function propiedadesPanel(id: PanelId) {
     return {
+<<<<<<< HEAD
       draggable: true,
+=======
+      draggable: !readOnly,
+>>>>>>> desarrollo-multiespacio
 
       style: {
         order: ordenPaneles.indexOf(id),
@@ -1786,6 +1866,10 @@ export default function MapEditor() {
       },
 
       onDragStart: (event: DragEvent<HTMLElement>) => {
+<<<<<<< HEAD
+=======
+        if (readOnly) { event.preventDefault(); return; }
+>>>>>>> desarrollo-multiespacio
         panelArrastradoRef.current = id;
 
         event.dataTransfer.effectAllowed = "move";
@@ -1855,8 +1939,18 @@ export default function MapEditor() {
           },
         ],
       },
+<<<<<<< HEAD
       center: [-63.5, -38],
       zoom: 3,
+=======
+      center: [
+        initialState?.mapCenter?.longitude ?? -63.5,
+        initialState?.mapCenter?.latitude ?? -38,
+      ],
+      zoom: initialState?.zoom ?? 3,
+      bearing: initialState?.bearing ?? 0,
+      pitch: initialState?.pitch ?? 0,
+>>>>>>> desarrollo-multiespacio
       minZoom: 1.75,
       maxZoom: 14,
       maxBounds: [
@@ -2410,6 +2504,18 @@ export default function MapEditor() {
           "line-width": 2.5,
         },
       });
+
+      // Habilita la sincronización cuando las fuentes y capas ya existen.
+      // Se repite en el siguiente frame y al quedar el mapa inactivo porque
+      // MapLibre puede informar temporalmente que el estilo todavía está
+      // cargando recursos externos, aunque el evento load ya se haya emitido.
+      setMapReady(true);
+      requestAnimationFrame(() => {
+        setMapRenderVersion((version) => version + 1);
+      });
+      map.once("idle", () => {
+        setMapRenderVersion((version) => version + 1);
+      });
     });
 
     mapRef.current = map;
@@ -2437,6 +2543,7 @@ export default function MapEditor() {
       dimensionesTonRef.current = {};
       medicionMarkersRef.current = [];
 
+      setMapReady(false);
       map.remove();
       mapRef.current = null;
     };
@@ -2444,8 +2551,12 @@ export default function MapEditor() {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !mapReady) return;
 
+    // Los marcadores HTML no necesitan esperar a que terminen de cargar
+    // todos los mosaicos remotos. La fuente de anillos ya fue creada antes
+    // de activar mapReady. Evitar isStyleLoaded() impide que la primera
+    // hidratación se pierda y recién aparezca al modificar un elemento.
     actualizarFuenteAnillos(elementos);
 
     elementos.forEach((elemento) => {
@@ -2552,7 +2663,7 @@ export default function MapEditor() {
       const marker = new maplibregl.Marker({
         element: crearIconoElemento(elemento),
         anchor: "center",
-        draggable: true,
+        draggable: !readOnly,
       })
         .setLngLat([elemento.longitude, elemento.latitude])
         .setPopup(
@@ -2569,6 +2680,7 @@ export default function MapEditor() {
       });
 
       marker.on("drag", () => {
+        if (readOnly) return;
         const posicion = marker.getLngLat();
 
         setElementos((anteriores) =>
@@ -2603,6 +2715,8 @@ export default function MapEditor() {
     mostrarAeronaves,
     mostrarRadares,
     mostrarDefensa,
+    mapReady,
+    mapRenderVersion,
   ]);
 
   useEffect(() => {
@@ -2615,7 +2729,7 @@ export default function MapEditor() {
     Object.values(etiquetasRef.current).forEach((marker) => {
       marker.getElement().style.display = mostrarRepublicas ? "block" : "none";
     });
-  }, [mostrarRepublicas]);
+  }, [mostrarRepublicas, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2637,7 +2751,7 @@ export default function MapEditor() {
         ? "block"
         : "none";
     });
-  }, [mostrarEntornoGeografico]);
+  }, [mostrarEntornoGeografico, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2645,7 +2759,7 @@ export default function MapEditor() {
 
     actualizarVisibilidadCapa(map, "ton-relleno", mostrarTon);
     actualizarVisibilidadCapa(map, "ton-borde", mostrarTon);
-  }, [mostrarTon]);
+  }, [mostrarTon, mapReady]);
 
   useEffect(() => {
     [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
@@ -2659,7 +2773,13 @@ export default function MapEditor() {
 
       marker.getElement().style.display = visible ? "flex" : "none";
     });
-  }, [mostrarBases, vistaFuerzas, basesVisibles]);
+  }, [mostrarBases, vistaFuerzas, basesVisibles, mapReady]);
+
+  useEffect(() => {
+    Object.values(comunicacionesRef.current).forEach((marcador) => {
+      marcador.getElement().style.display = mostrarComunicaciones ? "flex" : "none";
+    });
+  }, [mostrarComunicaciones, mapReady]);
 
   useEffect(() => {
     Object.values(comunicacionesRef.current).forEach((marcador) => {
@@ -2679,7 +2799,7 @@ export default function MapEditor() {
       actualizarVisibilidadCapa(map, `${mascara.id}-relleno`, visible);
       actualizarVisibilidadCapa(map, `${mascara.id}-borde`, visible);
     });
-  }, [mascarasVisibles, vistaFuerzas]);
+  }, [mascarasVisibles, vistaFuerzas, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2694,7 +2814,7 @@ export default function MapEditor() {
         map.setPaintProperty(`${mascara.id}-borde`, "line-color", color);
       }
     });
-  }, [coloresMascaras]);
+  }, [coloresMascaras, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2707,7 +2827,7 @@ export default function MapEditor() {
     });
     expresion.push("#94a3b8");
     map.setPaintProperty("republicas-relleno", "fill-color", expresion as any);
-  }, [coloresRepublicas]);
+  }, [coloresRepublicas, mapReady]);
 
   function cambiarMascara(id: string, visible: boolean) {
     setMascarasVisibles((anteriores) => ({
@@ -2734,13 +2854,13 @@ export default function MapEditor() {
     const map = mapRef.current;
     if (!map) return;
     actualizarVisibilidadCapa(map, "relieve-topografico", mostrarRelieve);
-  }, [mostrarRelieve]);
+  }, [mostrarRelieve, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
     actualizarVisibilidadCapa(map, "rios", mostrarRios);
-  }, [mostrarRios]);
+  }, [mostrarRios, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2757,14 +2877,129 @@ export default function MapEditor() {
       "grilla-coordenadas-etiquetas",
       mostrarGrilla,
     );
-  }, [mostrarGrilla, intervaloGrilla]);
+  }, [mostrarGrilla, intervaloGrilla, mapReady]);
 
   useEffect(() => {
     Object.values(dimensionesTonRef.current).forEach((marker) => {
       marker.getElement().style.display =
         mostrarTon && mostrarDimensionesTon ? "block" : "none";
     });
-  }, [mostrarTon, mostrarDimensionesTon]);
+  }, [mostrarTon, mostrarDimensionesTon, mapReady]);
+
+  function crearSnapshot(): ZeusMapSnapshot {
+    const mapa = mapRef.current;
+    const centro = mapa?.getCenter();
+
+    return {
+      mapState: {
+        scenarioName: "Escenario principal",
+        mapCenter: {
+          longitude: centro?.lng ?? initialState?.mapCenter?.longitude ?? -63.5,
+          latitude: centro?.lat ?? initialState?.mapCenter?.latitude ?? -38,
+        },
+        zoom: mapa?.getZoom() ?? initialState?.zoom ?? 3,
+        bearing: mapa?.getBearing() ?? initialState?.bearing ?? 0,
+        pitch: mapa?.getPitch() ?? initialState?.pitch ?? 0,
+        visibleLayers: {
+          republicas: mostrarRepublicas,
+          entornoGeografico: mostrarEntornoGeografico,
+          ton: mostrarTon,
+          bases: mostrarBases,
+          comunicaciones: mostrarComunicaciones,
+          aeronaves: mostrarAeronaves,
+          radares: mostrarRadares,
+          defensa: mostrarDefensa,
+          relieve: mostrarRelieve,
+          rios: mostrarRios,
+          grilla: mostrarGrilla,
+          dimensionesTon: mostrarDimensionesTon,
+        },
+        panelOrder: ordenPaneles,
+        settings: {
+          vistaFuerzas,
+          intervaloGrilla,
+          mascarasVisibles,
+          coloresMascaras,
+          coloresRepublicas,
+          basesVisibles,
+        },
+      },
+      elements: elementos,
+    };
+  }
+
+  async function guardarMapaCompleto() {
+    if (readOnly || !onSave || guardandoMapa) return;
+
+    setGuardandoMapa(true);
+    setMensajeGuardado("Guardando cambios...");
+
+    try {
+      await onSave(crearSnapshot());
+      setCambiosPendientes(false);
+      setMensajeGuardado(
+        `Cambios guardados a las ${new Date().toLocaleTimeString("es-AR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+      );
+    } catch (error) {
+      console.error("Error guardando el mapa:", error);
+      setMensajeGuardado("No se pudieron guardar los cambios");
+      throw error;
+    } finally {
+      setGuardandoMapa(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!seguimientoCambiosRef.current) {
+      seguimientoCambiosRef.current = true;
+      return;
+    }
+
+    if (!readOnly) {
+      setCambiosPendientes(true);
+      setMensajeGuardado("Cambios sin guardar");
+    }
+  }, [
+    elementos,
+    vistaFuerzas,
+    mostrarRepublicas,
+    mostrarEntornoGeografico,
+    mostrarTon,
+    mostrarBases,
+    mostrarComunicaciones,
+    mostrarAeronaves,
+    mostrarRadares,
+    mostrarDefensa,
+    mostrarRelieve,
+    mostrarRios,
+    mostrarGrilla,
+    intervaloGrilla,
+    mostrarDimensionesTon,
+    ordenPaneles,
+    mascarasVisibles,
+    coloresMascaras,
+    coloresRepublicas,
+    basesVisibles,
+    readOnly,
+  ]);
+
+  useEffect(() => {
+    const mapa = mapRef.current;
+    if (!mapa || readOnly) return;
+
+    const marcarCambio = () => {
+      setCambiosPendientes(true);
+      setMensajeGuardado("Cambios sin guardar");
+    };
+
+    mapa.on("moveend", marcarCambio);
+    return () => {
+      mapa.off("moveend", marcarCambio);
+    };
+  }, [readOnly]);
 
   function borrarMedicion() {
     setPuntosMedicion([]);
@@ -2782,6 +3017,7 @@ export default function MapEditor() {
 
   return (
     <div className="flex h-screen w-screen">
+<<<<<<< HEAD
       <aside className="flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white">
         <h1 className="mb-2 text-xl font-bold" style={{ order: -2 }}>
           EJERCICIO ZEUS (TO NORTE)
@@ -2790,6 +3026,36 @@ export default function MapEditor() {
           Arrastrá cualquier recuadro para ordenar el panel a tu gusto.
         </p>
 
+=======
+      <aside className={`flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white ${readOnly ? "workspace-readonly" : ""}`}>
+        <h1 className="mb-2 text-xl font-bold" style={{ order: -2 }}>
+          EJERCICIO ZEUS (TO NORTE)
+        </h1>
+        <p className="mb-3 text-xs text-slate-400" style={{ order: -1 }}>
+          {readOnly
+            ? "Podés consultar el mapa y navegar, pero no modificarlo."
+            : "Arrastrá cualquier recuadro para ordenar el panel a tu gusto."}
+        </p>
+
+        <div className="sticky top-0 z-20 mb-4 rounded-lg border border-slate-700 bg-slate-950/95 p-3 shadow-lg" style={{ order: -1 }}>
+          <div className="flex items-center justify-between gap-2">
+            <span className={`text-xs font-semibold ${cambiosPendientes ? "text-amber-300" : "text-emerald-300"}`}>
+              {mensajeGuardado}
+            </span>
+            {!readOnly && onSave && (
+              <button
+                type="button"
+                onClick={() => void guardarMapaCompleto()}
+                disabled={guardandoMapa}
+                className="rounded bg-cyan-700 px-3 py-2 text-xs font-bold hover:bg-cyan-600 disabled:opacity-50"
+              >
+                {guardandoMapa ? "Guardando..." : "Guardar cambios"}
+              </button>
+            )}
+          </div>
+        </div>
+
+>>>>>>> desarrollo-multiespacio
         <section {...propiedadesPanel("fuerzas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Fuerzas visibles</h2>
 
@@ -3943,6 +4209,14 @@ export default function MapEditor() {
         .zeus-popup .maplibregl-popup-close-button:hover {
           background: #334155;
           border-radius: 6px;
+        }
+
+        .workspace-readonly input,
+        .workspace-readonly select,
+        .workspace-readonly button,
+        .workspace-readonly [draggable="true"] {
+          pointer-events: none !important;
+          opacity: 0.72;
         }
       `}</style>
     </div>

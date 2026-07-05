@@ -1,0 +1,67 @@
+Comandante del Teatro de Operaciones Norte
+
+EDICIÓN:
+https://zeus-map-editor.vercel.app/espacio/comandante/1145cb883ee229596b3ffaf5992242a30c455ec59e13492fafe9bab062beeafd
+
+SOLO LECTURA:
+https://zeus-map-editor.vercel.app/ver/comandante/a025d544803de2ce56e5fe692292d9ff1e1aed8454a60fdd1824677ecf56bc18
+
+----------------------------------------
+
+Jefe de Estado Mayor del TON
+
+EDICIÓN:
+https://zeus-map-editor.vercel.app/espacio/jem/afa42254bd99c69afc7afc1587e39f9fd82ceae596cb3b407290f2f7c09ad380
+
+SOLO LECTURA:
+https://zeus-map-editor.vercel.app/ver/jem/b815f8e3791931eb7f57d03470d4ce96ce5986b95cde9b229f6a376ab69826d5
+
+----------------------------------------
+
+A1 – Personal
+
+EDICIÓN:
+https://zeus-map-editor.vercel.app/espacio/a1/d5943969aec685982d4ee1fd48467425eef821277fbe8bc2d1768eac57b73dd2
+
+SOLO LECTURA:
+https://zeus-map-editor.vercel.app/ver/a1/04d0d827ad0c48f46aeea9a44b7a93b5ec79803a064211d7d99b2ff62dd5bf5e
+
+----------------------------------------
+
+A2 – Inteligencia
+
+EDICIÓN:
+https://zeus-map-editor.vercel.app/espacio/a2/a3915afde5cb62637e29f7f0328c9e0057cbc6c4ba21e642e7db4d2b9470cfbc
+
+SOLO LECTURA:
+https://zeus-map-editor.vercel.app/ver/a2/d30bf8d29cb2c8bd42b18c134a4daf6caa54ff54868a820eeb60cffb7041fac5
+
+----------------------------------------
+
+A3 – Operaciones
+
+EDICIÓN:
+https://zeus-map-editor.vercel.app/espacio/a3/eec8615ab41d0c67904cad642ee4e20d3cf66aacac6458868bfce1c516c282e1
+
+SOLO LECTURA:
+https://zeus-map-editor.vercel.app/ver/a3/28b4a49761eebce0e0de298d9bed3031500345440a0988f784114ae8aa360108
+
+----------------------------------------
+
+A4 – Logística
+
+EDICIÓN:
+https://zeus-map-editor.vercel.app/espacio/a4/77127350d246f30d1ec83bff9b4f1e490593515090c3d16a5b99c002813ba611
+
+SOLO LECTURA:
+https://zeus-map-editor.vercel.app/ver/a4/879f690709a1fffa3255c5e27394de7732622fe4f33553e25b28e31c77a88ddf
+
+----------------------------------------
+
+A5 – Comunicaciones
+
+EDICIÓN:
+https://zeus-map-editor.vercel.app/espacio/a5/2108b0f130191ad29037c4e48ce5efc1f24ee0ed7cc75a365db7de62c95113c7
+
+SOLO LECTURA:
+https://zeus-map-editor.vercel.app/ver/a5/462da5c92dc815fb2541a2263565ec5a4ba1f65abffcc4915bbcf456956fed10

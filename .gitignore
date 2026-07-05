@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+enlaces-privados-zeus.txt
+crear-espacios.sql
+generar-espacios.cjs
