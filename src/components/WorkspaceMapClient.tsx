@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getWorkspaceProfile } from "@/config/workspaces";
 import MapEditor, {
   type ElementoOperacional,
   type ZeusMapSnapshot,
@@ -107,6 +108,7 @@ export default function WorkspaceMapClient({
   token,
   access,
 }: WorkspaceMapClientProps) {
+  const workspaceProfile = getWorkspaceProfile(workspaceCode);
   const [status, setStatus] = useState("Validando enlace...");
   const [workspace, setWorkspace] =
     useState<WorkspaceInformation | null>(null);
@@ -220,7 +222,7 @@ export default function WorkspaceMapClient({
     <main className="min-h-screen bg-slate-950">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700 bg-slate-900 px-4 py-3 text-white">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">
+          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${workspaceProfile.accentClass}`}>
             EJERCICIO ZEUS – TO NORTE
           </p>
           <h1 className="text-lg font-bold">
@@ -243,6 +245,9 @@ export default function WorkspaceMapClient({
         initialElements={initialElements}
         readOnly={access === "view"}
         onSave={access === "edit" ? guardar : undefined}
+        allowedPanels={workspaceProfile.allowedPanels}
+        workspaceLabel={workspaceProfile.shortName}
+        workspaceDescription={workspaceProfile.mission}
       />
     </main>
   );

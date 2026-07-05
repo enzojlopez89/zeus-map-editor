@@ -143,6 +143,9 @@ type MapEditorProps = {
   initialElements?: ElementoOperacional[];
   readOnly?: boolean;
   onSave?: (snapshot: ZeusMapSnapshot) => Promise<void>;
+  allowedPanels?: PanelId[];
+  workspaceLabel?: string;
+  workspaceDescription?: string;
 };
 
 const TON_GEOJSON: GeoJSON.FeatureCollection = {
@@ -1279,6 +1282,9 @@ export default function MapEditor({
   initialElements = [],
   readOnly = false,
   onSave,
+  allowedPanels = ORDEN_PANELES_INICIAL,
+  workspaceLabel,
+  workspaceDescription,
 }: MapEditorProps) {
   const capasIniciales = initialState?.visibleLayers ?? {};
   const ajustesIniciales = initialState?.settings ?? {};
@@ -1296,7 +1302,6 @@ export default function MapEditor({
   const modoMedicionRef = useRef(false);
 
   const [mapReady, setMapReady] = useState(false);
-  const [mapRenderVersion, setMapRenderVersion] = useState(0);
   const [elementos, setElementos] = useState<ElementoOperacional[]>(initialElements);
   const [seleccionadoId, setSeleccionadoId] = useState<string | null>(null);
 
@@ -1819,13 +1824,16 @@ export default function MapEditor({
   }
 
   function propiedadesPanel(id: PanelId) {
+    const panelPermitido = allowedPanels.includes(id);
+
     return {
-      draggable: !readOnly,
+      draggable: !readOnly && panelPermitido,
 
       style: {
         order: ordenPaneles.indexOf(id),
-        cursor: "grab",
+        cursor: panelPermitido ? "grab" : "default",
         userSelect: "none" as const,
+        display: panelPermitido ? undefined : "none",
       },
 
       onDragStart: (event: DragEvent<HTMLElement>) => {
@@ -2460,17 +2468,9 @@ export default function MapEditor({
         },
       });
 
-      // Habilita la sincronización cuando las fuentes y capas ya existen.
-      // Se repite en el siguiente frame y al quedar el mapa inactivo porque
-      // MapLibre puede informar temporalmente que el estilo todavía está
-      // cargando recursos externos, aunque el evento load ya se haya emitido.
+      // Fuerza una nueva sincronización de los datos persistidos una vez
+      // que el estilo, las fuentes y las capas del mapa ya existen.
       setMapReady(true);
-      requestAnimationFrame(() => {
-        setMapRenderVersion((version) => version + 1);
-      });
-      map.once("idle", () => {
-        setMapRenderVersion((version) => version + 1);
-      });
     });
 
     mapRef.current = map;
@@ -2506,12 +2506,8 @@ export default function MapEditor({
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map || !map.isStyleLoaded()) return;
 
-    // Los marcadores HTML no necesitan esperar a que terminen de cargar
-    // todos los mosaicos remotos. La fuente de anillos ya fue creada antes
-    // de activar mapReady. Evitar isStyleLoaded() impide que la primera
-    // hidratación se pierda y recién aparezca al modificar un elemento.
     actualizarFuenteAnillos(elementos);
 
     elementos.forEach((elemento) => {
@@ -2671,7 +2667,6 @@ export default function MapEditor({
     mostrarRadares,
     mostrarDefensa,
     mapReady,
-    mapRenderVersion,
   ]);
 
   useEffect(() => {
@@ -2967,13 +2962,24 @@ export default function MapEditor({
   return (
     <div className="flex h-screen w-screen">
       <aside className={`flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white ${readOnly ? "workspace-readonly" : ""}`}>
-        <h1 className="mb-2 text-xl font-bold" style={{ order: -2 }}>
+        <h1 className="mb-1 text-xl font-bold" style={{ order: -3 }}>
           EJERCICIO ZEUS (TO NORTE)
         </h1>
-        <p className="mb-3 text-xs text-slate-400" style={{ order: -1 }}>
+        {workspaceLabel && (
+          <h2 className="mb-1 text-sm font-semibold text-cyan-300" style={{ order: -2 }}>
+            {workspaceLabel}
+          </h2>
+        )}
+        <p className="mb-1 text-xs text-slate-400" style={{ order: -1 }}>
+          {workspaceDescription ??
+            (readOnly
+              ? "Podés consultar el mapa y navegar, pero no modificarlo."
+              : "Arrastrá cualquier recuadro para ordenar el panel a tu gusto.")}
+        </p>
+        <p className="mb-3 text-[11px] text-slate-500" style={{ order: -1 }}>
           {readOnly
-            ? "Podés consultar el mapa y navegar, pero no modificarlo."
-            : "Arrastrá cualquier recuadro para ordenar el panel a tu gusto."}
+            ? "Acceso de consulta."
+            : "Los paneles visibles corresponden al perfil de este espacio."}
         </p>
 
         <div className="sticky top-0 z-20 mb-4 rounded-lg border border-slate-700 bg-slate-950/95 p-3 shadow-lg" style={{ order: -1 }}>
