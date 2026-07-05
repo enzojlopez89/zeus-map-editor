@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getWorkspaceProfile } from "@/config/workspaces";
 import MapEditor, {
   type ElementoOperacional,
@@ -59,6 +59,22 @@ type LoadResponse = {
   workspace?: WorkspaceInformation;
   mapState?: DatabaseMapState | null;
   elements?: DatabaseMapElement[];
+};
+
+type CellSummary = {
+  code: string;
+  name: string;
+  version: number;
+  elementCount: number;
+  lastSavedAt: string | null;
+};
+
+type FollowUpResponse = {
+  ok: boolean;
+  error?: string;
+  summaries?: CellSummary[];
+  elements?: DatabaseMapElement[];
+  refreshedAt?: string;
 };
 
 type WorkspaceMapClientProps = {
@@ -139,6 +155,12 @@ export default function WorkspaceMapClient({
     useState<ZeusMapWorkspaceState | null>(null);
   const [initialElements, setInitialElements] =
     useState<ElementoOperacional[]>([]);
+  const canFollow = workspaceCode === "comandante" || workspaceCode === "jem";
+  const [cellSummaries, setCellSummaries] = useState<CellSummary[]>([]);
+  const [followElements, setFollowElements] = useState<ElementoOperacional[]>([]);
+  const [selectedCells, setSelectedCells] = useState<Record<string, boolean>>({});
+  const [followStatus, setFollowStatus] = useState("Sin actualizar");
+  const [followLoading, setFollowLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -189,6 +211,72 @@ export default function WorkspaceMapClient({
       cancelled = true;
     };
   }, [workspaceCode, token, access]);
+
+  async function cargarSeguimiento(silent = false) {
+    if (!canFollow) return;
+    if (!silent) setFollowLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/workspaces/${workspaceCode}/follow-up`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, access }),
+          cache: "no-store",
+        },
+      );
+      const result = (await response.json()) as FollowUpResponse;
+
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error ?? "No se pudo actualizar el seguimiento.");
+      }
+
+      setCellSummaries(result.summaries ?? []);
+      setFollowElements(convertirElementos(result.elements));
+      setSelectedCells((actual) => {
+        if (Object.keys(actual).length > 0) return actual;
+        return Object.fromEntries(
+          (result.summaries ?? []).map((cell) => [cell.code, false]),
+        );
+      });
+      setFollowStatus(
+        `Actualizado ${new Date(result.refreshedAt ?? Date.now()).toLocaleTimeString("es-AR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })}`,
+      );
+    } catch (error) {
+      console.error("Error cargando seguimiento:", error);
+      setFollowStatus(
+        error instanceof Error ? error.message : "Error de seguimiento",
+      );
+    } finally {
+      if (!silent) setFollowLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!authorized || !canFollow) return;
+    void cargarSeguimiento();
+    const timer = window.setInterval(() => {
+      void cargarSeguimiento(true);
+    }, 20000);
+    return () => window.clearInterval(timer);
+    // cargarSeguimiento depende únicamente de las credenciales de esta página.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authorized, canFollow, workspaceCode, token, access]);
+
+  const followedElements = useMemo(
+    () =>
+      followElements.filter(
+        (elemento) =>
+          Boolean(elemento.originWorkspaceCode) &&
+          selectedCells[elemento.originWorkspaceCode ?? ""] === true,
+      ),
+    [followElements, selectedCells],
+  );
 
   async function guardar(snapshot: ZeusMapSnapshot) {
     const response = await fetch(
@@ -262,9 +350,98 @@ export default function WorkspaceMapClient({
         </div>
       </header>
 
+      {canFollow && (
+        <section className="border-b border-slate-700 bg-slate-900 px-4 py-3 text-white">
+          <details open className="mx-auto max-w-[1800px] rounded-lg border border-slate-700 bg-slate-950/70 p-3">
+            <summary className="cursor-pointer select-none font-bold text-amber-200">
+              Seguimiento de células — {followStatus}
+            </summary>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedCells(
+                    Object.fromEntries(cellSummaries.map((cell) => [cell.code, true])),
+                  )
+                }
+                className="rounded bg-cyan-700 px-3 py-1.5 text-sm font-semibold hover:bg-cyan-600"
+              >
+                Ver todas
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedCells(
+                    Object.fromEntries(cellSummaries.map((cell) => [cell.code, false])),
+                  )
+                }
+                className="rounded bg-slate-700 px-3 py-1.5 text-sm font-semibold hover:bg-slate-600"
+              >
+                Ocultar todas
+              </button>
+              <button
+                type="button"
+                onClick={() => void cargarSeguimiento()}
+                disabled={followLoading}
+                className="rounded bg-emerald-700 px-3 py-1.5 text-sm font-semibold hover:bg-emerald-600 disabled:opacity-50"
+              >
+                {followLoading ? "Actualizando..." : "Actualizar ahora"}
+              </button>
+              <span className="text-xs text-slate-400">
+                Actualización automática cada 20 segundos. Los elementos externos son de solo lectura.
+              </span>
+            </div>
+
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+              {cellSummaries.map((cell) => (
+                <label
+                  key={cell.code}
+                  className={`cursor-pointer rounded-lg border p-3 text-sm ${
+                    selectedCells[cell.code]
+                      ? "border-cyan-500 bg-cyan-950/40"
+                      : "border-slate-700 bg-slate-900"
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedCells[cell.code] ?? false}
+                      onChange={(event) =>
+                        setSelectedCells((actual) => ({
+                          ...actual,
+                          [cell.code]: event.target.checked,
+                        }))
+                      }
+                      className="mt-1"
+                    />
+                    <div>
+                      <p className="font-bold">{cell.name}</p>
+                      <p className="text-slate-300">Elementos: {cell.elementCount}</p>
+                      <p className="text-slate-300">Versión: {cell.version}</p>
+                      <p className="text-xs text-slate-400">
+                        Último guardado: {cell.lastSavedAt
+                          ? new Date(cell.lastSavedAt).toLocaleString("es-AR", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : "Sin registros"}
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </details>
+        </section>
+      )}
+
       <MapEditor
         initialState={initialState}
         initialElements={initialElements}
+        followedElements={followedElements}
         readOnly={access === "view"}
         onSave={access === "edit" ? guardar : undefined}
         allowedPanels={workspaceProfile.allowedPanels}

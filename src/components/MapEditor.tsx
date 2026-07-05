@@ -197,6 +197,7 @@ export type ZeusMapSnapshot = {
 type MapEditorProps = {
   initialState?: ZeusMapWorkspaceState | null;
   initialElements?: ElementoOperacional[];
+  followedElements?: ElementoOperacional[];
   readOnly?: boolean;
   onSave?: (snapshot: ZeusMapSnapshot) => Promise<void>;
   allowedPanels?: PanelId[];
@@ -1373,6 +1374,7 @@ function obtenerMaximoSlider(elemento: ElementoOperacional) {
 export default function MapEditor({
   initialState = null,
   initialElements = [],
+  followedElements = [],
   readOnly = false,
   onSave,
   allowedPanels = ORDEN_PANELES_INICIAL,
@@ -1398,6 +1400,23 @@ export default function MapEditor({
   const [mapReady, setMapReady] = useState(false);
   const [elementos, setElementos] = useState<ElementoOperacional[]>(initialElements);
   const [seleccionadoId, setSeleccionadoId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setElementos((actuales) => {
+      const propios = actuales.filter((elemento) => !elemento.sharedExternal);
+      const externosBase =
+        followedElements.length > 0
+          ? followedElements
+          : initialElements.filter((elemento) => elemento.sharedExternal);
+
+      const unicos = new Map<string, ElementoOperacional>();
+      [...propios, ...externosBase].forEach((elemento) => {
+        unicos.set(elemento.id, elemento);
+      });
+
+      return Array.from(unicos.values());
+    });
+  }, [followedElements, initialElements]);
 
   const [vistaFuerzas, setVistaFuerzas] = useState<VistaFuerzas>((ajustesIniciales.vistaFuerzas as VistaFuerzas | undefined) ?? "ambas");
 
@@ -3042,6 +3061,14 @@ export default function MapEditor({
     }
   }
 
+  const firmaElementosPropios = useMemo(
+    () =>
+      JSON.stringify(
+        elementos.filter((elemento) => !elemento.sharedExternal),
+      ),
+    [elementos],
+  );
+
   useEffect(() => {
     if (!seguimientoCambiosRef.current) {
       seguimientoCambiosRef.current = true;
@@ -3053,7 +3080,7 @@ export default function MapEditor({
       setMensajeGuardado("Cambios sin guardar");
     }
   }, [
-    elementos,
+    firmaElementosPropios,
     vistaFuerzas,
     mostrarRepublicas,
     mostrarEntornoGeografico,
