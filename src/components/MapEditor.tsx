@@ -123,8 +123,6 @@ const ORDEN_PANELES_INICIAL: PanelId[] = [
   "desplegados",
 ];
 
-<<<<<<< HEAD
-=======
 export type ZeusMapWorkspaceState = {
   mapCenter?: { longitude: number; latitude: number };
   zoom?: number;
@@ -147,7 +145,6 @@ type MapEditorProps = {
   onSave?: (snapshot: ZeusMapSnapshot) => Promise<void>;
 };
 
->>>>>>> desarrollo-multiespacio
 const TON_GEOJSON: GeoJSON.FeatureCollection = {
   type: "FeatureCollection",
   features: [
@@ -1307,22 +1304,6 @@ export default function MapEditor({
 
   const [mostrarRepublicas, setMostrarRepublicas] = useState(capasIniciales.republicas ?? true);
   const [mostrarEntornoGeografico, setMostrarEntornoGeografico] =
-<<<<<<< HEAD
-    useState(true);
-  const [mostrarTon, setMostrarTon] = useState(true);
-  const [mostrarBases, setMostrarBases] = useState(true);
-  const [mostrarComunicaciones, setMostrarComunicaciones] = useState(false);
-  const [mostrarAeronaves, setMostrarAeronaves] = useState(true);
-  const [mostrarRadares, setMostrarRadares] = useState(true);
-  const [mostrarDefensa, setMostrarDefensa] = useState(true);
-  const [mostrarRelieve, setMostrarRelieve] = useState(false);
-  const [mostrarRios, setMostrarRios] = useState(false);
-  const [mostrarGrilla, setMostrarGrilla] = useState(false);
-  const [intervaloGrilla, setIntervaloGrilla] = useState(2);
-  const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(false);
-  const [modoMedicion, setModoMedicion] = useState(false);
-  const [ordenPaneles, setOrdenPaneles] = useState<PanelId[]>(ORDEN_PANELES_INICIAL);
-=======
     useState(capasIniciales.entornoGeografico ?? true);
   const [mostrarTon, setMostrarTon] = useState(capasIniciales.ton ?? true);
   const [mostrarBases, setMostrarBases] = useState(capasIniciales.bases ?? true);
@@ -1337,7 +1318,6 @@ export default function MapEditor({
   const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(capasIniciales.dimensionesTon ?? false);
   const [modoMedicion, setModoMedicion] = useState(false);
   const [ordenPaneles, setOrdenPaneles] = useState<PanelId[]>(initialState?.panelOrder?.length ? initialState.panelOrder : ORDEN_PANELES_INICIAL);
->>>>>>> desarrollo-multiespacio
   const panelArrastradoRef = useRef<PanelId | null>(null);
   const [puntosMedicion, setPuntosMedicion] = useState<PuntoMedicion[]>([]);
   const [distanciaMedicionKm, setDistanciaMedicionKm] = useState(0);
@@ -1796,10 +1776,7 @@ export default function MapEditor({
   }
 
   useEffect(() => {
-<<<<<<< HEAD
-=======
     if (initialState?.panelOrder?.length) return;
->>>>>>> desarrollo-multiespacio
     try {
       const guardado = window.localStorage.getItem("zeus-orden-paneles");
       if (!guardado) return;
@@ -1816,10 +1793,7 @@ export default function MapEditor({
   }, []);
 
   useEffect(() => {
-<<<<<<< HEAD
-=======
     if (readOnly) return;
->>>>>>> desarrollo-multiespacio
     try {
       window.localStorage.setItem(
         "zeus-orden-paneles",
@@ -1831,10 +1805,7 @@ export default function MapEditor({
   }, [ordenPaneles]);
 
   function soltarPanel(destino: PanelId) {
-<<<<<<< HEAD
-=======
     if (readOnly) return;
->>>>>>> desarrollo-multiespacio
     const origen = panelArrastradoRef.current;
     panelArrastradoRef.current = null;
     if (!origen || origen === destino) return;
@@ -1849,11 +1820,7 @@ export default function MapEditor({
 
   function propiedadesPanel(id: PanelId) {
     return {
-<<<<<<< HEAD
-      draggable: true,
-=======
       draggable: !readOnly,
->>>>>>> desarrollo-multiespacio
 
       style: {
         order: ordenPaneles.indexOf(id),
@@ -1862,10 +1829,7 @@ export default function MapEditor({
       },
 
       onDragStart: (event: DragEvent<HTMLElement>) => {
-<<<<<<< HEAD
-=======
         if (readOnly) { event.preventDefault(); return; }
->>>>>>> desarrollo-multiespacio
         panelArrastradoRef.current = id;
 
         event.dataTransfer.effectAllowed = "move";
@@ -1935,10 +1899,6 @@ export default function MapEditor({
           },
         ],
       },
-<<<<<<< HEAD
-      center: [-63.5, -38],
-      zoom: 3,
-=======
       center: [
         initialState?.mapCenter?.longitude ?? -63.5,
         initialState?.mapCenter?.latitude ?? -38,
@@ -1946,7 +1906,6 @@ export default function MapEditor({
       zoom: initialState?.zoom ?? 3,
       bearing: initialState?.bearing ?? 0,
       pitch: initialState?.pitch ?? 0,
->>>>>>> desarrollo-multiespacio
       minZoom: 1.75,
       maxZoom: 14,
       maxBounds: [
@@ -2778,12 +2737,6 @@ export default function MapEditor({
   }, [mostrarComunicaciones, mapReady]);
 
   useEffect(() => {
-    Object.values(comunicacionesRef.current).forEach((marcador) => {
-      marcador.getElement().style.display = mostrarComunicaciones ? "flex" : "none";
-    });
-  }, [mostrarComunicaciones]);
-
-  useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
@@ -3013,16 +2966,6 @@ export default function MapEditor({
 
   return (
     <div className="flex h-screen w-screen">
-<<<<<<< HEAD
-      <aside className="flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white">
-        <h1 className="mb-2 text-xl font-bold" style={{ order: -2 }}>
-          EJERCICIO ZEUS (TO NORTE)
-        </h1>
-        <p className="mb-5 text-xs text-slate-400" style={{ order: -1 }}>
-          Arrastrá cualquier recuadro para ordenar el panel a tu gusto.
-        </p>
-
-=======
       <aside className={`flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white ${readOnly ? "workspace-readonly" : ""}`}>
         <h1 className="mb-2 text-xl font-bold" style={{ order: -2 }}>
           EJERCICIO ZEUS (TO NORTE)
@@ -3051,7 +2994,6 @@ export default function MapEditor({
           </div>
         </div>
 
->>>>>>> desarrollo-multiespacio
         <section {...propiedadesPanel("fuerzas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Fuerzas visibles</h2>
 
