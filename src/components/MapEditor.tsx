@@ -94,11 +94,7 @@ type IconoCatalogo = {
 
 type PuntoMedicion = [number, number];
 
-<<<<<<< HEAD
-type PanelId =
-=======
 export type PanelId =
->>>>>>> desarrollo-multiespacio
   | "fuerzas"
   | "referencia"
   | "capas"
