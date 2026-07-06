@@ -82,7 +82,7 @@ type BaseMilitar = {
   longitude: number;
   latitude: number;
   bando: Bando;
-  tipo: "Base aérea" | "Estación radar" | "Centro de comando" | "Comunicaciones";
+  tipo: "Base aérea" | "Estación radar" | "Centro de comando" | "Comunicaciones" | "Apoyo logístico";
 };
 
 type MascaraRadar = {
@@ -302,6 +302,20 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -35.47,
     bando: "propio",
     tipo: "Base aérea",
+  },
+  {
+    nombre: "Área de Material Realicó (AMR)",
+    longitude: -64.245,
+    latitude: -35.035,
+    bando: "propio",
+    tipo: "Apoyo logístico",
+  },
+  {
+    nombre: "Área de Material San Rafael (AMSR)",
+    longitude: -68.33,
+    latitude: -34.617,
+    bando: "propio",
+    tipo: "Apoyo logístico",
   },
 ];
 
@@ -1881,7 +1895,9 @@ export default function MapEditor({
         ? "radar"
         : base.tipo === "Centro de comando"
           ? "puesto_de_mando"
-          : ICONO_BASE;
+          : base.tipo === "Apoyo logístico"
+            ? "instalacion"
+            : ICONO_BASE;
 
     imagen.src = `/data/iconos/simbologia/${familia}__${afiliacionIcono(
       base.bando,
