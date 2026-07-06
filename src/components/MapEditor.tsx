@@ -7,7 +7,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 type Bando = "propio" | "enemigo";
 type VistaFuerzas = "propias" | "enemigas" | "ambas";
-type TipoElemento = "aeronave" | "radar" | "defensa";
+type TipoElemento = "aeronave" | "radar" | "defensa" | "terrestre" | "naval";
 type FuenteDistancia = "orden" | "externa" | "manual";
 type EstadoInteligencia = "pendiente" | "estimado" | "probable" | "confirmado" | "descartado";
 type NivelConfianza = "baja" | "media" | "alta";
@@ -35,6 +35,8 @@ export type ElementoOperacional = {
   referenciaDistancia?: string;
   permiteReabastecimiento?: boolean;
   conReabastecimiento?: boolean;
+  mostrarRadar?: boolean;
+  alcanceRadarKm?: number;
   intelligenceStatus?: EstadoInteligencia;
   confidenceLevel?: NivelConfianza;
   informationDate?: string;
@@ -327,6 +329,15 @@ const COAE_RIO_CUARTO: BaseMilitar = {
   tipo: "Centro de comando",
 };
 
+
+const COAE_ENEMIGO_INGENIERO_JUAREZ: BaseMilitar = {
+  nombre: "COAe enemigo / Ingeniero Juárez",
+  longitude: -61.855,
+  latitude: -23.900,
+  bando: "enemigo",
+  tipo: "Centro de comando",
+};
+
 const GRUPOS_COMUNICACIONES: BaseMilitar[] = [
   {
     nombre: "Grupo 1 COM / San Luis",
@@ -352,6 +363,12 @@ const LABORATORIO_TRITIO = {
   descripcion:
     "Instalación estratégica enemiga establecida por el Plan de Campaña para el procesamiento de tritio.",
   fuente: "Plan de Campaña TON ZEUS I 2026",
+};
+
+
+const POSICION_INICIAL_MEDIO_PERSONALIZADO = {
+  longitude: -58.5,
+  latitude: -27.0,
 };
 
 const BASES_ENEMIGAS: BaseMilitar[] = [
@@ -701,6 +718,20 @@ function radioAereoRepresentado(elemento: ElementoOperacional) {
   if (elemento.tipo !== "aeronave") return elemento.alcanceKm;
   const multiplicador = elemento.conReabastecimiento ? 2 : 1;
   return elemento.radioCombateKm * multiplicador;
+}
+
+
+function inferirTipoPersonalizado(nombre: string, iconoTipo: string): TipoElemento {
+  const texto = `${nombre} ${iconoTipo}`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (texto.includes("radar") || texto.includes("sensor")) return "radar";
+  if (texto.includes("antiaerea") || texto.includes("misil") || texto.includes("defensa")) return "defensa";
+  if (texto.includes("aeronave") || texto.includes("ala_fija") || texto.includes("ala_rotativa") || texto.includes("helicoptero") || texto.includes("uav")) return "aeronave";
+  if (texto.includes("naval") || texto.includes("buque") || texto.includes("fragata") || texto.includes("corbeta") || texto.includes("submarino") || texto.includes("barco") || texto.includes("superficie")) return "naval";
+  return "terrestre";
 }
 
 const CATALOGO_AERONAVES_PROPIAS: AeronaveCatalogo[] = Object.entries(
@@ -1236,6 +1267,26 @@ function familiaIconoMedio(elemento: ElementoOperacional) {
     return elemento.iconoTipo;
   }
 
+  if (elemento.tipo === "naval") {
+    if (texto.includes("submarino")) {
+      return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
+    }
+    if (texto.includes("buque") || texto.includes("fragata") || texto.includes("corbeta") || texto.includes("naval") || texto.includes("barco")) {
+      return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
+    }
+    return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
+  }
+
+  if (elemento.tipo === "terrestre") {
+    if (texto.includes("logistic") || texto.includes("logística") || texto.includes("logistica") || texto.includes("abastecimiento") || texto.includes("deposito") || texto.includes("depósito")) {
+      return `logistica__${afiliacionIcono(elemento.bando)}.png`;
+    }
+    if (texto.includes("comando") || texto.includes("coae") || texto.includes("c2")) {
+      return `centro_conjunto_de_inteligencia__${afiliacionIcono(elemento.bando)}.png`;
+    }
+    return `equipo_terrestre__${afiliacionIcono(elemento.bando)}.png`;
+  }
+
   if (elemento.tipo === "radar") {
     return `radar__${afiliacionIcono(elemento.bando)}.png`;
   }
@@ -1390,7 +1441,11 @@ function obtenerMaximoSlider(elemento: ElementoOperacional) {
       ? 5000
       : elemento.tipo === "radar"
         ? 1200
-        : 400;
+        : elemento.tipo === "naval"
+          ? 1200
+          : elemento.tipo === "terrestre"
+            ? 800
+            : 400;
 
   return Math.max(base, Math.ceil(valorActual * 1.5));
 }
@@ -1418,6 +1473,7 @@ export default function MapEditor({
   const oceanosRef = useRef<Record<string, maplibregl.Marker>>({});
   const basesRef = useRef<Record<string, maplibregl.Marker>>({});
   const coaeRef = useRef<maplibregl.Marker | null>(null);
+  const coaeEnemigoRef = useRef<maplibregl.Marker | null>(null);
   const comunicacionesRef = useRef<Record<string, maplibregl.Marker>>({});
   const laboratorioTritioRef = useRef<maplibregl.Marker | null>(null);
   const dimensionesTonRef = useRef<Record<string, maplibregl.Marker>>({});
@@ -1530,9 +1586,13 @@ export default function MapEditor({
       true,
   );
 
+  const [mostrarCOAeEnemigo, setMostrarCOAeEnemigo] = useState<boolean>(
+    () =>
+      (ajustesIniciales.mostrarCOAeEnemigo as boolean | undefined) ??
+      true,
+  );
+
   const [nombrePersonalizado, setNombrePersonalizado] = useState("");
-  const [tipoPersonalizado, setTipoPersonalizado] =
-    useState<TipoElemento>("aeronave");
   const [bandoPersonalizado, setBandoPersonalizado] = useState<Bando>("propio");
   const [basePersonalizada, setBasePersonalizada] = useState(
     BASES_PROPIAS[0]?.nombre ?? "",
@@ -1569,6 +1629,25 @@ export default function MapEditor({
     [elementos, seleccionadoId],
   );
 
+
+
+  useEffect(() => {
+    if (readOnly) return;
+
+    function manejarTecla(event: KeyboardEvent) {
+      if (event.key !== "Delete" && event.key !== "Suprimir") return;
+      const objetivo = event.target as HTMLElement | null;
+      if (objetivo && ["INPUT", "TEXTAREA", "SELECT"].includes(objetivo.tagName)) return;
+      if (!seleccionadoId) return;
+
+      event.preventDefault();
+      eliminarElemento(seleccionadoId);
+    }
+
+    window.addEventListener("keydown", manejarTecla);
+    return () => window.removeEventListener("keydown", manejarTecla);
+  }, [readOnly, seleccionadoId]);
+
   const mostrarControlesPropios =
     vistaFuerzas === "propias" || vistaFuerzas === "ambas";
 
@@ -1603,24 +1682,50 @@ export default function MapEditor({
           icono.archivo.toLowerCase().includes(termino);
 
         return coincideBando && coincideTexto;
-      })
-      .slice(0, 120);
+      });
   }, [catalogoIconos, busquedaIcono, bandoPersonalizado]);
 
-  function crearAnillo(elemento: ElementoOperacional) {
+  function crearAnillosElemento(elemento: ElementoOperacional) {
+    const anillos: GeoJSON.Feature[] = [];
     const radio = radioAereoRepresentado(elemento);
 
-    return circle([elemento.longitude, elemento.latitude], radio, {
-      steps: 128,
-      units: "kilometers",
-      properties: {
-        id: elemento.id,
-        nombre: elemento.nombre,
-        tipo: elemento.tipo,
-        bando: elemento.bando,
-        color: elemento.color,
-      },
-    });
+    if (radio > 0 && debeMostrarAnillo(elemento)) {
+      anillos.push(circle([elemento.longitude, elemento.latitude], radio, {
+        steps: 128,
+        units: "kilometers",
+        properties: {
+          id: elemento.id,
+          nombre: elemento.nombre,
+          tipo: elemento.tipo,
+          bando: elemento.bando,
+          color: elemento.color,
+          clase: "alcance",
+        },
+      }) as GeoJSON.Feature);
+    }
+
+    if (
+      elemento.tipo === "aeronave" &&
+      elemento.mostrarRadar &&
+      (elemento.alcanceRadarKm ?? 0) > 0 &&
+      bandoVisible(elemento.bando, vistaFuerzas) &&
+      mostrarAeronaves
+    ) {
+      anillos.push(circle([elemento.longitude, elemento.latitude], elemento.alcanceRadarKm ?? 0, {
+        steps: 128,
+        units: "kilometers",
+        properties: {
+          id: `${elemento.id}-radar`,
+          nombre: `${elemento.nombre} - radar`,
+          tipo: "radar-aeronave",
+          bando: elemento.bando,
+          color: elemento.bando === "propio" ? "#38bdf8" : "#f97316",
+          clase: "radar",
+        },
+      }) as GeoJSON.Feature);
+    }
+
+    return anillos;
   }
 
   function debeMostrarAnillo(elemento: ElementoOperacional) {
@@ -1666,7 +1771,7 @@ export default function MapEditor({
 
     source.setData({
       type: "FeatureCollection",
-      features: lista.filter(debeMostrarAnillo).map(crearAnillo),
+      features: lista.flatMap(crearAnillosElemento),
     });
   }
 
@@ -1809,26 +1914,26 @@ export default function MapEditor({
     const nombre = nombrePersonalizado.trim();
     if (!nombre) return;
 
-    const base = obtenerBase(basePersonalizada);
-    const centro = mapRef.current?.getCenter();
+    const tipoInferido = inferirTipoPersonalizado(nombre, iconoTipoPersonalizado);
 
     const nuevo: ElementoOperacional = {
       id: crearId(),
       visible: true,
       bando: bandoPersonalizado,
-      tipo: tipoPersonalizado,
+      tipo: tipoInferido,
       nombre,
-      baseOrigen: base?.nombre ?? "Ubicación personalizada",
-      longitude: base?.longitude ?? centro?.lng ?? -64.5,
-      latitude: base?.latitude ?? centro?.lat ?? -35.5,
-      radioCombateKm:
-        tipoPersonalizado === "aeronave" ? alcancePersonalizado : 0,
-      alcanceKm: tipoPersonalizado === "aeronave" ? 0 : alcancePersonalizado,
+      baseOrigen: "Ubicación inicial oceánica",
+      longitude: POSICION_INICIAL_MEDIO_PERSONALIZADO.longitude,
+      latitude: POSICION_INICIAL_MEDIO_PERSONALIZADO.latitude,
+      radioCombateKm: tipoInferido === "aeronave" ? alcancePersonalizado : 0,
+      alcanceKm: tipoInferido === "aeronave" ? 0 : alcancePersonalizado,
       mostrarAnillo: alcancePersonalizado > 0,
       color: colorPersonalizado,
       iconoPersonalizado,
       iconoTipo: iconoTipoPersonalizado,
       descripcion: "Medio personalizado",
+      mostrarRadar: false,
+      alcanceRadarKm: 0,
     };
 
     setElementos((anteriores) => [...anteriores, nuevo]);
@@ -2088,6 +2193,57 @@ export default function MapEditor({
       map.getCanvas().style.cursor = modoMedicion ? "crosshair" : "";
     }
   }, [modoMedicion]);
+
+
+
+  function agregarPuntoMedicion(coordenadas: PuntoMedicion) {
+    const map = mapRef.current;
+
+    setPuntosMedicion((anteriores) => {
+      const nuevos = [...anteriores, coordenadas];
+      const source = map?.getSource("medicion") as
+        maplibregl.GeoJSONSource | undefined;
+
+      const features: GeoJSON.Feature[] = nuevos.map((coordenada) => ({
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "Point",
+          coordinates: coordenada,
+        },
+      }));
+
+      let distancia = 0;
+
+      if (nuevos.length >= 2) {
+        const linea = lineString(nuevos);
+        distancia = turfLength(linea, {
+          units: "kilometers",
+        });
+        features.push(linea);
+      }
+
+      source?.setData({
+        type: "FeatureCollection",
+        features,
+      });
+
+      setDistanciaMedicionKm(distancia);
+      return nuevos;
+    });
+  }
+
+  function habilitarMedicionSobreMarcador(
+    marker: maplibregl.Marker,
+    coordenadas: PuntoMedicion,
+  ) {
+    marker.getElement().addEventListener("click", (event) => {
+      if (!modoMedicionRef.current) return;
+      event.preventDefault();
+      event.stopPropagation();
+      agregarPuntoMedicion(coordenadas);
+    });
+  }
 
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
@@ -2353,6 +2509,34 @@ export default function MapEditor({
         )
         .addTo(map);
       coaeRef.current = marcadorCOAe;
+      habilitarMedicionSobreMarcador(marcadorCOAe, [
+        COAE_RIO_CUARTO.longitude,
+        COAE_RIO_CUARTO.latitude,
+      ]);
+
+      const marcadorCOAeEnemigo = new maplibregl.Marker({
+        element: crearMarcadorEspecial(COAE_ENEMIGO_INGENIERO_JUAREZ, "C2", "#fca5a5"),
+        anchor: "center",
+      })
+        .setLngLat([
+          COAE_ENEMIGO_INGENIERO_JUAREZ.longitude,
+          COAE_ENEMIGO_INGENIERO_JUAREZ.latitude,
+        ])
+        .setPopup(
+          new maplibregl.Popup({ offset: 25, maxWidth: "380px", className: "zeus-popup" }).setHTML(`
+            <div style="background:#0f172a;color:white;padding:14px">
+              <strong>COAe enemigo / Ingeniero Juárez</strong><br />
+              Comando de Operaciones Aeroespaciales enemigo<br />
+              <em>Punto fijo enemigo de comando y control</em>
+            </div>
+          `),
+        )
+        .addTo(map);
+      coaeEnemigoRef.current = marcadorCOAeEnemigo;
+      habilitarMedicionSobreMarcador(marcadorCOAeEnemigo, [
+        COAE_ENEMIGO_INGENIERO_JUAREZ.longitude,
+        COAE_ENEMIGO_INGENIERO_JUAREZ.latitude,
+      ]);
 
       GRUPOS_COMUNICACIONES.forEach((grupo) => {
         const marcador = new maplibregl.Marker({
@@ -2370,6 +2554,7 @@ export default function MapEditor({
             `),
           )
           .addTo(map);
+        habilitarMedicionSobreMarcador(marcador, [grupo.longitude, grupo.latitude]);
         marcador.getElement().style.display = "none";
         comunicacionesRef.current[grupo.nombre] = marcador;
       });
@@ -2420,6 +2605,10 @@ export default function MapEditor({
           `),
         )
         .addTo(map);
+      habilitarMedicionSobreMarcador(laboratorioTritioRef.current, [
+        LABORATORIO_TRITIO.longitude,
+        LABORATORIO_TRITIO.latitude,
+      ]);
 
             [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
         const marker = new maplibregl.Marker({
@@ -2435,6 +2624,7 @@ export default function MapEditor({
             }).setHTML(mediosDeBase(base)),
           )
           .addTo(map);
+        habilitarMedicionSobreMarcador(marker, [base.longitude, base.latitude]);
 
         basesRef.current[base.nombre] = marker;
       });
@@ -2650,43 +2840,7 @@ export default function MapEditor({
       map.on("click", (evento) => {
         if (!modoMedicionRef.current) return;
 
-        const nuevoPunto: PuntoMedicion = [
-          evento.lngLat.lng,
-          evento.lngLat.lat,
-        ];
-
-        setPuntosMedicion((anteriores) => {
-          const nuevos = [...anteriores, nuevoPunto];
-          const source = map.getSource("medicion") as
-            maplibregl.GeoJSONSource | undefined;
-
-          const features: GeoJSON.Feature[] = nuevos.map((coordenada) => ({
-            type: "Feature",
-            properties: {},
-            geometry: {
-              type: "Point",
-              coordinates: coordenada,
-            },
-          }));
-
-          let distancia = 0;
-
-          if (nuevos.length >= 2) {
-            const linea = lineString(nuevos);
-            distancia = turfLength(linea, {
-              units: "kilometers",
-            });
-            features.push(linea);
-          }
-
-          source?.setData({
-            type: "FeatureCollection",
-            features,
-          });
-
-          setDistanciaMedicionKm(distancia);
-          return nuevos;
-        });
+        agregarPuntoMedicion([evento.lngLat.lng, evento.lngLat.lat]);
       });
 
       map.addSource("anillos-operacionales", {
@@ -2732,6 +2886,7 @@ export default function MapEditor({
       Object.values(oceanosRef.current).forEach((marker) => marker.remove());
       Object.values(basesRef.current).forEach((marker) => marker.remove());
       coaeRef.current?.remove();
+      coaeEnemigoRef.current?.remove();
       Object.values(comunicacionesRef.current).forEach((marker) => marker.remove());
       laboratorioTritioRef.current?.remove();
       Object.values(dimensionesTonRef.current).forEach((marker) =>
@@ -2744,6 +2899,7 @@ export default function MapEditor({
       oceanosRef.current = {};
       basesRef.current = {};
       coaeRef.current = null;
+      coaeEnemigoRef.current = null;
       comunicacionesRef.current = {};
       laboratorioTritioRef.current = null;
       dimensionesTonRef.current = {};
@@ -2767,7 +2923,9 @@ export default function MapEditor({
           ? mostrarAeronaves
           : elemento.tipo === "radar"
             ? mostrarRadares
-            : mostrarDefensa;
+            : elemento.tipo === "defensa"
+              ? mostrarDefensa
+              : true;
 
       const visible =
         elemento.visible &&
@@ -2877,7 +3035,15 @@ export default function MapEditor({
         )
         .addTo(map);
 
-      marker.getElement().addEventListener("click", () => {
+      marker.getElement().addEventListener("click", (event) => {
+        if (modoMedicionRef.current) {
+          event.preventDefault();
+          event.stopPropagation();
+          const posicion = marker.getLngLat();
+          agregarPuntoMedicion([posicion.lng, posicion.lat]);
+          return;
+        }
+
         setSeleccionadoId(elemento.id);
       });
 
@@ -2987,6 +3153,18 @@ export default function MapEditor({
 
     marcador.getElement().style.display = visibleCOAe ? "flex" : "none";
   }, [mostrarBases, mostrarCOAe, vistaFuerzas, mapReady]);
+
+  useEffect(() => {
+    const marcador = coaeEnemigoRef.current;
+    if (!marcador) return;
+
+    const visibleCOAeEnemigo =
+      mostrarBases &&
+      mostrarCOAeEnemigo &&
+      bandoVisible("enemigo", vistaFuerzas);
+
+    marcador.getElement().style.display = visibleCOAeEnemigo ? "flex" : "none";
+  }, [mostrarBases, mostrarCOAeEnemigo, vistaFuerzas, mapReady]);
 
   useEffect(() => {
     const marcador = laboratorioTritioRef.current;
@@ -3139,7 +3317,7 @@ export default function MapEditor({
           radares: mostrarRadares,
           defensa: mostrarDefensa,
           relieve: mostrarRelieve,
-          rios: mostrarRios,
+          rios: false,
           grilla: mostrarGrilla,
           dimensionesTon: mostrarDimensionesTon,
         },
@@ -3152,6 +3330,7 @@ export default function MapEditor({
           coloresRepublicas,
           basesVisibles,
           mostrarCOAe,
+          mostrarCOAeEnemigo,
           mostrarLaboratorioTritio,
         },
       },
@@ -3213,7 +3392,6 @@ export default function MapEditor({
     mostrarRadares,
     mostrarDefensa,
     mostrarRelieve,
-    mostrarRios,
     mostrarGrilla,
     intervaloGrilla,
     mostrarDimensionesTon,
@@ -3222,6 +3400,9 @@ export default function MapEditor({
     coloresMascaras,
     coloresRepublicas,
     basesVisibles,
+    mostrarCOAe,
+    mostrarCOAeEnemigo,
+    mostrarLaboratorioTritio,
     readOnly,
   ]);
 
@@ -3439,6 +3620,23 @@ export default function MapEditor({
                   <br />
                   <span className="text-xs text-slate-400">
                     Objetivo estratégico enemigo
+                  </span>
+                </span>
+              </label>
+
+              <label className="mt-3 flex items-start gap-2 border-t border-orange-900 pt-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={mostrarCOAeEnemigo}
+                  onChange={(event) =>
+                    setMostrarCOAeEnemigo(event.target.checked)
+                  }
+                />
+                <span>
+                  <strong className="text-orange-300">COAe enemigo / Ingeniero Juárez</strong>
+                  <br />
+                  <span className="text-xs text-slate-400">
+                    Centro de comando y control enemigo
                   </span>
                 </span>
               </label>
@@ -3669,17 +3867,9 @@ export default function MapEditor({
               checked={mostrarRelieve}
               onChange={(event) => setMostrarRelieve(event.target.checked)}
             />
-            Relieve físico sin nombres
+            Relieve
           </label>
 
-          <label className="mb-3 flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={mostrarRios}
-              onChange={(event) => setMostrarRios(event.target.checked)}
-            />
-            Ríos y cursos de agua
-          </label>
 
           <label className="mb-3 flex items-center gap-2">
             <input
@@ -4087,6 +4277,12 @@ export default function MapEditor({
 
         <section {...propiedadesPanel("elementos")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Elementos visibles</h2>
+          {elementos.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2 text-xs">
+              <button type="button" onClick={() => setElementos((anteriores) => anteriores.map((elemento) => ({ ...elemento, visible: true })))} className="rounded bg-emerald-700 px-2 py-1">Ver todos</button>
+              <button type="button" onClick={() => setElementos((anteriores) => anteriores.map((elemento) => ({ ...elemento, visible: false })))} className="rounded bg-slate-700 px-2 py-1">Ocultar todos</button>
+            </div>
+          )}
           {elementos.length === 0 ? (
             <p className="text-xs text-slate-400">
               Todavía no agregaste medios.
@@ -4131,66 +4327,26 @@ export default function MapEditor({
             className="mb-3 w-full rounded bg-slate-800 p-2"
           />
 
-          <div className="mb-3 grid grid-cols-2 gap-2">
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-300">
-                Tipo de medio
-              </label>
-              <select
-                value={tipoPersonalizado}
-                onChange={(event) =>
-                  setTipoPersonalizado(event.target.value as TipoElemento)
-                }
-                className="w-full rounded bg-slate-800 p-2"
-              >
-                <option value="aeronave">Aeronave / medio aéreo</option>
-                <option value="radar">Radar / sensor</option>
-                <option value="defensa">Defensa antiaérea</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-300">
-                Bando
-              </label>
-              <select
-                value={bandoPersonalizado}
-                onChange={(event) => {
-                  const bando = event.target.value as Bando;
-                  setBandoPersonalizado(bando);
-                  const bases =
-                    bando === "propio" ? BASES_PROPIAS : BASES_ENEMIGAS;
-                  setBasePersonalizada(bases[0]?.nombre ?? "");
-                }}
-                className="w-full rounded bg-slate-800 p-2"
-              >
-                <option value="propio">Propio</option>
-                <option value="enemigo">Enemigo</option>
-              </select>
-            </div>
-          </div>
-
           <label className="mb-1 block text-xs font-semibold text-slate-300">
-            Base o ubicación inicial
+            Bando
           </label>
           <select
-            value={basePersonalizada}
-            onChange={(event) => setBasePersonalizada(event.target.value)}
+            value={bandoPersonalizado}
+            onChange={(event) => setBandoPersonalizado(event.target.value as Bando)}
             className="mb-3 w-full rounded bg-slate-800 p-2"
           >
-            {(bandoPersonalizado === "propio"
-              ? BASES_PROPIAS
-              : BASES_ENEMIGAS
-            ).map((base) => (
-              <option key={base.nombre} value={base.nombre}>
-                {base.nombre}
-              </option>
-            ))}
+            <option value="propio">Propio</option>
+            <option value="enemigo">Enemigo</option>
           </select>
+
+          <p className="mb-3 rounded bg-slate-800 p-2 text-xs text-slate-300">
+            El medio se ubicará inicialmente en el océano próximo al teatro de operaciones. Luego podés arrastrarlo al punto exacto. El tipo se infiere por el nombre o por el icono elegido.
+          </p>
 
           <div className="mb-3 grid grid-cols-[1fr_76px] gap-2">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-300">
-                Radio o alcance
+                Radio de alcance
               </label>
               <input
                 type="number"
@@ -4510,6 +4666,40 @@ export default function MapEditor({
                 </p>
               )}
             </div>
+
+
+            {seleccionado.tipo === "aeronave" && (
+              <div className="rounded border border-cyan-800 bg-slate-900 p-3 text-sm">
+                <label className="mb-3 flex items-center gap-2 text-cyan-200">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(seleccionado.mostrarRadar)}
+                    onChange={(event) =>
+                      actualizarElemento(seleccionado.id, {
+                        mostrarRadar: event.target.checked,
+                      })
+                    }
+                  />
+                  Mostrar alcance radar de la aeronave
+                </label>
+
+                <label className="mb-1 block text-xs text-slate-300">
+                  Alcance radar 
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={seleccionado.alcanceRadarKm ?? 0}
+                  onChange={(event) =>
+                    actualizarElemento(seleccionado.id, {
+                      alcanceRadarKm: Math.max(0, Number(event.target.value)),
+                    })
+                  }
+                  className="w-full rounded bg-slate-800 p-2"
+                />
+              </div>
+            )}
 
             <label className="flex items-center gap-2">
               <input

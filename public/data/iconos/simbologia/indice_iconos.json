@@ -1,5 +1,15 @@
 [
   {
+    "archivo": "abastecimiento__propio.png",
+    "nombre": "Abastecimiento",
+    "afiliacion": "propio"
+  },
+  {
+    "archivo": "logistica__propio.png",
+    "nombre": "Logística / abastecimiento",
+    "afiliacion": "propio"
+  },
+  {
     "archivo": "instalacion__desconocido.png",
     "nombre": "Instalación",
     "afiliacion": "desconocido"

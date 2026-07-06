@@ -56,6 +56,7 @@ export const WORKSPACE_PROFILES: Record<string, WorkspaceProfile> = {
     allowedPanels: [
       "capas",
       "bases",
+      "mascaras",
       "cartografia",
       "medicion",
       "visibilidad",
