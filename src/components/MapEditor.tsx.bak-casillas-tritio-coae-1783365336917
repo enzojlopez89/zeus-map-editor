@@ -1518,18 +1518,6 @@ export default function MapEditor({
       ),
   );
 
-  const [mostrarLaboratorioTritio, setMostrarLaboratorioTritio] = useState<boolean>(
-    () =>
-      (ajustesIniciales.mostrarLaboratorioTritio as boolean | undefined) ??
-      true,
-  );
-
-  const [mostrarCOAe, setMostrarCOAe] = useState<boolean>(
-    () =>
-      (ajustesIniciales.mostrarCOAe as boolean | undefined) ??
-      true,
-  );
-
   const [nombrePersonalizado, setNombrePersonalizado] = useState("");
   const [tipoPersonalizado, setTipoPersonalizado] =
     useState<TipoElemento>("aeronave");
@@ -2977,30 +2965,6 @@ export default function MapEditor({
   }, [mostrarBases, vistaFuerzas, basesVisibles, mapReady]);
 
   useEffect(() => {
-    const marcador = coaeRef.current;
-    if (!marcador) return;
-
-    const visibleCOAe =
-      mostrarBases &&
-      mostrarCOAe &&
-      bandoVisible("propio", vistaFuerzas);
-
-    marcador.getElement().style.display = visibleCOAe ? "flex" : "none";
-  }, [mostrarBases, mostrarCOAe, vistaFuerzas, mapReady]);
-
-  useEffect(() => {
-    const marcador = laboratorioTritioRef.current;
-    if (!marcador) return;
-
-    const visibleLaboratorioTritio =
-      mostrarBases &&
-      mostrarLaboratorioTritio &&
-      bandoVisible("enemigo", vistaFuerzas);
-
-    marcador.getElement().style.display = visibleLaboratorioTritio ? "flex" : "none";
-  }, [mostrarBases, mostrarLaboratorioTritio, vistaFuerzas, mapReady]);
-
-  useEffect(() => {
     Object.values(comunicacionesRef.current).forEach((marcador) => {
       marcador.getElement().style.display = mostrarComunicaciones ? "flex" : "none";
     });
@@ -3151,8 +3115,6 @@ export default function MapEditor({
           coloresMascaras,
           coloresRepublicas,
           basesVisibles,
-          mostrarCOAe,
-          mostrarLaboratorioTritio,
         },
       },
       elements: elementos,
@@ -3370,7 +3332,7 @@ export default function MapEditor({
           </label>
 
           <p className="mt-2 text-xs text-slate-400">
-            El COAe de Río Cuarto puede mostrarse u ocultarse desde Bases y estaciones visibles → Propias.
+            El COAe de Río Cuarto permanece visible como punto fijo.
           </p>
         </section>
 
@@ -3392,21 +3354,6 @@ export default function MapEditor({
                   <span>{base.nombre}</span>
                 </label>
               ))}
-
-              <label className="mt-3 flex items-start gap-2 border-t border-blue-900 pt-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={mostrarCOAe}
-                  onChange={(event) => setMostrarCOAe(event.target.checked)}
-                />
-                <span>
-                  <strong className="text-cyan-300">COAe / Río Cuarto</strong>
-                  <br />
-                  <span className="text-xs text-slate-400">
-                    Centro de operaciones aeroespaciales propio
-                  </span>
-                </span>
-              </label>
             </div>
           )}
 
@@ -3425,23 +3372,6 @@ export default function MapEditor({
                   <span>{base.nombre}</span>
                 </label>
               ))}
-
-              <label className="mt-3 flex items-start gap-2 border-t border-orange-900 pt-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={mostrarLaboratorioTritio}
-                  onChange={(event) =>
-                    setMostrarLaboratorioTritio(event.target.checked)
-                  }
-                />
-                <span>
-                  <strong className="text-red-300">☢ {LABORATORIO_TRITIO.nombre}</strong>
-                  <br />
-                  <span className="text-xs text-slate-400">
-                    Objetivo estratégico enemigo
-                  </span>
-                </span>
-              </label>
             </div>
           )}
         </section>
