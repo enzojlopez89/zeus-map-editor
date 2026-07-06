@@ -330,6 +330,16 @@ const GRUPOS_COMUNICACIONES: BaseMilitar[] = [
   },
 ];
 
+const LABORATORIO_TRITIO = {
+  nombre: "Laboratorio de procesamiento de tritio",
+  longitude: -66.80665833333333,
+  latitude: -25.0827,
+  coordenadasDms: `25° 4'57.72"S 66° 48'23.97"O`,
+  descripcion:
+    "Instalación estratégica enemiga establecida por el Plan de Campaña para el procesamiento de tritio.",
+  fuente: "Plan de Campaña TON ZEUS I 2026",
+};
+
 const BASES_ENEMIGAS: BaseMilitar[] = [
   {
     nombre: "Cuartel General / Salta",
@@ -1395,6 +1405,7 @@ export default function MapEditor({
   const basesRef = useRef<Record<string, maplibregl.Marker>>({});
   const coaeRef = useRef<maplibregl.Marker | null>(null);
   const comunicacionesRef = useRef<Record<string, maplibregl.Marker>>({});
+  const laboratorioTritioRef = useRef<maplibregl.Marker | null>(null);
   const dimensionesTonRef = useRef<Record<string, maplibregl.Marker>>({});
   const medicionMarkersRef = useRef<maplibregl.Marker[]>([]);
   const modoMedicionRef = useRef(false);
@@ -2335,7 +2346,54 @@ export default function MapEditor({
         comunicacionesRef.current[grupo.nombre] = marcador;
       });
 
-      [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
+
+
+      const iconoLaboratorioTritio = document.createElement("div");
+      iconoLaboratorioTritio.style.width = "44px";
+      iconoLaboratorioTritio.style.height = "44px";
+      iconoLaboratorioTritio.style.display = "flex";
+      iconoLaboratorioTritio.style.alignItems = "center";
+      iconoLaboratorioTritio.style.justifyContent = "center";
+      iconoLaboratorioTritio.style.background = "#7f1d1d";
+      iconoLaboratorioTritio.style.border = "3px solid #ff1744";
+      iconoLaboratorioTritio.style.borderRadius = "999px";
+      iconoLaboratorioTritio.style.color = "#fecaca";
+      iconoLaboratorioTritio.style.fontSize = "24px";
+      iconoLaboratorioTritio.style.fontWeight = "900";
+      iconoLaboratorioTritio.style.boxShadow =
+        "0 0 0 3px rgba(127,29,29,0.35), 0 2px 8px rgba(0,0,0,0.55)";
+      iconoLaboratorioTritio.style.cursor = "pointer";
+      iconoLaboratorioTritio.textContent = "☢";
+      iconoLaboratorioTritio.title = LABORATORIO_TRITIO.nombre;
+
+      laboratorioTritioRef.current = new maplibregl.Marker({
+        element: iconoLaboratorioTritio,
+        anchor: "center",
+      })
+        .setLngLat([
+          LABORATORIO_TRITIO.longitude,
+          LABORATORIO_TRITIO.latitude,
+        ])
+        .setPopup(
+          new maplibregl.Popup({
+            offset: 25,
+            maxWidth: "420px",
+            className: "zeus-popup",
+          }).setHTML(`
+            <div style="background:#0f172a;color:white;padding:14px">
+              <strong style="color:#fecaca">${LABORATORIO_TRITIO.nombre}</strong><br />
+              <span>${LABORATORIO_TRITIO.descripcion}</span><br />
+              <br />
+              <strong>Bando:</strong> enemigo<br />
+              <strong>Categoría:</strong> objetivo estratégico<br />
+              <strong>Coordenadas:</strong> ${LABORATORIO_TRITIO.coordenadasDms}<br />
+              <strong>Fuente:</strong> ${LABORATORIO_TRITIO.fuente}
+            </div>
+          `),
+        )
+        .addTo(map);
+
+            [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
         const marker = new maplibregl.Marker({
           element: crearIconoBase(base),
           anchor: "center",
@@ -2647,6 +2705,7 @@ export default function MapEditor({
       Object.values(basesRef.current).forEach((marker) => marker.remove());
       coaeRef.current?.remove();
       Object.values(comunicacionesRef.current).forEach((marker) => marker.remove());
+      laboratorioTritioRef.current?.remove();
       Object.values(dimensionesTonRef.current).forEach((marker) =>
         marker.remove(),
       );
@@ -2658,6 +2717,7 @@ export default function MapEditor({
       basesRef.current = {};
       coaeRef.current = null;
       comunicacionesRef.current = {};
+      laboratorioTritioRef.current = null;
       dimensionesTonRef.current = {};
       medicionMarkersRef.current = [];
 
