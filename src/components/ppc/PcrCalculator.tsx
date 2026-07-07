@@ -357,17 +357,58 @@ function bestHumanTextInRows(sheet: Sheet, startRow: number, endRow: number) {
   }
   return candidates[0] ?? "Tabla";
 }
+function genericTableText(value: string) {
+  const text = value.trim();
+  return (
+    !text ||
+    /^Tabla\s*\d*$/i.test(text) ||
+    /^Fila(?:s)?\s*\d+/i.test(text) ||
+    isFormulaLikeText(text) ||
+    isMostlyNumericText(text)
+  );
+}
+function bestHumanTextNearBlock(sheet: Sheet, startRow: number, endRow: number) {
+  const current = bestHumanTextInRows(sheet, startRow, endRow);
+  if (current && !genericTableText(current)) return current;
+
+  const nearby: string[] = [];
+  const fromRow = Math.max(1, startRow - 4);
+  for (let r = startRow - 1; r >= fromRow; r -= 1) {
+    for (let c = 1; c <= sheet.maxCol; c += 1) {
+      const value = cellRecord(sheet, `${numberToCol(c)}${r}`)?.v;
+      const text = humanCellText(value);
+      if (text && !/^(TERRA|NORTE|TOTAL|prioriz|coefic)$/i.test(text))
+        nearby.push(text);
+    }
+    if (nearby.length) break;
+  }
+  const candidate = nearby[0] ?? "";
+  return candidate && !genericTableText(candidate) ? candidate : "";
+}
 function blockTitle(sheet: Sheet, block: any, index?: number) {
   const raw = humanCellText(block?.title);
-  if (raw && !/^Tabla\s+\d+$/i.test(raw)) return raw;
-  const fromRows = bestHumanTextInRows(
+  if (raw && !genericTableText(raw)) return raw;
+  const fromRows = bestHumanTextNearBlock(
     sheet,
     Number(block?.startRow ?? 1),
     Number(block?.endRow ?? 1),
   );
-  return fromRows === "Tabla"
-    ? `Tabla ${index != null ? index + 1 : ""}`.trim()
-    : fromRows;
+  if (fromRows && !genericTableText(fromRows)) return fromRows;
+  return `Cálculo intermedio · filas ${block?.startRow ?? ""}-${block?.endRow ?? ""}`;
+}
+function blockHasEditableInputs(sheet: Sheet, block: any) {
+  for (let r = Number(block?.startRow ?? 1); r <= Number(block?.endRow ?? 1); r += 1) {
+    for (let c = 1; c <= sheet.maxCol; c += 1) {
+      const record = cellRecord(sheet, `${numberToCol(c)}${r}`);
+      if (!record || record.f) continue;
+      if (cellKind(sheet, r, c, record, false) === "input") return true;
+    }
+  }
+  return false;
+}
+function isIntermediateBlock(sheet: Sheet, block: any) {
+  const title = blockTitle(sheet, block);
+  return title.startsWith("Cálculo intermedio") && !blockHasEditableInputs(sheet, block);
 }
 function cellKind(
   sheet: Sheet,
@@ -425,6 +466,7 @@ export default function PcrCalculator({ workspaceCode, token }: Props) {
   const [version, setVersion] = useState(0);
   const [saving, setSaving] = useState(false);
   const [showFormulas, setShowFormulas] = useState(false);
+  const [showIntermediate, setShowIntermediate] = useState(false);
   const evaluator = useMemo(
     () => formulaEvaluator(content.overrides),
     [content.overrides],
@@ -455,15 +497,33 @@ export default function PcrCalculator({ workspaceCode, token }: Props) {
       leader,
     };
   }, [evaluator]);
+  const chartRows = useMemo(
+    () =>
+      summary.rows.filter(
+        (row) =>
+          row.label !== "Total" &&
+          row.label !== "PCR final" &&
+          (Math.abs(row.blueValue) > 0 || Math.abs(row.redValue) > 0),
+      ),
+    [summary.rows],
+  );
+  const maxChartValue = Math.max(
+    1,
+    ...chartRows.flatMap((row) => [Math.abs(row.blueValue), Math.abs(row.redValue)]),
+  );
+
   const filteredBlocks = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return blocks;
-    return blocks.filter((b: any) =>
+    const visibleBlocks = showIntermediate
+      ? blocks
+      : blocks.filter((b: any) => !isIntermediateBlock(active, b));
+    if (!q) return visibleBlocks;
+    return visibleBlocks.filter((b: any) =>
       `${blockTitle(active, b)} ${rowsText(active, b.startRow, b.endRow)}`
         .toLowerCase()
         .includes(q),
     );
-  }, [blocks, active, search]);
+  }, [blocks, active, search, showIntermediate]);
 
   async function loadAnalysis(
     analysisKey = content.analysisKey,
@@ -900,30 +960,73 @@ export default function PcrCalculator({ workspaceCode, token }: Props) {
                 </div>
               ))}
             </div>
-            <div className="mt-3">
-              <div className="mb-1 flex justify-between text-xs">
-                <span>{content.blueName}</span>
-                <span>{displayValue(summary.pcrBlue)}</span>
+            <div className="mt-4 rounded-lg border border-slate-700 bg-slate-950 p-3">
+              <h3 className="mb-3 text-sm font-bold text-amber-100">
+                Gráfico comparativo del PCR
+              </h3>
+              <div className="space-y-3">
+                {chartRows.map((row) => (
+                  <div key={row.label}>
+                    <p className="mb-1 text-xs font-semibold text-slate-200">
+                      {row.label}
+                    </p>
+                    <div className="grid grid-cols-[4.5rem_1fr_3.5rem] items-center gap-2 text-[11px]">
+                      <span className="truncate text-blue-200">{content.blueName}</span>
+                      <div className="h-4 rounded bg-slate-800">
+                        <div
+                          className="h-4 rounded bg-blue-500"
+                          style={{
+                            width: `${Math.max(2, Math.min(100, (Math.abs(row.blueValue) / maxChartValue) * 100))}%`,
+                          }}
+                        />
+                      </div>
+                      <span className="text-right text-blue-100">
+                        {displayValue(row.blueValue)}
+                      </span>
+                      <span className="truncate text-red-200">{content.redName}</span>
+                      <div className="h-4 rounded bg-slate-800">
+                        <div
+                          className="h-4 rounded bg-red-500"
+                          style={{
+                            width: `${Math.max(2, Math.min(100, (Math.abs(row.redValue) / maxChartValue) * 100))}%`,
+                          }}
+                        />
+                      </div>
+                      <span className="text-right text-red-100">
+                        {displayValue(row.redValue)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="h-4 rounded bg-slate-800">
-                <div
-                  className="h-4 rounded bg-blue-500"
-                  style={{
-                    width: `${Math.max(2, Math.min(100, summary.pcrBlue * 100))}%`,
-                  }}
-                />
-              </div>
-              <div className="mb-1 mt-2 flex justify-between text-xs">
-                <span>{content.redName}</span>
-                <span>{displayValue(summary.pcrRed)}</span>
-              </div>
-              <div className="h-4 rounded bg-slate-800">
-                <div
-                  className="h-4 rounded bg-red-500"
-                  style={{
-                    width: `${Math.max(2, Math.min(100, summary.pcrRed * 100))}%`,
-                  }}
-                />
+              <div className="mt-4 border-t border-slate-700 pt-3">
+                <p className="mb-2 text-xs font-semibold text-slate-200">PCR final</p>
+                <div className="grid grid-cols-[4.5rem_1fr_3.5rem] items-center gap-2 text-[11px]">
+                  <span className="truncate text-blue-200">{content.blueName}</span>
+                  <div className="h-5 rounded bg-slate-800">
+                    <div
+                      className="h-5 rounded bg-blue-500"
+                      style={{
+                        width: `${Math.max(2, Math.min(100, summary.pcrBlue * 100))}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-right text-blue-100">
+                    {displayValue(summary.pcrBlue)}
+                  </span>
+                  <span className="truncate text-red-200">{content.redName}</span>
+                  <div className="h-5 rounded bg-slate-800">
+                    <div
+                      className="h-5 rounded bg-red-500"
+                      style={{
+                        width: `${Math.max(2, Math.min(100, summary.pcrRed * 100))}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-right text-red-100">
+                    {displayValue(summary.pcrRed)}
+                  </span>
+                </div>
               </div>
             </div>
             <label className="mt-3 block text-sm">
@@ -970,20 +1073,30 @@ export default function PcrCalculator({ workspaceCode, token }: Props) {
                 Todas las tablas del Excel
               </h2>
               <p className="text-sm text-slate-300">
-                Seleccioná hoja y tabla. Ejemplo: SECC II P-E → c. Aeronaves de
-                Reconocimiento. Las celdas azules son editables para tipear
-                valores; las grises son resultados calculados. Las fórmulas
-                quedan ocultas salvo que actives “Ver fórmulas”.
+                Seleccioná hoja y subsección. Ejemplo: SECC II P-E → c. Aeronaves de
+                Reconocimiento. Las celdas azules son valores de entrada para tipear;
+                las grises son resultados calculados. Los cálculos intermedios y las
+                fórmulas quedan ocultos por defecto para que la carga sea más limpia.
               </p>
             </div>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={showFormulas}
-                onChange={(e) => setShowFormulas(e.target.checked)}
-              />{" "}
-              Ver fórmulas
-            </label>
+            <div className="flex flex-wrap gap-3">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={showIntermediate}
+                  onChange={(e) => setShowIntermediate(e.target.checked)}
+                />{" "}
+                Mostrar cálculos intermedios
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={showFormulas}
+                  onChange={(e) => setShowFormulas(e.target.checked)}
+                />{" "}
+                Ver fórmulas
+              </label>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             {SHEETS.map((sheet) => (
@@ -1003,7 +1116,7 @@ export default function PcrCalculator({ workspaceCode, token }: Props) {
           <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
             <div className="rounded-lg border border-slate-700 bg-slate-950 p-3">
               <input
-                placeholder="Buscar tabla o variable..."
+                placeholder="Buscar sección, subsección o concepto..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="mb-3 w-full rounded bg-slate-900 px-3 py-2 text-sm"
@@ -1013,7 +1126,7 @@ export default function PcrCalculator({ workspaceCode, token }: Props) {
                 onClick={() => setActiveBlockId("all")}
                 className={`mb-2 w-full rounded px-3 py-2 text-left text-sm ${activeBlockId === "all" ? "bg-cyan-700" : "bg-slate-800 hover:bg-slate-700"}`}
               >
-                Hoja completa
+                Ver hoja completa
               </button>
               <div className="max-h-[65vh] space-y-2 overflow-auto">
                 {filteredBlocks.map((block: any) => (
@@ -1028,7 +1141,7 @@ export default function PcrCalculator({ workspaceCode, token }: Props) {
                     </span>
                     <br />
                     <span className="text-xs text-slate-400">
-                      Filas {block.startRow}-{block.endRow}
+                      Rango del Excel: filas {block.startRow}-{block.endRow}
                     </span>
                   </button>
                 ))}
