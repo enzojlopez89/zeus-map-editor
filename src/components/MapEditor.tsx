@@ -84,7 +84,19 @@ type BaseMilitar = {
   longitude: number;
   latitude: number;
   bando: Bando;
-  tipo: "Base aérea" | "Estación radar" | "Centro de comando" | "Comunicaciones" | "Apoyo logístico";
+  tipo:
+    | "Base aérea"
+    | "Estación radar"
+    | "Centro de comando"
+    | "Comunicaciones"
+    | "Apoyo logístico"
+    | "Unidad terrestre"
+    | "Inteligencia"
+    | "Ingenieros"
+    | "Fuerza de despliegue rápido";
+  icono?: string;
+  detalle?: string;
+  escalon?: string;
 };
 
 type MascaraRadar = {
@@ -470,6 +482,105 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     bando: "enemigo",
     tipo: "Estación radar",
   },
+ ];
+
+const ESTABLECIMIENTOS_EJERCITO_ENEMIGO: BaseMilitar[] = [
+  {
+    nombre: "Compañía de Ingenieros Mecanizados N.º 11 / Ingeniero Juárez",
+    longitude: -61.855,
+    latitude: -23.9,
+    bando: "enemigo",
+    tipo: "Ingenieros",
+    icono: "produccion_de_equipos_de_ingenieros",
+    escalon: "Compañía",
+    detalle:
+      "Unidad terrestre enemiga. Compañía de Ingenieros Mecanizados N.º 11, asociada al dispositivo de la 2.ª División en Ingeniero Juárez.",
+  },
+  {
+    nombre: "1.ª Brigada de Montaña / Jujuy",
+    longitude: -65.299444,
+    latitude: -24.185556,
+    bando: "enemigo",
+    tipo: "Unidad terrestre",
+    icono: "equipo_terrestre",
+    escalon: "Brigada",
+    detalle: "Fuerza terrestre enemiga. 1.ª Brigada de Montaña ubicada en Jujuy.",
+  },
+  {
+    nombre: "Compañía de Inteligencia de Montaña 11 / Jujuy",
+    longitude: -65.287,
+    latitude: -24.193,
+    bando: "enemigo",
+    tipo: "Inteligencia",
+    icono: "inteligencia_militar",
+    escalon: "Compañía",
+    detalle:
+      "Unidad de inteligencia enemiga asociada a la 1.ª Brigada de Montaña.",
+  },
+  {
+    nombre: "2.ª Brigada de Montaña / Pampa del Infierno",
+    longitude: -61.174361,
+    latitude: -26.505169,
+    bando: "enemigo",
+    tipo: "Unidad terrestre",
+    icono: "equipo_terrestre",
+    escalon: "Brigada",
+    detalle:
+      "Fuerza terrestre enemiga. 2.ª Brigada de Montaña ubicada en Pampa del Infierno.",
+  },
+  {
+    nombre: "Compañía de Inteligencia de Montaña 21 / Pampa del Infierno",
+    longitude: -61.162,
+    latitude: -26.512,
+    bando: "enemigo",
+    tipo: "Inteligencia",
+    icono: "inteligencia_militar",
+    escalon: "Compañía",
+    detalle:
+      "Unidad de inteligencia enemiga asociada a la 2.ª Brigada de Montaña.",
+  },
+  {
+    nombre: "Fuerzas de Despliegue Rápido / Orán",
+    longitude: -64.324261,
+    latitude: -23.13705,
+    bando: "enemigo",
+    tipo: "Fuerza de despliegue rápido",
+    icono: "equipo_terrestre",
+    escalon: "Fuerza",
+    detalle: "Fuerza terrestre enemiga de despliegue rápido ubicada en Orán.",
+  },
+  {
+    nombre: "Batallón de Inteligencia de Despliegue Rápido / Orán",
+    longitude: -64.312,
+    latitude: -23.145,
+    bando: "enemigo",
+    tipo: "Inteligencia",
+    icono: "inteligencia_militar",
+    escalon: "Batallón",
+    detalle:
+      "Unidad de inteligencia enemiga asociada a las Fuerzas de Despliegue Rápido.",
+  },
+  {
+    nombre: "Compañía de Inteligencia Mecanizada 31 / Ingeniero Juárez",
+    longitude: -61.842,
+    latitude: -23.907,
+    bando: "enemigo",
+    tipo: "Inteligencia",
+    icono: "inteligencia_militar",
+    escalon: "Compañía",
+    detalle:
+      "Unidad de inteligencia mecanizada enemiga ubicada en Ingeniero Juárez.",
+  },
+];
+
+const BASES_Y_ESTABLECIMIENTOS_ENEMIGOS: BaseMilitar[] = [
+  ...BASES_ENEMIGAS,
+  ...ESTABLECIMIENTOS_EJERCITO_ENEMIGO,
+];
+
+const TODAS_LAS_BASES_Y_ESTABLECIMIENTOS: BaseMilitar[] = [
+  ...BASES_PROPIAS,
+  ...BASES_Y_ESTABLECIMIENTOS_ENEMIGOS,
 ];
 
 const AERONAVES_PROPIAS_POR_BASE: Record<string, string[]> = {
@@ -1567,7 +1678,7 @@ export default function MapEditor({
     () =>
       (ajustesIniciales.basesVisibles as Record<string, boolean> | undefined) ??
       Object.fromEntries(
-        [...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [
+        TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.map((base) => [
           base.nombre,
           true,
         ]),
@@ -2008,13 +2119,21 @@ export default function MapEditor({
 
     const imagen = document.createElement("img");
     const familia =
-      base.tipo === "Estación radar"
+      base.icono ??
+      (base.tipo === "Estación radar"
         ? "radar"
         : base.tipo === "Centro de comando"
           ? "puesto_de_mando"
           : base.tipo === "Apoyo logístico"
             ? "instalacion"
-            : ICONO_BASE;
+            : base.tipo === "Inteligencia"
+              ? "inteligencia_militar"
+              : base.tipo === "Ingenieros"
+                ? "produccion_de_equipos_de_ingenieros"
+                : base.tipo === "Unidad terrestre" ||
+                    base.tipo === "Fuerza de despliegue rápido"
+                  ? "equipo_terrestre"
+                  : ICONO_BASE);
 
     imagen.src = `/data/iconos/simbologia/${familia}__${afiliacionIcono(
       base.bando,
@@ -2075,6 +2194,8 @@ export default function MapEditor({
         <em>${base.tipo} — ${
           base.bando === "propio" ? "PROPIO" : "ENEMIGO"
         }</em>
+        ${base.escalon ? `<br /><strong>Escalón:</strong> ${base.escalon}` : ""}
+        ${base.detalle ? `<br /><br /><span>${base.detalle}</span>` : ""}
         <hr style="margin:8px 0;border:0;border-top:1px solid #475569" />
         <strong>Aeronaves:</strong><br />${listar(aeronaves)}
         <br /><br />
@@ -2610,7 +2731,7 @@ export default function MapEditor({
         LABORATORIO_TRITIO.latitude,
       ]);
 
-            [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
+            TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
         const marker = new maplibregl.Marker({
           element: crearIconoBase(base),
           anchor: "center",
@@ -3129,7 +3250,7 @@ export default function MapEditor({
   }, [mostrarTon, mapReady]);
 
   useEffect(() => {
-    [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
+    TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
       const marker = basesRef.current[base.nombre];
       if (!marker) return;
 
@@ -3596,11 +3717,11 @@ export default function MapEditor({
               <div className="mb-2 flex items-center justify-between gap-2">
                 <strong className="text-sm text-orange-300">Enemigas</strong>
                 <div className="flex gap-2 text-xs">
-                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_ENEMIGAS.map((b) => [b.nombre, true]))}))} className="rounded bg-orange-700 px-2 py-1">Todas</button>
-                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_ENEMIGAS.map((b) => [b.nombre, false]))}))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((b) => [b.nombre, true]))}))} className="rounded bg-orange-700 px-2 py-1">Todas</button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((b) => [b.nombre, false]))}))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
                 </div>
               </div>
-              {BASES_ENEMIGAS.map((base) => (
+              {BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((base) => (
                 <label key={base.nombre} className="mb-2 flex items-start gap-2 text-sm last:mb-0">
                   <input type="checkbox" checked={Boolean(basesVisibles[base.nombre])} onChange={(event) => setBasesVisibles((a) => ({ ...a, [base.nombre]: event.target.checked }))} />
                   <span>{base.nombre}</span>
