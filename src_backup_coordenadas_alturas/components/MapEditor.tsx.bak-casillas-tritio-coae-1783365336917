@@ -7,7 +7,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 type Bando = "propio" | "enemigo";
 type VistaFuerzas = "propias" | "enemigas" | "ambas";
-type TipoElemento = "aeronave" | "radar" | "defensa" | "terrestre" | "naval";
+type TipoElemento = "aeronave" | "radar" | "defensa";
 type FuenteDistancia = "orden" | "externa" | "manual";
 type EstadoInteligencia = "pendiente" | "estimado" | "probable" | "confirmado" | "descartado";
 type NivelConfianza = "baja" | "media" | "alta";
@@ -35,8 +35,6 @@ export type ElementoOperacional = {
   referenciaDistancia?: string;
   permiteReabastecimiento?: boolean;
   conReabastecimiento?: boolean;
-  mostrarRadar?: boolean;
-  alcanceRadarKm?: number;
   intelligenceStatus?: EstadoInteligencia;
   confidenceLevel?: NivelConfianza;
   informationDate?: string;
@@ -77,12 +75,6 @@ export type ElementoOperacional = {
   encryptionStatus?: string;
   redundancy?: string;
   communicationsNotes?: string;
-  isAttackPlan?: boolean;
-  attackName?: string;
-  attackMedium?: string;
-  attackRoute?: [number, number][];
-  attackImpact?: [number, number];
-  attackMunition?: string;
 };
 
 type BaseMilitar = {
@@ -90,20 +82,7 @@ type BaseMilitar = {
   longitude: number;
   latitude: number;
   bando: Bando;
-  tipo:
-    | "Base aérea"
-    | "Estación radar"
-    | "Centro de comando"
-    | "Comunicaciones"
-    | "Apoyo logístico"
-    | "Unidad terrestre"
-    | "Inteligencia"
-    | "Ingenieros"
-    | "Fuerza de despliegue rápido";
-  icono?: string;
-  detalle?: string;
-  escalon?: string;
-  altitudeMeters?: number;
+  tipo: "Base aérea" | "Estación radar" | "Centro de comando" | "Comunicaciones" | "Apoyo logístico";
 };
 
 type MascaraRadar = {
@@ -288,7 +267,6 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -29.376201,
     bando: "propio",
     tipo: "Base aérea",
-    altitudeMeters: 438,
   },
   {
     nombre: "2º Brigada Aérea / Villa Mercedes",
@@ -296,7 +274,6 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -33.738415,
     bando: "propio",
     tipo: "Base aérea",
-    altitudeMeters: 485,
   },
   {
     nombre: "3º Brigada Aérea / Córdoba",
@@ -304,7 +281,6 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -31.319799,
     bando: "propio",
     tipo: "Base aérea",
-    altitudeMeters: 489,
   },
   {
     nombre: "4º Brigada Aérea / Mendoza",
@@ -312,7 +288,6 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -32.89,
     bando: "propio",
     tipo: "Base aérea",
-    altitudeMeters: 704,
   },
   {
     nombre: "5º Brigada Aérea / Gral. Acha",
@@ -320,7 +295,6 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -37.425428,
     bando: "propio",
     tipo: "Base aérea",
-    altitudeMeters: 277,
   },
   {
     nombre: "Base Aérea Militar Malargüe",
@@ -328,7 +302,6 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -35.47,
     bando: "propio",
     tipo: "Base aérea",
-    altitudeMeters: 1425,
   },
   {
     nombre: "Área de Material Realicó (AMR)",
@@ -336,7 +309,6 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -35.035,
     bando: "propio",
     tipo: "Apoyo logístico",
-    altitudeMeters: 145,
   },
   {
     nombre: "Área de Material San Rafael (AMSR)",
@@ -344,7 +316,6 @@ const BASES_PROPIAS: BaseMilitar[] = [
     latitude: -34.617,
     bando: "propio",
     tipo: "Apoyo logístico",
-    altitudeMeters: 748,
   },
 ];
 
@@ -354,17 +325,6 @@ const COAE_RIO_CUARTO: BaseMilitar = {
   latitude: -33.085,
   bando: "propio",
   tipo: "Centro de comando",
-  altitudeMeters: 421,
-};
-
-
-const COAE_ENEMIGO_INGENIERO_JUAREZ: BaseMilitar = {
-  nombre: "COAe enemigo / Ingeniero Juárez",
-  longitude: -61.855,
-  latitude: -23.900,
-  bando: "enemigo",
-  tipo: "Centro de comando",
-  altitudeMeters: 146,
 };
 
 const GRUPOS_COMUNICACIONES: BaseMilitar[] = [
@@ -374,7 +334,6 @@ const GRUPOS_COMUNICACIONES: BaseMilitar[] = [
     latitude: -33.274,
     bando: "propio",
     tipo: "Comunicaciones",
-    altitudeMeters: 709,
   },
   {
     nombre: "Grupo 2 COM / Malargüe",
@@ -382,7 +341,6 @@ const GRUPOS_COMUNICACIONES: BaseMilitar[] = [
     latitude: -35.47,
     bando: "propio",
     tipo: "Comunicaciones",
-    altitudeMeters: 1425,
   },
 ];
 
@@ -391,50 +349,9 @@ const LABORATORIO_TRITIO = {
   longitude: -66.80665833333333,
   latitude: -25.0827,
   coordenadasDms: `25° 4'57.72"S 66° 48'23.97"O`,
-  altitudeMeters: 3950,
   descripcion:
     "Instalación estratégica enemiga establecida por el Plan de Campaña para el procesamiento de tritio.",
   fuente: "Plan de Campaña TON ZEUS I 2026",
-};
-
-
-
-function formatearNumeroCoordenada(valor: number) {
-  return valor.toFixed(6);
-}
-
-function formatearDms(valor: number, tipo: "lat" | "lon") {
-  const direccion = tipo === "lat" ? (valor >= 0 ? "N" : "S") : valor >= 0 ? "E" : "O";
-  const absoluto = Math.abs(valor);
-  const grados = Math.floor(absoluto);
-  const minutosDecimales = (absoluto - grados) * 60;
-  const minutos = Math.floor(minutosDecimales);
-  const segundos = (minutosDecimales - minutos) * 60;
-  return `${grados}° ${minutos}' ${segundos.toFixed(2)}" ${direccion}`;
-}
-
-function coordenadasDetalladasHtml(
-  latitude: number,
-  longitude: number,
-  altitudeMeters?: number,
-) {
-  const alturaTexto =
-    typeof altitudeMeters === "number"
-      ? `${altitudeMeters.toLocaleString("es-AR")} m s. n. m.`
-      : "Altura no cargada";
-
-  return `
-    <hr style="margin:8px 0;border:0;border-top:1px solid #475569" />
-    <strong>Coordenadas del mapa:</strong><br />
-    Decimal: ${formatearNumeroCoordenada(latitude)}, ${formatearNumeroCoordenada(longitude)}<br />
-    DMS: ${formatearDms(latitude, "lat")} / ${formatearDms(longitude, "lon")}<br />
-    <strong>Altura:</strong> ${alturaTexto}
-  `;
-}
-
-const POSICION_INICIAL_MEDIO_PERSONALIZADO = {
-  longitude: -58.5,
-  latitude: -27.0,
 };
 
 const BASES_ENEMIGAS: BaseMilitar[] = [
@@ -444,7 +361,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -24.79,
     bando: "enemigo",
     tipo: "Centro de comando",
-    altitudeMeters: 1187,
   },
   {
     nombre: "Ala Aérea n.º 1 / Resistencia",
@@ -452,7 +368,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -27.45,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 52,
   },
   {
     nombre: "Ala Aérea n.º 2 / Sáenz Peña",
@@ -460,7 +375,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -26.79,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 92,
   },
   {
     nombre: "Ala Aérea n.º 3 / Salta",
@@ -468,7 +382,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -24.86,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 1246,
   },
   {
     nombre: "Ala Aérea n.º 4 / Catamarca",
@@ -476,7 +389,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -28.6,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 454,
   },
   {
     nombre: "Ala Aérea n.º 5 / Tucumán",
@@ -484,7 +396,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -26.84,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 456,
   },
   {
     nombre: "Ala Aérea n.º 6 / Formosa",
@@ -492,7 +403,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -26.21,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 59,
   },
   {
     nombre: "Ala Aérea n.º 7 / Belén",
@@ -500,7 +410,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -27.65,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 1260,
   },
   {
     nombre: "Ala Aérea n.º 8 / Tartagal",
@@ -508,7 +417,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -22.52,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 450,
   },
   {
     nombre: "Ala Aérea n.º 9 / Las Lomitas",
@@ -516,7 +424,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -24.730022,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 130,
   },
   {
     nombre: "Escuadrón Aéreo 31 / Santa Rosa (Catamarca)",
@@ -524,7 +431,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -28.26,
     bando: "enemigo",
     tipo: "Base aérea",
-    altitudeMeters: 620,
   },
   {
     nombre: "Estación radar / Las Lomitas",
@@ -532,7 +438,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -24.730022,
     bando: "enemigo",
     tipo: "Estación radar",
-    altitudeMeters: 130,
   },
   {
     nombre: "Estación radar / Cafayate",
@@ -540,7 +445,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -26.062598,
     bando: "enemigo",
     tipo: "Estación radar",
-    altitudeMeters: 1683,
   },
   {
     nombre: "Estación radar / Orán",
@@ -548,115 +452,7 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     latitude: -23.15641,
     bando: "enemigo",
     tipo: "Estación radar",
-    altitudeMeters: 337,
   },
- ];
-
-const ESTABLECIMIENTOS_EJERCITO_ENEMIGO: BaseMilitar[] = [
-  {
-    nombre: "Compañía de Ingenieros Mecanizados N.º 11 / Ingeniero Juárez",
-    longitude: -61.855,
-    latitude: -23.9,
-    bando: "enemigo",
-    tipo: "Ingenieros",
-    altitudeMeters: 146,
-    icono: "produccion_de_equipos_de_ingenieros",
-    escalon: "Compañía",
-    detalle:
-      "Unidad terrestre enemiga. Compañía de Ingenieros Mecanizados N.º 11, asociada al dispositivo de la 2.ª División en Ingeniero Juárez.",
-  },
-  {
-    nombre: "1.ª Brigada de Montaña / Jujuy",
-    longitude: -65.299444,
-    latitude: -24.185556,
-    bando: "enemigo",
-    tipo: "Unidad terrestre",
-    altitudeMeters: 1259,
-    icono: "equipo_terrestre",
-    escalon: "Brigada",
-    detalle: "Fuerza terrestre enemiga. 1.ª Brigada de Montaña ubicada en Jujuy.",
-  },
-  {
-    nombre: "Compañía de Inteligencia de Montaña 11 / Jujuy",
-    longitude: -65.287,
-    latitude: -24.193,
-    bando: "enemigo",
-    tipo: "Inteligencia",
-    altitudeMeters: 1259,
-    icono: "inteligencia_militar",
-    escalon: "Compañía",
-    detalle:
-      "Unidad de inteligencia enemiga asociada a la 1.ª Brigada de Montaña.",
-  },
-  {
-    nombre: "2.ª Brigada de Montaña / Pampa del Infierno",
-    longitude: -61.174361,
-    latitude: -26.505169,
-    bando: "enemigo",
-    tipo: "Unidad terrestre",
-    altitudeMeters: 111,
-    icono: "equipo_terrestre",
-    escalon: "Brigada",
-    detalle:
-      "Fuerza terrestre enemiga. 2.ª Brigada de Montaña ubicada en Pampa del Infierno.",
-  },
-  {
-    nombre: "Compañía de Inteligencia de Montaña 21 / Pampa del Infierno",
-    longitude: -61.162,
-    latitude: -26.512,
-    bando: "enemigo",
-    tipo: "Inteligencia",
-    altitudeMeters: 111,
-    icono: "inteligencia_militar",
-    escalon: "Compañía",
-    detalle:
-      "Unidad de inteligencia enemiga asociada a la 2.ª Brigada de Montaña.",
-  },
-  {
-    nombre: "Fuerzas de Despliegue Rápido / Orán",
-    longitude: -64.324261,
-    latitude: -23.13705,
-    bando: "enemigo",
-    tipo: "Fuerza de despliegue rápido",
-    altitudeMeters: 337,
-    icono: "equipo_terrestre",
-    escalon: "Fuerza",
-    detalle: "Fuerza terrestre enemiga de despliegue rápido ubicada en Orán.",
-  },
-  {
-    nombre: "Batallón de Inteligencia de Despliegue Rápido / Orán",
-    longitude: -64.312,
-    latitude: -23.145,
-    bando: "enemigo",
-    tipo: "Inteligencia",
-    altitudeMeters: 337,
-    icono: "inteligencia_militar",
-    escalon: "Batallón",
-    detalle:
-      "Unidad de inteligencia enemiga asociada a las Fuerzas de Despliegue Rápido.",
-  },
-  {
-    nombre: "Compañía de Inteligencia Mecanizada 31 / Ingeniero Juárez",
-    longitude: -61.842,
-    latitude: -23.907,
-    bando: "enemigo",
-    tipo: "Inteligencia",
-    altitudeMeters: 146,
-    icono: "inteligencia_militar",
-    escalon: "Compañía",
-    detalle:
-      "Unidad de inteligencia mecanizada enemiga ubicada en Ingeniero Juárez.",
-  },
-];
-
-const BASES_Y_ESTABLECIMIENTOS_ENEMIGOS: BaseMilitar[] = [
-  ...BASES_ENEMIGAS,
-  ...ESTABLECIMIENTOS_EJERCITO_ENEMIGO,
-];
-
-const TODAS_LAS_BASES_Y_ESTABLECIMIENTOS: BaseMilitar[] = [
-  ...BASES_PROPIAS,
-  ...BASES_Y_ESTABLECIMIENTOS_ENEMIGOS,
 ];
 
 const AERONAVES_PROPIAS_POR_BASE: Record<string, string[]> = {
@@ -905,20 +701,6 @@ function radioAereoRepresentado(elemento: ElementoOperacional) {
   if (elemento.tipo !== "aeronave") return elemento.alcanceKm;
   const multiplicador = elemento.conReabastecimiento ? 2 : 1;
   return elemento.radioCombateKm * multiplicador;
-}
-
-
-function inferirTipoPersonalizado(nombre: string, iconoTipo: string): TipoElemento {
-  const texto = `${nombre} ${iconoTipo}`
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  if (texto.includes("radar") || texto.includes("sensor")) return "radar";
-  if (texto.includes("antiaerea") || texto.includes("misil") || texto.includes("defensa")) return "defensa";
-  if (texto.includes("aeronave") || texto.includes("ala_fija") || texto.includes("ala_rotativa") || texto.includes("helicoptero") || texto.includes("uav")) return "aeronave";
-  if (texto.includes("naval") || texto.includes("buque") || texto.includes("fragata") || texto.includes("corbeta") || texto.includes("submarino") || texto.includes("barco") || texto.includes("superficie")) return "naval";
-  return "terrestre";
 }
 
 const CATALOGO_AERONAVES_PROPIAS: AeronaveCatalogo[] = Object.entries(
@@ -1454,26 +1236,6 @@ function familiaIconoMedio(elemento: ElementoOperacional) {
     return elemento.iconoTipo;
   }
 
-  if (elemento.tipo === "naval") {
-    if (texto.includes("submarino")) {
-      return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
-    }
-    if (texto.includes("buque") || texto.includes("fragata") || texto.includes("corbeta") || texto.includes("naval") || texto.includes("barco")) {
-      return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
-    }
-    return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
-  }
-
-  if (elemento.tipo === "terrestre") {
-    if (texto.includes("logistic") || texto.includes("logística") || texto.includes("logistica") || texto.includes("abastecimiento") || texto.includes("deposito") || texto.includes("depósito")) {
-      return `logistica__${afiliacionIcono(elemento.bando)}.png`;
-    }
-    if (texto.includes("comando") || texto.includes("coae") || texto.includes("c2")) {
-      return `centro_conjunto_de_inteligencia__${afiliacionIcono(elemento.bando)}.png`;
-    }
-    return `equipo_terrestre__${afiliacionIcono(elemento.bando)}.png`;
-  }
-
   if (elemento.tipo === "radar") {
     return `radar__${afiliacionIcono(elemento.bando)}.png`;
   }
@@ -1628,11 +1390,7 @@ function obtenerMaximoSlider(elemento: ElementoOperacional) {
       ? 5000
       : elemento.tipo === "radar"
         ? 1200
-        : elemento.tipo === "naval"
-          ? 1200
-          : elemento.tipo === "terrestre"
-            ? 800
-            : 400;
+        : 400;
 
   return Math.max(base, Math.ceil(valorActual * 1.5));
 }
@@ -1660,13 +1418,11 @@ export default function MapEditor({
   const oceanosRef = useRef<Record<string, maplibregl.Marker>>({});
   const basesRef = useRef<Record<string, maplibregl.Marker>>({});
   const coaeRef = useRef<maplibregl.Marker | null>(null);
-  const coaeEnemigoRef = useRef<maplibregl.Marker | null>(null);
   const comunicacionesRef = useRef<Record<string, maplibregl.Marker>>({});
   const laboratorioTritioRef = useRef<maplibregl.Marker | null>(null);
   const dimensionesTonRef = useRef<Record<string, maplibregl.Marker>>({});
   const medicionMarkersRef = useRef<maplibregl.Marker[]>([]);
   const modoMedicionRef = useRef(false);
-  const modoAtaqueRef = useRef(false);
 
   const [mapReady, setMapReady] = useState(false);
   const [elementos, setElementos] = useState<ElementoOperacional[]>(initialElements);
@@ -1716,13 +1472,6 @@ export default function MapEditor({
   const panelArrastradoRef = useRef<PanelId | null>(null);
   const [puntosMedicion, setPuntosMedicion] = useState<PuntoMedicion[]>([]);
   const [distanciaMedicionKm, setDistanciaMedicionKm] = useState(0);
-  const [modoAtaque, setModoAtaque] = useState(false);
-  const [medioAtaque, setMedioAtaque] = useState("F-16CJ + AGM-88C HARM");
-  const [nombreAtaque, setNombreAtaque] = useState("Ataque planificado");
-  const [municionAtaque, setMunicionAtaque] = useState("GBU / HARM / MAR-1");
-  const [puntosAtaque, setPuntosAtaque] = useState<[number, number][]>([]);
-  const [latAtaqueManual, setLatAtaqueManual] = useState("");
-  const [lngAtaqueManual, setLngAtaqueManual] = useState("");
   const [coordenadasCursor, setCoordenadasCursor] = useState({
     latitud: -35.5,
     longitud: -64.5,
@@ -1762,32 +1511,16 @@ export default function MapEditor({
     () =>
       (ajustesIniciales.basesVisibles as Record<string, boolean> | undefined) ??
       Object.fromEntries(
-        TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.map((base) => [
+        [...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [
           base.nombre,
           true,
         ]),
       ),
   );
 
-  const [mostrarLaboratorioTritio, setMostrarLaboratorioTritio] = useState<boolean>(
-    () =>
-      (ajustesIniciales.mostrarLaboratorioTritio as boolean | undefined) ??
-      true,
-  );
-
-  const [mostrarCOAe, setMostrarCOAe] = useState<boolean>(
-    () =>
-      (ajustesIniciales.mostrarCOAe as boolean | undefined) ??
-      true,
-  );
-
-  const [mostrarCOAeEnemigo, setMostrarCOAeEnemigo] = useState<boolean>(
-    () =>
-      (ajustesIniciales.mostrarCOAeEnemigo as boolean | undefined) ??
-      true,
-  );
-
   const [nombrePersonalizado, setNombrePersonalizado] = useState("");
+  const [tipoPersonalizado, setTipoPersonalizado] =
+    useState<TipoElemento>("aeronave");
   const [bandoPersonalizado, setBandoPersonalizado] = useState<Bando>("propio");
   const [basePersonalizada, setBasePersonalizada] = useState(
     BASES_PROPIAS[0]?.nombre ?? "",
@@ -1824,25 +1557,6 @@ export default function MapEditor({
     [elementos, seleccionadoId],
   );
 
-
-
-  useEffect(() => {
-    if (readOnly) return;
-
-    function manejarTecla(event: KeyboardEvent) {
-      if (event.key !== "Delete" && event.key !== "Suprimir") return;
-      const objetivo = event.target as HTMLElement | null;
-      if (objetivo && ["INPUT", "TEXTAREA", "SELECT"].includes(objetivo.tagName)) return;
-      if (!seleccionadoId) return;
-
-      event.preventDefault();
-      eliminarElemento(seleccionadoId);
-    }
-
-    window.addEventListener("keydown", manejarTecla);
-    return () => window.removeEventListener("keydown", manejarTecla);
-  }, [readOnly, seleccionadoId]);
-
   const mostrarControlesPropios =
     vistaFuerzas === "propias" || vistaFuerzas === "ambas";
 
@@ -1877,50 +1591,24 @@ export default function MapEditor({
           icono.archivo.toLowerCase().includes(termino);
 
         return coincideBando && coincideTexto;
-      });
+      })
+      .slice(0, 120);
   }, [catalogoIconos, busquedaIcono, bandoPersonalizado]);
 
-  function crearAnillosElemento(elemento: ElementoOperacional) {
-    const anillos: GeoJSON.Feature[] = [];
+  function crearAnillo(elemento: ElementoOperacional) {
     const radio = radioAereoRepresentado(elemento);
 
-    if (radio > 0 && debeMostrarAnillo(elemento)) {
-      anillos.push(circle([elemento.longitude, elemento.latitude], radio, {
-        steps: 128,
-        units: "kilometers",
-        properties: {
-          id: elemento.id,
-          nombre: elemento.nombre,
-          tipo: elemento.tipo,
-          bando: elemento.bando,
-          color: elemento.color,
-          clase: "alcance",
-        },
-      }) as GeoJSON.Feature);
-    }
-
-    if (
-      elemento.tipo === "aeronave" &&
-      elemento.mostrarRadar &&
-      (elemento.alcanceRadarKm ?? 0) > 0 &&
-      bandoVisible(elemento.bando, vistaFuerzas) &&
-      mostrarAeronaves
-    ) {
-      anillos.push(circle([elemento.longitude, elemento.latitude], elemento.alcanceRadarKm ?? 0, {
-        steps: 128,
-        units: "kilometers",
-        properties: {
-          id: `${elemento.id}-radar`,
-          nombre: `${elemento.nombre} - radar`,
-          tipo: "radar-aeronave",
-          bando: elemento.bando,
-          color: elemento.bando === "propio" ? "#38bdf8" : "#f97316",
-          clase: "radar",
-        },
-      }) as GeoJSON.Feature);
-    }
-
-    return anillos;
+    return circle([elemento.longitude, elemento.latitude], radio, {
+      steps: 128,
+      units: "kilometers",
+      properties: {
+        id: elemento.id,
+        nombre: elemento.nombre,
+        tipo: elemento.tipo,
+        bando: elemento.bando,
+        color: elemento.color,
+      },
+    });
   }
 
   function debeMostrarAnillo(elemento: ElementoOperacional) {
@@ -1966,7 +1654,7 @@ export default function MapEditor({
 
     source.setData({
       type: "FeatureCollection",
-      features: lista.flatMap(crearAnillosElemento),
+      features: lista.filter(debeMostrarAnillo).map(crearAnillo),
     });
   }
 
@@ -2109,26 +1797,26 @@ export default function MapEditor({
     const nombre = nombrePersonalizado.trim();
     if (!nombre) return;
 
-    const tipoInferido = inferirTipoPersonalizado(nombre, iconoTipoPersonalizado);
+    const base = obtenerBase(basePersonalizada);
+    const centro = mapRef.current?.getCenter();
 
     const nuevo: ElementoOperacional = {
       id: crearId(),
       visible: true,
       bando: bandoPersonalizado,
-      tipo: tipoInferido,
+      tipo: tipoPersonalizado,
       nombre,
-      baseOrigen: "Ubicación inicial oceánica",
-      longitude: POSICION_INICIAL_MEDIO_PERSONALIZADO.longitude,
-      latitude: POSICION_INICIAL_MEDIO_PERSONALIZADO.latitude,
-      radioCombateKm: tipoInferido === "aeronave" ? alcancePersonalizado : 0,
-      alcanceKm: tipoInferido === "aeronave" ? 0 : alcancePersonalizado,
+      baseOrigen: base?.nombre ?? "Ubicación personalizada",
+      longitude: base?.longitude ?? centro?.lng ?? -64.5,
+      latitude: base?.latitude ?? centro?.lat ?? -35.5,
+      radioCombateKm:
+        tipoPersonalizado === "aeronave" ? alcancePersonalizado : 0,
+      alcanceKm: tipoPersonalizado === "aeronave" ? 0 : alcancePersonalizado,
       mostrarAnillo: alcancePersonalizado > 0,
       color: colorPersonalizado,
       iconoPersonalizado,
       iconoTipo: iconoTipoPersonalizado,
       descripcion: "Medio personalizado",
-      mostrarRadar: false,
-      alcanceRadarKm: 0,
     };
 
     setElementos((anteriores) => [...anteriores, nuevo]);
@@ -2203,21 +1891,13 @@ export default function MapEditor({
 
     const imagen = document.createElement("img");
     const familia =
-      base.icono ??
-      (base.tipo === "Estación radar"
+      base.tipo === "Estación radar"
         ? "radar"
         : base.tipo === "Centro de comando"
           ? "puesto_de_mando"
           : base.tipo === "Apoyo logístico"
             ? "instalacion"
-            : base.tipo === "Inteligencia"
-              ? "inteligencia_militar"
-              : base.tipo === "Ingenieros"
-                ? "produccion_de_equipos_de_ingenieros"
-                : base.tipo === "Unidad terrestre" ||
-                    base.tipo === "Fuerza de despliegue rápido"
-                  ? "equipo_terrestre"
-                  : ICONO_BASE);
+            : ICONO_BASE;
 
     imagen.src = `/data/iconos/simbologia/${familia}__${afiliacionIcono(
       base.bando,
@@ -2278,9 +1958,6 @@ export default function MapEditor({
         <em>${base.tipo} — ${
           base.bando === "propio" ? "PROPIO" : "ENEMIGO"
         }</em>
-        ${base.escalon ? `<br /><strong>Escalón:</strong> ${base.escalon}` : ""}
-        ${coordenadasDetalladasHtml(base.latitude, base.longitude, base.altitudeMeters)}
-        ${base.detalle ? `<br /><br /><span>${base.detalle}</span>` : ""}
         <hr style="margin:8px 0;border:0;border-top:1px solid #475569" />
         <strong>Aeronaves:</strong><br />${listar(aeronaves)}
         <br /><br />
@@ -2396,173 +2073,9 @@ export default function MapEditor({
     modoMedicionRef.current = modoMedicion;
     const map = mapRef.current;
     if (map) {
-      map.getCanvas().style.cursor = modoMedicion || modoAtaque ? "crosshair" : "";
+      map.getCanvas().style.cursor = modoMedicion ? "crosshair" : "";
     }
-  }, [modoMedicion, modoAtaque]);
-
-  useEffect(() => {
-    modoAtaqueRef.current = modoAtaque;
-  }, [modoAtaque]);
-
-
-
-  function agregarPuntoMedicion(coordenadas: PuntoMedicion) {
-    const map = mapRef.current;
-
-    setPuntosMedicion((anteriores) => {
-      const nuevos = [...anteriores, coordenadas];
-      const source = map?.getSource("medicion") as
-        maplibregl.GeoJSONSource | undefined;
-
-      const features: GeoJSON.Feature[] = nuevos.map((coordenada) => ({
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "Point",
-          coordinates: coordenada,
-        },
-      }));
-
-      let distancia = 0;
-
-      if (nuevos.length >= 2) {
-        const linea = lineString(nuevos);
-        distancia = turfLength(linea, {
-          units: "kilometers",
-        });
-        features.push(linea);
-      }
-
-      source?.setData({
-        type: "FeatureCollection",
-        features,
-      });
-
-      setDistanciaMedicionKm(distancia);
-      return nuevos;
-    });
-  }
-
-  function habilitarMedicionSobreMarcador(
-    marker: maplibregl.Marker,
-    coordenadas: PuntoMedicion,
-  ) {
-    marker.getElement().addEventListener("click", (event) => {
-      if (!modoMedicionRef.current) return;
-      event.preventDefault();
-      event.stopPropagation();
-      agregarPuntoMedicion(coordenadas);
-    });
-  }
-
-
-  function actualizarFuenteAtaques(puntosTemporales: [number, number][] = puntosAtaque) {
-    const map = mapRef.current;
-    const source = map?.getSource("planes-ataque") as maplibregl.GeoJSONSource | undefined;
-    if (!source) return;
-
-    const features: GeoJSON.Feature[] = [];
-
-    elementos
-      .filter((elemento) => elemento.isAttackPlan && elemento.visible !== false && elemento.attackRoute && elemento.attackRoute.length >= 2)
-      .forEach((elemento) => {
-        const ruta = elemento.attackRoute ?? [];
-        features.push({
-          type: "Feature",
-          properties: { id: elemento.id, nombre: elemento.attackName ?? elemento.nombre, tipo: "ruta" },
-          geometry: { type: "LineString", coordinates: ruta },
-        });
-        ruta.forEach((coordenada, indice) => {
-          features.push({
-            type: "Feature",
-            properties: { id: elemento.id, nombre: elemento.attackName ?? elemento.nombre, tipo: indice === ruta.length - 1 ? "impacto" : "punto", numero: indice + 1 },
-            geometry: { type: "Point", coordinates: coordenada },
-          });
-        });
-      });
-
-    if (puntosTemporales.length > 0) {
-      puntosTemporales.forEach((coordenada, indice) => {
-        features.push({
-          type: "Feature",
-          properties: { id: "ataque-temporal", nombre: nombreAtaque, tipo: indice === puntosTemporales.length - 1 ? "impacto-temporal" : "punto-temporal", numero: indice + 1 },
-          geometry: { type: "Point", coordinates: coordenada },
-        });
-      });
-      if (puntosTemporales.length >= 2) {
-        features.push({
-          type: "Feature",
-          properties: { id: "ataque-temporal", nombre: nombreAtaque, tipo: "ruta-temporal" },
-          geometry: { type: "LineString", coordinates: puntosTemporales },
-        });
-      }
-    }
-
-    source.setData({ type: "FeatureCollection", features });
-  }
-
-  function agregarPuntoAtaque(coordenadas: [number, number]) {
-    if (!modoAtaqueRef.current || readOnly) return;
-    setPuntosAtaque((anteriores) => {
-      const nuevos = [...anteriores, coordenadas];
-      actualizarFuenteAtaques(nuevos);
-      return nuevos;
-    });
-  }
-
-  function agregarPuntoAtaqueManual() {
-    const lat = Number(latAtaqueManual.replace(",", "."));
-    const lng = Number(lngAtaqueManual.replace(",", "."));
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-    agregarPuntoAtaque([lng, lat]);
-    setLatAtaqueManual("");
-    setLngAtaqueManual("");
-  }
-
-  function borrarRutaAtaqueTemporal() {
-    setPuntosAtaque([]);
-    actualizarFuenteAtaques([]);
-  }
-
-  function guardarAtaquePlanificado() {
-    if (readOnly || puntosAtaque.length < 2) return;
-    const origen = puntosAtaque[0];
-    const impacto = puntosAtaque[puntosAtaque.length - 1];
-    const id = `ataque-${Date.now()}`;
-    const nuevoAtaque: ElementoOperacional = {
-      id,
-      visible: true,
-      bando: "propio",
-      tipo: "aeronave",
-      nombre: nombreAtaque.trim() || `Ataque ${medioAtaque}`,
-      baseOrigen: "Planificador de ataque",
-      longitude: origen[0],
-      latitude: origen[1],
-      radioCombateKm: 0,
-      alcanceKm: 0,
-      mostrarAnillo: false,
-      color: "#ef4444",
-      descripcion: `Medio: ${medioAtaque}. Munición/efecto: ${municionAtaque}. Último punto: impacto/explosión sobre el blanco.`,
-      classification: "compartible",
-      sharedWithCommander: true,
-      sharedWithJem: true,
-      sharedWithOtherCells: true,
-      originWorkspaceCode: workspaceCode,
-      isAttackPlan: true,
-      attackName: nombreAtaque.trim() || `Ataque ${medioAtaque}`,
-      attackMedium: medioAtaque,
-      attackRoute: puntosAtaque,
-      attackImpact: impacto,
-      attackMunition: municionAtaque,
-    };
-
-    setElementos((anteriores) => [...anteriores, nuevoAtaque]);
-    setSeleccionadoId(id);
-    setModoAtaque(false);
-    setPuntosAtaque([]);
-    setMensajeGuardado("Cambios sin guardar");
-    setCambiosPendientes(true);
-  }
+  }, [modoMedicion]);
 
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
@@ -2823,41 +2336,11 @@ export default function MapEditor({
               <strong>COAe / Río Cuarto</strong><br />
               Comando de Operaciones Aeroespaciales<br />
               <em>Punto fijo propio</em>
-              ${coordenadasDetalladasHtml(COAE_RIO_CUARTO.latitude, COAE_RIO_CUARTO.longitude, COAE_RIO_CUARTO.altitudeMeters)}
             </div>
           `),
         )
         .addTo(map);
       coaeRef.current = marcadorCOAe;
-      habilitarMedicionSobreMarcador(marcadorCOAe, [
-        COAE_RIO_CUARTO.longitude,
-        COAE_RIO_CUARTO.latitude,
-      ]);
-
-      const marcadorCOAeEnemigo = new maplibregl.Marker({
-        element: crearMarcadorEspecial(COAE_ENEMIGO_INGENIERO_JUAREZ, "C2", "#fca5a5"),
-        anchor: "center",
-      })
-        .setLngLat([
-          COAE_ENEMIGO_INGENIERO_JUAREZ.longitude,
-          COAE_ENEMIGO_INGENIERO_JUAREZ.latitude,
-        ])
-        .setPopup(
-          new maplibregl.Popup({ offset: 25, maxWidth: "380px", className: "zeus-popup" }).setHTML(`
-            <div style="background:#0f172a;color:white;padding:14px">
-              <strong>COAe enemigo / Ingeniero Juárez</strong><br />
-              Comando de Operaciones Aeroespaciales enemigo<br />
-              <em>Punto fijo enemigo de comando y control</em>
-              ${coordenadasDetalladasHtml(COAE_ENEMIGO_INGENIERO_JUAREZ.latitude, COAE_ENEMIGO_INGENIERO_JUAREZ.longitude, COAE_ENEMIGO_INGENIERO_JUAREZ.altitudeMeters)}
-            </div>
-          `),
-        )
-        .addTo(map);
-      coaeEnemigoRef.current = marcadorCOAeEnemigo;
-      habilitarMedicionSobreMarcador(marcadorCOAeEnemigo, [
-        COAE_ENEMIGO_INGENIERO_JUAREZ.longitude,
-        COAE_ENEMIGO_INGENIERO_JUAREZ.latitude,
-      ]);
 
       GRUPOS_COMUNICACIONES.forEach((grupo) => {
         const marcador = new maplibregl.Marker({
@@ -2871,12 +2354,10 @@ export default function MapEditor({
                 <strong>${grupo.nombre}</strong><br />
                 Grupo de Comunicaciones<br />
                 <em>Bando propio</em>
-                ${coordenadasDetalladasHtml(grupo.latitude, grupo.longitude, grupo.altitudeMeters)}
               </div>
             `),
           )
           .addTo(map);
-        habilitarMedicionSobreMarcador(marcador, [grupo.longitude, grupo.latitude]);
         marcador.getElement().style.display = "none";
         comunicacionesRef.current[grupo.nombre] = marcador;
       });
@@ -2922,19 +2403,13 @@ export default function MapEditor({
               <strong>Bando:</strong> enemigo<br />
               <strong>Categoría:</strong> objetivo estratégico<br />
               <strong>Coordenadas:</strong> ${LABORATORIO_TRITIO.coordenadasDms}<br />
-              <strong>Coordenadas decimales:</strong> ${formatearNumeroCoordenada(LABORATORIO_TRITIO.latitude)}, ${formatearNumeroCoordenada(LABORATORIO_TRITIO.longitude)}<br />
-              <strong>Altura:</strong> ${LABORATORIO_TRITIO.altitudeMeters.toLocaleString("es-AR")} m s. n. m.<br />
               <strong>Fuente:</strong> ${LABORATORIO_TRITIO.fuente}
             </div>
           `),
         )
         .addTo(map);
-      habilitarMedicionSobreMarcador(laboratorioTritioRef.current, [
-        LABORATORIO_TRITIO.longitude,
-        LABORATORIO_TRITIO.latitude,
-      ]);
 
-            TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
+            [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
         const marker = new maplibregl.Marker({
           element: crearIconoBase(base),
           anchor: "center",
@@ -2948,7 +2423,6 @@ export default function MapEditor({
             }).setHTML(mediosDeBase(base)),
           )
           .addTo(map);
-        habilitarMedicionSobreMarcador(marker, [base.longitude, base.latitude]);
 
         basesRef.current[base.nombre] = marker;
       });
@@ -3154,62 +2628,6 @@ export default function MapEditor({
         },
       });
 
-      map.addSource("planes-ataque", {
-        type: "geojson",
-        data: { type: "FeatureCollection", features: [] },
-      });
-
-      map.addLayer({
-        id: "planes-ataque-lineas",
-        type: "line",
-        source: "planes-ataque",
-        filter: ["==", ["geometry-type"], "LineString"],
-        paint: {
-          "line-color": "#dc2626",
-          "line-width": 3,
-          "line-dasharray": [1.5, 1.5],
-        },
-      });
-
-      map.addLayer({
-        id: "planes-ataque-puntos",
-        type: "circle",
-        source: "planes-ataque",
-        filter: ["all", ["==", ["geometry-type"], "Point"], ["!", ["in", ["get", "tipo"], ["literal", ["impacto", "impacto-temporal"]]]]],
-        paint: {
-          "circle-radius": 6,
-          "circle-color": "#ffffff",
-          "circle-stroke-color": "#dc2626",
-          "circle-stroke-width": 2,
-        },
-      });
-
-      map.addLayer({
-        id: "planes-ataque-impactos",
-        type: "circle",
-        source: "planes-ataque",
-        filter: ["all", ["==", ["geometry-type"], "Point"], ["in", ["get", "tipo"], ["literal", ["impacto", "impacto-temporal"]]]],
-        paint: {
-          "circle-radius": 15,
-          "circle-color": "#f97316",
-          "circle-stroke-color": "#7f1d1d",
-          "circle-stroke-width": 4,
-        },
-      });
-
-      map.addLayer({
-        id: "planes-ataque-impactos-centro",
-        type: "circle",
-        source: "planes-ataque",
-        filter: ["all", ["==", ["geometry-type"], "Point"], ["in", ["get", "tipo"], ["literal", ["impacto", "impacto-temporal"]]]],
-        paint: {
-          "circle-radius": 5,
-          "circle-color": "#ffff00",
-          "circle-stroke-color": "#111827",
-          "circle-stroke-width": 1,
-        },
-      });
-
       map.on("mousemove", (evento) => {
         setCoordenadasCursor({
           latitud: evento.lngLat.lat,
@@ -3218,24 +2636,45 @@ export default function MapEditor({
       });
 
       map.on("click", (evento) => {
-        if (modoAtaqueRef.current) {
-          agregarPuntoAtaque([evento.lngLat.lng, evento.lngLat.lat]);
-          return;
-        }
-
         if (!modoMedicionRef.current) return;
 
-        agregarPuntoMedicion([evento.lngLat.lng, evento.lngLat.lat]);
-      });
+        const nuevoPunto: PuntoMedicion = [
+          evento.lngLat.lng,
+          evento.lngLat.lat,
+        ];
 
-      map.on("click", "planes-ataque-lineas", (evento) => {
-        const id = evento.features?.[0]?.properties?.id;
-        if (typeof id === "string" && id !== "ataque-temporal") setSeleccionadoId(id);
-      });
+        setPuntosMedicion((anteriores) => {
+          const nuevos = [...anteriores, nuevoPunto];
+          const source = map.getSource("medicion") as
+            maplibregl.GeoJSONSource | undefined;
 
-      map.on("click", "planes-ataque-impactos", (evento) => {
-        const id = evento.features?.[0]?.properties?.id;
-        if (typeof id === "string" && id !== "ataque-temporal") setSeleccionadoId(id);
+          const features: GeoJSON.Feature[] = nuevos.map((coordenada) => ({
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Point",
+              coordinates: coordenada,
+            },
+          }));
+
+          let distancia = 0;
+
+          if (nuevos.length >= 2) {
+            const linea = lineString(nuevos);
+            distancia = turfLength(linea, {
+              units: "kilometers",
+            });
+            features.push(linea);
+          }
+
+          source?.setData({
+            type: "FeatureCollection",
+            features,
+          });
+
+          setDistanciaMedicionKm(distancia);
+          return nuevos;
+        });
       });
 
       map.addSource("anillos-operacionales", {
@@ -3281,7 +2720,6 @@ export default function MapEditor({
       Object.values(oceanosRef.current).forEach((marker) => marker.remove());
       Object.values(basesRef.current).forEach((marker) => marker.remove());
       coaeRef.current?.remove();
-      coaeEnemigoRef.current?.remove();
       Object.values(comunicacionesRef.current).forEach((marker) => marker.remove());
       laboratorioTritioRef.current?.remove();
       Object.values(dimensionesTonRef.current).forEach((marker) =>
@@ -3294,7 +2732,6 @@ export default function MapEditor({
       oceanosRef.current = {};
       basesRef.current = {};
       coaeRef.current = null;
-      coaeEnemigoRef.current = null;
       comunicacionesRef.current = {};
       laboratorioTritioRef.current = null;
       dimensionesTonRef.current = {};
@@ -3318,9 +2755,7 @@ export default function MapEditor({
           ? mostrarAeronaves
           : elemento.tipo === "radar"
             ? mostrarRadares
-            : elemento.tipo === "defensa"
-              ? mostrarDefensa
-              : true;
+            : mostrarDefensa;
 
       const visible =
         elemento.visible &&
@@ -3380,15 +2815,6 @@ export default function MapEditor({
               ? `<div><strong>Capacidad:</strong> ${elemento.descripcion}</div>`
               : ""
           }
-          ${elemento.isAttackPlan ? `
-            <div style="margin-top:8px;padding:8px;border:1px solid #ef4444;border-radius:8px;background:rgba(127,29,29,0.35)">
-              <div style="font-weight:800;color:#fecaca">PLAN DE ATAQUE</div>
-              <div><strong>Medio:</strong> ${elemento.attackMedium ?? "Sin definir"}</div>
-              <div><strong>Munición / efecto:</strong> ${elemento.attackMunition ?? "Sin definir"}</div>
-              <div><strong>Puntos de ruta:</strong> ${elemento.attackRoute?.length ?? 0}</div>
-              <div><strong>Último punto:</strong> impacto / explosión sobre el blanco</div>
-            </div>
-          ` : ""}
           <div style="margin-top:7px;padding-top:7px;border-top:1px solid #475569">
             <strong>${
               elemento.tipo === "aeronave" ? (elemento.terminoDistancia ?? "Radio de acción") : "Alcance"
@@ -3439,15 +2865,7 @@ export default function MapEditor({
         )
         .addTo(map);
 
-      marker.getElement().addEventListener("click", (event) => {
-        if (modoMedicionRef.current) {
-          event.preventDefault();
-          event.stopPropagation();
-          const posicion = marker.getLngLat();
-          agregarPuntoMedicion([posicion.lng, posicion.lat]);
-          return;
-        }
-
+      marker.getElement().addEventListener("click", () => {
         setSeleccionadoId(elemento.id);
       });
 
@@ -3489,10 +2907,6 @@ export default function MapEditor({
     mostrarDefensa,
     mapReady,
   ]);
-
-  useEffect(() => {
-    actualizarFuenteAtaques(puntosAtaque);
-  }, [elementos, puntosAtaque, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -3537,7 +2951,7 @@ export default function MapEditor({
   }, [mostrarTon, mapReady]);
 
   useEffect(() => {
-    TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
+    [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
       const marker = basesRef.current[base.nombre];
       if (!marker) return;
 
@@ -3549,42 +2963,6 @@ export default function MapEditor({
       marker.getElement().style.display = visible ? "flex" : "none";
     });
   }, [mostrarBases, vistaFuerzas, basesVisibles, mapReady]);
-
-  useEffect(() => {
-    const marcador = coaeRef.current;
-    if (!marcador) return;
-
-    const visibleCOAe =
-      mostrarBases &&
-      mostrarCOAe &&
-      bandoVisible("propio", vistaFuerzas);
-
-    marcador.getElement().style.display = visibleCOAe ? "flex" : "none";
-  }, [mostrarBases, mostrarCOAe, vistaFuerzas, mapReady]);
-
-  useEffect(() => {
-    const marcador = coaeEnemigoRef.current;
-    if (!marcador) return;
-
-    const visibleCOAeEnemigo =
-      mostrarBases &&
-      mostrarCOAeEnemigo &&
-      bandoVisible("enemigo", vistaFuerzas);
-
-    marcador.getElement().style.display = visibleCOAeEnemigo ? "flex" : "none";
-  }, [mostrarBases, mostrarCOAeEnemigo, vistaFuerzas, mapReady]);
-
-  useEffect(() => {
-    const marcador = laboratorioTritioRef.current;
-    if (!marcador) return;
-
-    const visibleLaboratorioTritio =
-      mostrarBases &&
-      mostrarLaboratorioTritio &&
-      bandoVisible("enemigo", vistaFuerzas);
-
-    marcador.getElement().style.display = visibleLaboratorioTritio ? "flex" : "none";
-  }, [mostrarBases, mostrarLaboratorioTritio, vistaFuerzas, mapReady]);
 
   useEffect(() => {
     Object.values(comunicacionesRef.current).forEach((marcador) => {
@@ -3725,7 +3103,7 @@ export default function MapEditor({
           radares: mostrarRadares,
           defensa: mostrarDefensa,
           relieve: mostrarRelieve,
-          rios: false,
+          rios: mostrarRios,
           grilla: mostrarGrilla,
           dimensionesTon: mostrarDimensionesTon,
         },
@@ -3737,9 +3115,6 @@ export default function MapEditor({
           coloresMascaras,
           coloresRepublicas,
           basesVisibles,
-          mostrarCOAe,
-          mostrarCOAeEnemigo,
-          mostrarLaboratorioTritio,
         },
       },
       elements: elementos,
@@ -3800,6 +3175,7 @@ export default function MapEditor({
     mostrarRadares,
     mostrarDefensa,
     mostrarRelieve,
+    mostrarRios,
     mostrarGrilla,
     intervaloGrilla,
     mostrarDimensionesTon,
@@ -3808,9 +3184,6 @@ export default function MapEditor({
     coloresMascaras,
     coloresRepublicas,
     basesVisibles,
-    mostrarCOAe,
-    mostrarCOAeEnemigo,
-    mostrarLaboratorioTritio,
     readOnly,
   ]);
 
@@ -3959,7 +3332,7 @@ export default function MapEditor({
           </label>
 
           <p className="mt-2 text-xs text-slate-400">
-            El COAe de Río Cuarto puede mostrarse u ocultarse desde Bases y estaciones visibles → Propias.
+            El COAe de Río Cuarto permanece visible como punto fijo.
           </p>
         </section>
 
@@ -3981,21 +3354,6 @@ export default function MapEditor({
                   <span>{base.nombre}</span>
                 </label>
               ))}
-
-              <label className="mt-3 flex items-start gap-2 border-t border-blue-900 pt-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={mostrarCOAe}
-                  onChange={(event) => setMostrarCOAe(event.target.checked)}
-                />
-                <span>
-                  <strong className="text-cyan-300">COAe / Río Cuarto</strong>
-                  <br />
-                  <span className="text-xs text-slate-400">
-                    Centro de operaciones aeroespaciales propio
-                  </span>
-                </span>
-              </label>
             </div>
           )}
 
@@ -4004,50 +3362,16 @@ export default function MapEditor({
               <div className="mb-2 flex items-center justify-between gap-2">
                 <strong className="text-sm text-orange-300">Enemigas</strong>
                 <div className="flex gap-2 text-xs">
-                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((b) => [b.nombre, true]))}))} className="rounded bg-orange-700 px-2 py-1">Todas</button>
-                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((b) => [b.nombre, false]))}))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_ENEMIGAS.map((b) => [b.nombre, true]))}))} className="rounded bg-orange-700 px-2 py-1">Todas</button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_ENEMIGAS.map((b) => [b.nombre, false]))}))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
                 </div>
               </div>
-              {BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((base) => (
+              {BASES_ENEMIGAS.map((base) => (
                 <label key={base.nombre} className="mb-2 flex items-start gap-2 text-sm last:mb-0">
                   <input type="checkbox" checked={Boolean(basesVisibles[base.nombre])} onChange={(event) => setBasesVisibles((a) => ({ ...a, [base.nombre]: event.target.checked }))} />
                   <span>{base.nombre}</span>
                 </label>
               ))}
-
-              <label className="mt-3 flex items-start gap-2 border-t border-orange-900 pt-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={mostrarLaboratorioTritio}
-                  onChange={(event) =>
-                    setMostrarLaboratorioTritio(event.target.checked)
-                  }
-                />
-                <span>
-                  <strong className="text-red-300">☢ {LABORATORIO_TRITIO.nombre}</strong>
-                  <br />
-                  <span className="text-xs text-slate-400">
-                    Objetivo estratégico enemigo
-                  </span>
-                </span>
-              </label>
-
-              <label className="mt-3 flex items-start gap-2 border-t border-orange-900 pt-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={mostrarCOAeEnemigo}
-                  onChange={(event) =>
-                    setMostrarCOAeEnemigo(event.target.checked)
-                  }
-                />
-                <span>
-                  <strong className="text-orange-300">COAe enemigo / Ingeniero Juárez</strong>
-                  <br />
-                  <span className="text-xs text-slate-400">
-                    Centro de comando y control enemigo
-                  </span>
-                </span>
-              </label>
             </div>
           )}
         </section>
@@ -4275,9 +3599,17 @@ export default function MapEditor({
               checked={mostrarRelieve}
               onChange={(event) => setMostrarRelieve(event.target.checked)}
             />
-            Relieve
+            Relieve físico sin nombres
           </label>
 
+          <label className="mb-3 flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={mostrarRios}
+              onChange={(event) => setMostrarRios(event.target.checked)}
+            />
+            Ríos y cursos de agua
+          </label>
 
           <label className="mb-3 flex items-center gap-2">
             <input
@@ -4373,40 +3705,6 @@ export default function MapEditor({
             distancia acumulada.
           </p>
         </section>
-
-        {!readOnly && (
-          <section className="mb-5 rounded border border-red-700 bg-slate-900 p-4">
-            <h2 className="mb-3 font-semibold text-red-300">Planificador de ataque aéreo</h2>
-            <label className="mb-2 block text-xs text-slate-300">Nombre del ataque</label>
-            <input value={nombreAtaque} onChange={(e) => setNombreAtaque(e.target.value)} className="mb-3 w-full rounded bg-slate-800 p-2 text-sm" />
-            <label className="mb-2 block text-xs text-slate-300">Medio empleado</label>
-            <select value={medioAtaque} onChange={(e) => setMedioAtaque(e.target.value)} className="mb-3 w-full rounded bg-slate-800 p-2 text-sm">
-              <option>F-16CJ + AGM-88C HARM</option>
-              <option>F-16C/D + GBU-10/12/38</option>
-              <option>AMX A-1M + MAR-1 / GBU</option>
-              <option>IAI HARPY SEAD</option>
-              <option>EC-130H Compass Call</option>
-              <option>COMAO A3</option>
-            </select>
-            <label className="mb-2 block text-xs text-slate-300">Munición / efecto</label>
-            <input value={municionAtaque} onChange={(e) => setMunicionAtaque(e.target.value)} className="mb-3 w-full rounded bg-slate-800 p-2 text-sm" />
-            <button type="button" onClick={() => { setModoAtaque((actual) => !actual); if (modoMedicion) setModoMedicion(false); }} className={`mb-2 w-full rounded px-3 py-2 font-semibold ${modoAtaque ? "bg-red-500 text-white" : "bg-slate-700 text-white"}`}>
-              {modoAtaque ? "Finalizar carga de puntos" : "Seleccionar puntos en el mapa"}
-            </button>
-            <div className="mb-2 grid grid-cols-2 gap-2">
-              <input placeholder="Latitud" value={latAtaqueManual} onChange={(e) => setLatAtaqueManual(e.target.value)} className="rounded bg-slate-800 p-2 text-xs" />
-              <input placeholder="Longitud" value={lngAtaqueManual} onChange={(e) => setLngAtaqueManual(e.target.value)} className="rounded bg-slate-800 p-2 text-xs" />
-            </div>
-            <button type="button" onClick={agregarPuntoAtaqueManual} className="mb-2 w-full rounded bg-slate-700 px-3 py-2 text-sm font-semibold">Agregar punto por coordenadas</button>
-            <button type="button" onClick={guardarAtaquePlanificado} disabled={puntosAtaque.length < 2} className="mb-2 w-full rounded bg-red-700 px-3 py-2 text-sm font-bold disabled:opacity-40">Guardar ataque y compartir con Comandante/JEM</button>
-            <button type="button" onClick={borrarRutaAtaqueTemporal} className="w-full rounded bg-slate-700 px-3 py-2 text-sm font-semibold">Borrar ruta temporal</button>
-            <div className="mt-3 rounded bg-slate-800 p-3 text-xs">
-              <div>Puntos marcados: <strong>{puntosAtaque.length}</strong></div>
-              <div>El último punto guardado se representa como explosión sobre el blanco.</div>
-              <div>La ruta se dibuja con línea punteada.</div>
-            </div>
-          </section>
-        )}
 
         <section {...propiedadesPanel("visibilidad")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Visibilidad de medios</h2>
@@ -4719,12 +4017,6 @@ export default function MapEditor({
 
         <section {...propiedadesPanel("elementos")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Elementos visibles</h2>
-          {elementos.length > 0 && (
-            <div className="mb-3 flex flex-wrap gap-2 text-xs">
-              <button type="button" onClick={() => setElementos((anteriores) => anteriores.map((elemento) => ({ ...elemento, visible: true })))} className="rounded bg-emerald-700 px-2 py-1">Ver todos</button>
-              <button type="button" onClick={() => setElementos((anteriores) => anteriores.map((elemento) => ({ ...elemento, visible: false })))} className="rounded bg-slate-700 px-2 py-1">Ocultar todos</button>
-            </div>
-          )}
           {elementos.length === 0 ? (
             <p className="text-xs text-slate-400">
               Todavía no agregaste medios.
@@ -4769,26 +4061,66 @@ export default function MapEditor({
             className="mb-3 w-full rounded bg-slate-800 p-2"
           />
 
+          <div className="mb-3 grid grid-cols-2 gap-2">
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-300">
+                Tipo de medio
+              </label>
+              <select
+                value={tipoPersonalizado}
+                onChange={(event) =>
+                  setTipoPersonalizado(event.target.value as TipoElemento)
+                }
+                className="w-full rounded bg-slate-800 p-2"
+              >
+                <option value="aeronave">Aeronave / medio aéreo</option>
+                <option value="radar">Radar / sensor</option>
+                <option value="defensa">Defensa antiaérea</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-300">
+                Bando
+              </label>
+              <select
+                value={bandoPersonalizado}
+                onChange={(event) => {
+                  const bando = event.target.value as Bando;
+                  setBandoPersonalizado(bando);
+                  const bases =
+                    bando === "propio" ? BASES_PROPIAS : BASES_ENEMIGAS;
+                  setBasePersonalizada(bases[0]?.nombre ?? "");
+                }}
+                className="w-full rounded bg-slate-800 p-2"
+              >
+                <option value="propio">Propio</option>
+                <option value="enemigo">Enemigo</option>
+              </select>
+            </div>
+          </div>
+
           <label className="mb-1 block text-xs font-semibold text-slate-300">
-            Bando
+            Base o ubicación inicial
           </label>
           <select
-            value={bandoPersonalizado}
-            onChange={(event) => setBandoPersonalizado(event.target.value as Bando)}
+            value={basePersonalizada}
+            onChange={(event) => setBasePersonalizada(event.target.value)}
             className="mb-3 w-full rounded bg-slate-800 p-2"
           >
-            <option value="propio">Propio</option>
-            <option value="enemigo">Enemigo</option>
+            {(bandoPersonalizado === "propio"
+              ? BASES_PROPIAS
+              : BASES_ENEMIGAS
+            ).map((base) => (
+              <option key={base.nombre} value={base.nombre}>
+                {base.nombre}
+              </option>
+            ))}
           </select>
-
-          <p className="mb-3 rounded bg-slate-800 p-2 text-xs text-slate-300">
-            El medio se ubicará inicialmente en el océano próximo al teatro de operaciones. Luego podés arrastrarlo al punto exacto. El tipo se infiere por el nombre o por el icono elegido.
-          </p>
 
           <div className="mb-3 grid grid-cols-[1fr_76px] gap-2">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-300">
-                Radio de alcance
+                Radio o alcance
               </label>
               <input
                 type="number"
@@ -4921,92 +4253,9 @@ export default function MapEditor({
         </section>
 
         {seleccionado?.sharedExternal && (
-          <section className="mb-5 space-y-3 rounded border border-amber-700 bg-amber-950/40 p-4 text-sm text-amber-100">
-            <div>
-              <p className="font-semibold text-amber-200">
-                Elemento compartido por {seleccionado.originWorkspaceCode?.toUpperCase() ?? "otra célula"}
-              </p>
-              <p className="mt-1 text-xs text-amber-200/80">
-                Se muestra en la vista consolidada. No se modifica desde este espacio.
-              </p>
-            </div>
-
-            {(seleccionado.originWorkspaceCode === "a3" || seleccionado.operationMission || seleccionado.operationTask || seleccionado.operationPhase || seleccionado.operationNotes) && (
-              <div className="rounded border border-cyan-800 bg-slate-950/70 p-3 text-slate-100">
-                <p className="mb-2 font-semibold text-cyan-300">A3 Operaciones: acción / efecto</p>
-                <div className="space-y-1 text-xs">
-                  {seleccionado.operationMission && <p><strong>Misión / efecto:</strong> {seleccionado.operationMission}</p>}
-                  {seleccionado.operationTask && <p><strong>Tarea:</strong> {seleccionado.operationTask}</p>}
-                  {seleccionado.operationPhase && <p><strong>Fase:</strong> {seleccionado.operationPhase}</p>}
-                  {seleccionado.operationPriority && <p><strong>Prioridad:</strong> {seleccionado.operationPriority}</p>}
-                  {seleccionado.operationStart && <p><strong>Inicio:</strong> {seleccionado.operationStart}</p>}
-                  {seleccionado.operationEnd && <p><strong>Fin:</strong> {seleccionado.operationEnd}</p>}
-                  {seleccionado.callSign && <p><strong>Indicativo:</strong> {seleccionado.callSign}</p>}
-                  {seleccionado.operationNotes && <p><strong>Observaciones:</strong> {seleccionado.operationNotes}</p>}
-                  {!seleccionado.operationMission && !seleccionado.operationTask && !seleccionado.operationPhase && !seleccionado.operationNotes && (
-                    <p className="text-slate-400">La célula A3 compartió el elemento, pero todavía no cargó acción, tarea o efecto.</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {(seleccionado.originWorkspaceCode === "a1" || seleccionado.personnelAssigned || seleccionado.personnelAvailable || seleccionado.personnelNotes || seleccionado.evacuationRequired) && (
-              <div className="rounded border border-pink-800 bg-slate-950/70 p-3 text-slate-100">
-                <p className="mb-2 font-semibold text-pink-300">A1 Personal: situación de efectivos</p>
-                <div className="space-y-1 text-xs">
-                  {seleccionado.personnelAssigned !== undefined && <p><strong>Asignados:</strong> {seleccionado.personnelAssigned}</p>}
-                  {seleccionado.personnelAvailable !== undefined && <p><strong>Disponibles:</strong> {seleccionado.personnelAvailable}</p>}
-                  {seleccionado.personnelCasualties !== undefined && <p><strong>Bajas:</strong> {seleccionado.personnelCasualties}</p>}
-                  {seleccionado.personnelReplacements !== undefined && <p><strong>Reemplazos:</strong> {seleccionado.personnelReplacements}</p>}
-                  {seleccionado.medicalStatus && <p><strong>Estado sanitario:</strong> {seleccionado.medicalStatus}</p>}
-                  {seleccionado.evacuationRequired && <p><strong>Evacuación sanitaria:</strong> requerida</p>}
-                  {seleccionado.personnelNotes && <p><strong>Novedades:</strong> {seleccionado.personnelNotes}</p>}
-                </div>
-              </div>
-            )}
-
-            {(seleccionado.originWorkspaceCode === "a2" || seleccionado.intelligenceStatus || seleccionado.intelligenceNotes || seleccionado.sourceDescription) && (
-              <div className="rounded border border-red-800 bg-slate-950/70 p-3 text-slate-100">
-                <p className="mb-2 font-semibold text-red-300">A2 Inteligencia: estado del dato</p>
-                <div className="space-y-1 text-xs">
-                  {seleccionado.intelligenceStatus && <p><strong>Estado:</strong> {seleccionado.intelligenceStatus}</p>}
-                  {seleccionado.confidenceLevel && <p><strong>Confianza:</strong> {seleccionado.confidenceLevel}</p>}
-                  {seleccionado.informationDate && <p><strong>Fecha:</strong> {seleccionado.informationDate}</p>}
-                  {seleccionado.sourceDescription && <p><strong>Fuente:</strong> {seleccionado.sourceDescription}</p>}
-                  {seleccionado.intelligenceNotes && <p><strong>Observaciones:</strong> {seleccionado.intelligenceNotes}</p>}
-                </div>
-              </div>
-            )}
-
-            {(seleccionado.originWorkspaceCode === "a4" || seleccionado.fuelPercent !== undefined || seleccionado.ammunitionPercent !== undefined || seleccionado.logisticsNotes) && (
-              <div className="rounded border border-emerald-800 bg-slate-950/70 p-3 text-slate-100">
-                <p className="mb-2 font-semibold text-emerald-300">A4 Logística: sostenimiento</p>
-                <div className="space-y-1 text-xs">
-                  {seleccionado.fuelPercent !== undefined && <p><strong>Combustible:</strong> {seleccionado.fuelPercent}%</p>}
-                  {seleccionado.ammunitionPercent !== undefined && <p><strong>Armamento:</strong> {seleccionado.ammunitionPercent}%</p>}
-                  {seleccionado.materialStatus && <p><strong>Estado del material:</strong> {seleccionado.materialStatus}</p>}
-                  {seleccionado.transportAvailable !== undefined && <p><strong>Transportes disponibles:</strong> {seleccionado.transportAvailable}</p>}
-                  {seleccionado.resupplyPriority && <p><strong>Prioridad de reabastecimiento:</strong> {seleccionado.resupplyPriority}</p>}
-                  {seleccionado.logisticsNotes && <p><strong>Observaciones:</strong> {seleccionado.logisticsNotes}</p>}
-                </div>
-              </div>
-            )}
-
-            {(seleccionado.originWorkspaceCode === "a5" || seleccionado.communicationNodeType || seleccionado.networkName || seleccionado.communicationsNotes) && (
-              <div className="rounded border border-sky-800 bg-slate-950/70 p-3 text-slate-100">
-                <p className="mb-2 font-semibold text-sky-300">A5 Comunicaciones: enlace / red</p>
-                <div className="space-y-1 text-xs">
-                  {seleccionado.communicationNodeType && <p><strong>Tipo de nodo:</strong> {seleccionado.communicationNodeType}</p>}
-                  {seleccionado.networkName && <p><strong>Red:</strong> {seleccionado.networkName}</p>}
-                  {seleccionado.frequency && <p><strong>Frecuencia / canal:</strong> {seleccionado.frequency}</p>}
-                  {seleccionado.linkStatus && <p><strong>Estado del enlace:</strong> {seleccionado.linkStatus}</p>}
-                  {seleccionado.coverageKm !== undefined && <p><strong>Cobertura:</strong> {seleccionado.coverageKm} km</p>}
-                  {seleccionado.encryptionStatus && <p><strong>Cifrado:</strong> {seleccionado.encryptionStatus}</p>}
-                  {seleccionado.redundancy && <p><strong>Redundancia:</strong> {seleccionado.redundancy}</p>}
-                  {seleccionado.communicationsNotes && <p><strong>Observaciones:</strong> {seleccionado.communicationsNotes}</p>}
-                </div>
-              </div>
-            )}
+          <section className="mb-5 rounded border border-amber-700 bg-amber-950/40 p-4 text-sm text-amber-200">
+            <p className="font-semibold">Elemento compartido por {seleccionado.originWorkspaceCode?.toUpperCase() ?? "otra célula"}</p>
+            <p className="mt-1 text-xs">Se muestra en la vista consolidada. No se guarda ni modifica desde este espacio.</p>
           </section>
         )}
 
@@ -5191,51 +4440,6 @@ export default function MapEditor({
                 </p>
               )}
             </div>
-
-
-            {seleccionado.isAttackPlan && (
-              <div className="rounded border border-red-700 bg-red-950/30 p-3 text-sm">
-                <h3 className="mb-2 font-semibold text-red-300">Ataque planificado</h3>
-                <p><strong>Medio:</strong> {seleccionado.attackMedium}</p>
-                <p><strong>Munición / efecto:</strong> {seleccionado.attackMunition}</p>
-                <p><strong>Puntos de ruta:</strong> {seleccionado.attackRoute?.length ?? 0}</p>
-                <p><strong>Impacto:</strong> {seleccionado.attackImpact ? `${seleccionado.attackImpact[1].toFixed(5)}, ${seleccionado.attackImpact[0].toFixed(5)}` : "Sin definir"}</p>
-                <p className="mt-2 text-xs text-slate-300">El último punto de la ruta se visualiza como explosión sobre el blanco. Si está compartido, Comandante y JEM lo ven al guardar.</p>
-              </div>
-            )}
-
-            {seleccionado.tipo === "aeronave" && (
-              <div className="rounded border border-cyan-800 bg-slate-900 p-3 text-sm">
-                <label className="mb-3 flex items-center gap-2 text-cyan-200">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(seleccionado.mostrarRadar)}
-                    onChange={(event) =>
-                      actualizarElemento(seleccionado.id, {
-                        mostrarRadar: event.target.checked,
-                      })
-                    }
-                  />
-                  Mostrar alcance radar de la aeronave
-                </label>
-
-                <label className="mb-1 block text-xs text-slate-300">
-                  Alcance radar 
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  step={1}
-                  value={seleccionado.alcanceRadarKm ?? 0}
-                  onChange={(event) =>
-                    actualizarElemento(seleccionado.id, {
-                      alcanceRadarKm: Math.max(0, Number(event.target.value)),
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </div>
-            )}
 
             <label className="flex items-center gap-2">
               <input
