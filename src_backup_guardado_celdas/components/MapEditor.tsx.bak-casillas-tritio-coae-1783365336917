@@ -7,10 +7,9 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 type Bando = "propio" | "enemigo";
 type VistaFuerzas = "propias" | "enemigas" | "ambas";
-type TipoElemento = "aeronave" | "radar" | "defensa" | "terrestre" | "naval";
+type TipoElemento = "aeronave" | "radar" | "defensa";
 type FuenteDistancia = "orden" | "externa" | "manual";
-type EstadoInteligencia =
-  "pendiente" | "estimado" | "probable" | "confirmado" | "descartado";
+type EstadoInteligencia = "pendiente" | "estimado" | "probable" | "confirmado" | "descartado";
 type NivelConfianza = "baja" | "media" | "alta";
 type ClasificacionInteligencia = "uso_interno" | "compartible" | "restringido";
 
@@ -36,8 +35,6 @@ export type ElementoOperacional = {
   referenciaDistancia?: string;
   permiteReabastecimiento?: boolean;
   conReabastecimiento?: boolean;
-  mostrarRadar?: boolean;
-  alcanceRadarKm?: number;
   intelligenceStatus?: EstadoInteligencia;
   confidenceLevel?: NivelConfianza;
   informationDate?: string;
@@ -78,10 +75,6 @@ export type ElementoOperacional = {
   encryptionStatus?: string;
   redundancy?: string;
   communicationsNotes?: string;
-  attackRouteId?: string;
-  attackMedium?: string;
-  attackPointOrder?: number;
-  attackPointRole?: "origen" | "ruta" | "impacto";
 };
 
 type BaseMilitar = {
@@ -89,19 +82,7 @@ type BaseMilitar = {
   longitude: number;
   latitude: number;
   bando: Bando;
-  tipo:
-    | "Base aérea"
-    | "Estación radar"
-    | "Centro de comando"
-    | "Comunicaciones"
-    | "Apoyo logístico"
-    | "Unidad terrestre"
-    | "Inteligencia"
-    | "Ingenieros"
-    | "Fuerza de despliegue rápido";
-  icono?: string;
-  detalle?: string;
-  escalon?: string;
+  tipo: "Base aérea" | "Estación radar" | "Centro de comando" | "Comunicaciones" | "Apoyo logístico";
 };
 
 type MascaraRadar = {
@@ -156,12 +137,6 @@ type IconoCatalogo = {
 };
 
 type PuntoMedicion = [number, number];
-
-type PuntoAtaque = {
-  id: string;
-  orden: number;
-  coordenadas: PuntoMedicion;
-};
 
 export type PanelId =
   | "fuerzas"
@@ -352,14 +327,6 @@ const COAE_RIO_CUARTO: BaseMilitar = {
   tipo: "Centro de comando",
 };
 
-const COAE_ENEMIGO_INGENIERO_JUAREZ: BaseMilitar = {
-  nombre: "COAe enemigo / Ingeniero Juárez",
-  longitude: -61.855,
-  latitude: -23.9,
-  bando: "enemigo",
-  tipo: "Centro de comando",
-};
-
 const GRUPOS_COMUNICACIONES: BaseMilitar[] = [
   {
     nombre: "Grupo 1 COM / San Luis",
@@ -385,11 +352,6 @@ const LABORATORIO_TRITIO = {
   descripcion:
     "Instalación estratégica enemiga establecida por el Plan de Campaña para el procesamiento de tritio.",
   fuente: "Plan de Campaña TON ZEUS I 2026",
-};
-
-const POSICION_INICIAL_MEDIO_PERSONALIZADO = {
-  longitude: -58.5,
-  latitude: -27.0,
 };
 
 const BASES_ENEMIGAS: BaseMilitar[] = [
@@ -491,106 +453,6 @@ const BASES_ENEMIGAS: BaseMilitar[] = [
     bando: "enemigo",
     tipo: "Estación radar",
   },
-];
-
-const ESTABLECIMIENTOS_EJERCITO_ENEMIGO: BaseMilitar[] = [
-  {
-    nombre: "Compañía de Ingenieros Mecanizados N.º 11 / Ingeniero Juárez",
-    longitude: -61.855,
-    latitude: -23.9,
-    bando: "enemigo",
-    tipo: "Ingenieros",
-    icono: "produccion_de_equipos_de_ingenieros",
-    escalon: "Compañía",
-    detalle:
-      "Unidad terrestre enemiga. Compañía de Ingenieros Mecanizados N.º 11, asociada al dispositivo de la 2.ª División en Ingeniero Juárez.",
-  },
-  {
-    nombre: "1.ª Brigada de Montaña / Jujuy",
-    longitude: -65.299444,
-    latitude: -24.185556,
-    bando: "enemigo",
-    tipo: "Unidad terrestre",
-    icono: "equipo_terrestre",
-    escalon: "Brigada",
-    detalle:
-      "Fuerza terrestre enemiga. 1.ª Brigada de Montaña ubicada en Jujuy.",
-  },
-  {
-    nombre: "Compañía de Inteligencia de Montaña 11 / Jujuy",
-    longitude: -65.287,
-    latitude: -24.193,
-    bando: "enemigo",
-    tipo: "Inteligencia",
-    icono: "inteligencia_militar",
-    escalon: "Compañía",
-    detalle:
-      "Unidad de inteligencia enemiga asociada a la 1.ª Brigada de Montaña.",
-  },
-  {
-    nombre: "2.ª Brigada de Montaña / Pampa del Infierno",
-    longitude: -61.174361,
-    latitude: -26.505169,
-    bando: "enemigo",
-    tipo: "Unidad terrestre",
-    icono: "equipo_terrestre",
-    escalon: "Brigada",
-    detalle:
-      "Fuerza terrestre enemiga. 2.ª Brigada de Montaña ubicada en Pampa del Infierno.",
-  },
-  {
-    nombre: "Compañía de Inteligencia de Montaña 21 / Pampa del Infierno",
-    longitude: -61.162,
-    latitude: -26.512,
-    bando: "enemigo",
-    tipo: "Inteligencia",
-    icono: "inteligencia_militar",
-    escalon: "Compañía",
-    detalle:
-      "Unidad de inteligencia enemiga asociada a la 2.ª Brigada de Montaña.",
-  },
-  {
-    nombre: "Fuerzas de Despliegue Rápido / Orán",
-    longitude: -64.324261,
-    latitude: -23.13705,
-    bando: "enemigo",
-    tipo: "Fuerza de despliegue rápido",
-    icono: "equipo_terrestre",
-    escalon: "Fuerza",
-    detalle: "Fuerza terrestre enemiga de despliegue rápido ubicada en Orán.",
-  },
-  {
-    nombre: "Batallón de Inteligencia de Despliegue Rápido / Orán",
-    longitude: -64.312,
-    latitude: -23.145,
-    bando: "enemigo",
-    tipo: "Inteligencia",
-    icono: "inteligencia_militar",
-    escalon: "Batallón",
-    detalle:
-      "Unidad de inteligencia enemiga asociada a las Fuerzas de Despliegue Rápido.",
-  },
-  {
-    nombre: "Compañía de Inteligencia Mecanizada 31 / Ingeniero Juárez",
-    longitude: -61.842,
-    latitude: -23.907,
-    bando: "enemigo",
-    tipo: "Inteligencia",
-    icono: "inteligencia_militar",
-    escalon: "Compañía",
-    detalle:
-      "Unidad de inteligencia mecanizada enemiga ubicada en Ingeniero Juárez.",
-  },
-];
-
-const BASES_Y_ESTABLECIMIENTOS_ENEMIGOS: BaseMilitar[] = [
-  ...BASES_ENEMIGAS,
-  ...ESTABLECIMIENTOS_EJERCITO_ENEMIGO,
-];
-
-const TODAS_LAS_BASES_Y_ESTABLECIMIENTOS: BaseMilitar[] = [
-  ...BASES_PROPIAS,
-  ...BASES_Y_ESTABLECIMIENTOS_ENEMIGOS,
 ];
 
 const AERONAVES_PROPIAS_POR_BASE: Record<string, string[]> = {
@@ -776,6 +638,7 @@ const CANTIDADES_AERONAVES_PROPIAS: Record<string, number> = {
   "5º Brigada Aérea / Gral. Acha|CH-47F": 6,
 };
 
+
 type DatosDistanciaAerea = {
   km: number;
   termino: string;
@@ -788,267 +651,56 @@ const COLOR_ORDEN = "#16a34a";
 const COLOR_EXTERNO = "#dc2626";
 
 const DATOS_DISTANCIA_AEREA: Record<string, DatosDistanciaAerea> = {
-  "F-16C Block 40": {
-    km: 1370,
-    termino: "Radio de acción",
-    fuente: "orden",
-    referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)",
-    permiteReabastecimiento: true,
-  },
-  "F-16D Block 42": {
-    km: 1370,
-    termino: "Radio de acción",
-    fuente: "orden",
-    referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)",
-    permiteReabastecimiento: true,
-  },
-  "F-16CJ Block 50": {
-    km: 1370,
-    termino: "Radio de acción",
-    fuente: "orden",
-    referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)",
-    permiteReabastecimiento: true,
-  },
-  "AMX A-1M": {
-    km: 889,
-    termino: "Radio de acción",
-    fuente: "orden",
-    referencia: "Orden: 480 MN",
-    permiteReabastecimiento: true,
-  },
-  "Hermes 450": {
-    km: 278,
-    termino: "Radio de acción",
-    fuente: "orden",
-    referencia: "Orden: 150 MN",
-  },
-  "IAI Harpy": {
-    km: 500,
-    termino: "Alcance operativo de empleo único",
-    fuente: "orden",
-    referencia: "Orden: 500 km / 270 MN",
-  },
+  "F-16C Block 40": { km: 1370, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)", permiteReabastecimiento: true },
+  "F-16D Block 42": { km: 1370, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)", permiteReabastecimiento: true },
+  "F-16CJ Block 50": { km: 1370, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 740 MN (valor superior del intervalo 500–740 MN)", permiteReabastecimiento: true },
+  "AMX A-1M": { km: 889, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 480 MN", permiteReabastecimiento: true },
+  "Hermes 450": { km: 278, termino: "Radio de acción", fuente: "orden", referencia: "Orden: 150 MN" },
+  "IAI Harpy": { km: 500, termino: "Alcance operativo de empleo único", fuente: "orden", referencia: "Orden: 500 km / 270 MN" },
 
-  "C-130J": {
-    km: 2000,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado con carga",
-  },
-  "KC-130J": {
-    km: 1833,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "LJ-60": {
-    km: 2220,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance máximo publicado",
-  },
-  "LJ-60 MEDEVAC": {
-    km: 2220,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance máximo publicado",
-  },
-  "DHC-6": {
-    km: 740,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "B-412": {
-    km: 370,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "UH-1Y": {
-    km: 220,
-    termino: "Radio de combate",
-    fuente: "externa",
-    referencia: "Fabricante: 119 MN de radio de combate",
-  },
-  "T-6 Texan II": {
-    km: 830,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "E-99M Erieye": {
-    km: 1529,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia:
-      "Estimado sobre plataforma ERJ-145; la orden solo informa autonomía",
-  },
-  "KC-135": {
-    km: 2778,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Valor público de referencia para misión de reabastecimiento",
-  },
-  "CH-47F": {
-    km: 370,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Valor público de referencia",
-  },
-  "EC-130H Compass Call": {
-    km: 2130,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado de la plataforma",
-  },
+  "C-130J": { km: 2000, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado con carga" },
+  "KC-130J": { km: 1833, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "LJ-60": { km: 2220, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance máximo publicado" },
+  "LJ-60 MEDEVAC": { km: 2220, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance máximo publicado" },
+  "DHC-6": { km: 740, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "B-412": { km: 370, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "UH-1Y": { km: 220, termino: "Radio de combate", fuente: "externa", referencia: "Fabricante: 119 MN de radio de combate" },
+  "T-6 Texan II": { km: 830, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "E-99M Erieye": { km: 1529, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado sobre plataforma ERJ-145; la orden solo informa autonomía" },
+  "KC-135": { km: 2778, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Valor público de referencia para misión de reabastecimiento" },
+  "CH-47F": { km: 370, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Valor público de referencia" },
+  "EC-130H Compass Call": { km: 2130, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado de la plataforma" },
 
-  "KAI KT-1": {
-    km: 650,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "C-98A": {
-    km: 990,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado a partir de aeronave utilitaria equivalente",
-  },
-  "UH-1N": {
-    km: 230,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Valor público aproximado",
-  },
-  "Mirage 2000-5 Mk2": {
-    km: 740,
-    termino: "Radio de combate de referencia",
-    fuente: "externa",
-    referencia: "Valor público aproximado",
-    permiteReabastecimiento: true,
-  },
-  "AS-725 Cougar": {
-    km: 430,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "E-2C AEW&C": {
-    km: 1300,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance de traslado publicado",
-  },
-  "Falcon DA-20": {
-    km: 1700,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "CASA C-295 IVR": {
-    km: 1075,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "C-130H": {
-    km: 1900,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "ERJ-145": {
-    km: 1529,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "Harrier T/AV-8B": {
-    km: 556,
-    termino: "Radio de combate de referencia",
-    fuente: "externa",
-    referencia: "Valor público aproximado",
-    permiteReabastecimiento: true,
-  },
-  "Mi-28D": {
-    km: 225,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Valor público aproximado",
-  },
-  "KC-130H": {
-    km: 1800,
-    termino: "Radio de acción de referencia",
-    fuente: "externa",
-    referencia: "Estimado como 50% del alcance publicado",
-  },
-  "Su-22M4": {
-    km: 575,
-    termino: "Radio de combate de referencia",
-    fuente: "externa",
-    referencia: "Valor público aproximado",
-  },
-  "Geran-2": {
-    km: 2500,
-    termino: "Alcance operativo de empleo único",
-    fuente: "externa",
-    referencia: "Estimación externa; no figura en la orden",
-  },
+  "KAI KT-1": { km: 650, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "C-98A": { km: 990, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado a partir de aeronave utilitaria equivalente" },
+  "UH-1N": { km: 230, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Valor público aproximado" },
+  "Mirage 2000-5 Mk2": { km: 740, termino: "Radio de combate de referencia", fuente: "externa", referencia: "Valor público aproximado", permiteReabastecimiento: true },
+  "AS-725 Cougar": { km: 430, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "E-2C AEW&C": { km: 1300, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance de traslado publicado" },
+  "Falcon DA-20": { km: 1700, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "CASA C-295 IVR": { km: 1075, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "C-130H": { km: 1900, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "ERJ-145": { km: 1529, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "Harrier T/AV-8B": { km: 556, termino: "Radio de combate de referencia", fuente: "externa", referencia: "Valor público aproximado", permiteReabastecimiento: true },
+  "Mi-28D": { km: 225, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Valor público aproximado" },
+  "KC-130H": { km: 1800, termino: "Radio de acción de referencia", fuente: "externa", referencia: "Estimado como 50% del alcance publicado" },
+  "Su-22M4": { km: 575, termino: "Radio de combate de referencia", fuente: "externa", referencia: "Valor público aproximado" },
+  "Geran-2": { km: 2500, termino: "Alcance operativo de empleo único", fuente: "externa", referencia: "Estimación externa; no figura en la orden" },
 };
 
 function datosDistanciaAerea(nombre: string): DatosDistanciaAerea {
-  return (
-    DATOS_DISTANCIA_AEREA[nombre] ?? {
-      km: 0,
-      termino: "Radio de acción",
-      fuente: "manual",
-      referencia: "Sin valor precargado",
-    }
-  );
+  return DATOS_DISTANCIA_AEREA[nombre] ?? {
+    km: 0,
+    termino: "Radio de acción",
+    fuente: "manual",
+    referencia: "Sin valor precargado",
+  };
 }
 
 function radioAereoRepresentado(elemento: ElementoOperacional) {
   if (elemento.tipo !== "aeronave") return elemento.alcanceKm;
   const multiplicador = elemento.conReabastecimiento ? 2 : 1;
   return elemento.radioCombateKm * multiplicador;
-}
-
-function inferirTipoPersonalizado(
-  nombre: string,
-  iconoTipo: string,
-): TipoElemento {
-  const texto = `${nombre} ${iconoTipo}`
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  if (texto.includes("radar") || texto.includes("sensor")) return "radar";
-  if (
-    texto.includes("antiaerea") ||
-    texto.includes("misil") ||
-    texto.includes("defensa")
-  )
-    return "defensa";
-  if (
-    texto.includes("aeronave") ||
-    texto.includes("ala_fija") ||
-    texto.includes("ala_rotativa") ||
-    texto.includes("helicoptero") ||
-    texto.includes("uav")
-  )
-    return "aeronave";
-  if (
-    texto.includes("naval") ||
-    texto.includes("buque") ||
-    texto.includes("fragata") ||
-    texto.includes("corbeta") ||
-    texto.includes("submarino") ||
-    texto.includes("barco") ||
-    texto.includes("superficie")
-  )
-    return "naval";
-  return "terrestre";
 }
 
 const CATALOGO_AERONAVES_PROPIAS: AeronaveCatalogo[] = Object.entries(
@@ -1063,8 +715,7 @@ const CATALOGO_AERONAVES_PROPIAS: AeronaveCatalogo[] = Object.entries(
     terminoDistancia: datosDistanciaAerea(nombre).termino,
     fuenteDistancia: datosDistanciaAerea(nombre).fuente,
     referenciaDistancia: datosDistanciaAerea(nombre).referencia,
-    permiteReabastecimiento:
-      datosDistanciaAerea(nombre).permiteReabastecimiento,
+    permiteReabastecimiento: datosDistanciaAerea(nombre).permiteReabastecimiento,
   })),
 );
 
@@ -1081,8 +732,7 @@ const CATALOGO_AERONAVES_ENEMIGAS: AeronaveCatalogo[] = Object.entries(
     terminoDistancia: datosDistanciaAerea(medio.nombre).termino,
     fuenteDistancia: datosDistanciaAerea(medio.nombre).fuente,
     referenciaDistancia: datosDistanciaAerea(medio.nombre).referencia,
-    permiteReabastecimiento: datosDistanciaAerea(medio.nombre)
-      .permiteReabastecimiento,
+    permiteReabastecimiento: datosDistanciaAerea(medio.nombre).permiteReabastecimiento,
   })),
 );
 
@@ -1195,235 +845,51 @@ const CATALOGO_DEFENSA_PROPIA: MedioCatalogo[] = [
 
 const CATALOGO_DEFENSA_ENEMIGA: MedioCatalogo[] = [
   ...[
-    [
-      "Ala Aérea n.º 2 / Sáenz Peña",
-      "SA-29",
-      6.5,
-      undefined,
-      "Sistema SA-29; cantidad no indicada en la orden",
-    ],
-    [
-      "Ala Aérea n.º 2 / Sáenz Peña",
-      "ZSU-23-2",
-      2.5,
-      undefined,
-      "Sistema ZSU-23-2; no se aplica el alcance del ZSU-23-4 Shilka por tratarse de otro modelo",
-    ],
-    [
-      "Ala Aérea n.º 2 / Sáenz Peña",
-      "SA-8 Osa-AK",
-      30,
-      5,
-      "Radar asociado: Land Roll",
-    ],
+    ["Ala Aérea n.º 2 / Sáenz Peña", "SA-29", 6.5, undefined, "Sistema SA-29; cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 2 / Sáenz Peña", "ZSU-23-2", 2.5, undefined, "Sistema ZSU-23-2; no se aplica el alcance del ZSU-23-4 Shilka por tratarse de otro modelo"],
+    ["Ala Aérea n.º 2 / Sáenz Peña", "SA-8 Osa-AK", 30, 5, "Radar asociado: Land Roll"],
 
-    [
-      "Ala Aérea n.º 3 / Salta",
-      "S-300 PMU-1",
-      150,
-      undefined,
-      'Radar asociado: 30N6E "Flap Lid"',
-    ],
-    [
-      "Ala Aérea n.º 3 / Salta",
-      "Improved HAWK",
-      70,
-      2,
-      "Radares asociados: AN/MPQ-46 / AN/MPQ-61",
-    ],
+    ["Ala Aérea n.º 3 / Salta", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 3 / Salta", "Improved HAWK", 70, 2, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
     ["Ala Aérea n.º 3 / Salta", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
-    [
-      "Ala Aérea n.º 3 / Salta",
-      "ZSU-23-2",
-      2.5,
-      undefined,
-      "Modelo indicado por la orden; distinto del ZSU-23-4 Shilka",
-    ],
-    [
-      "Ala Aérea n.º 3 / Salta",
-      "SA-29",
-      6.5,
-      undefined,
-      "Cantidad no indicada en la orden",
-    ],
+    ["Ala Aérea n.º 3 / Salta", "ZSU-23-2", 2.5, undefined, "Modelo indicado por la orden; distinto del ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 3 / Salta", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
 
-    [
-      "Ala Aérea n.º 4 / Catamarca",
-      "S-300 PMU-1",
-      150,
-      undefined,
-      'Radar asociado: 30N6E "Flap Lid"',
-    ],
-    [
-      "Ala Aérea n.º 4 / Catamarca",
-      "Pantsir-S1",
-      28,
-      2,
-      "Radar asociado: 1RS2-1E",
-    ],
-    [
-      "Ala Aérea n.º 4 / Catamarca",
-      "SA-8 Osa-AK",
-      30,
-      4,
-      "Radar asociado: Land Roll",
-    ],
-    [
-      "Ala Aérea n.º 4 / Catamarca",
-      "ZSU-23",
-      2.5,
-      undefined,
-      "La orden no confirma que sea ZSU-23-4 Shilka",
-    ],
-    [
-      "Ala Aérea n.º 4 / Catamarca",
-      "SA-29",
-      6.5,
-      undefined,
-      "Cantidad no indicada en la orden",
-    ],
+    ["Ala Aérea n.º 4 / Catamarca", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 4 / Catamarca", "Pantsir-S1", 28, 2, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 4 / Catamarca", "SA-8 Osa-AK", 30, 4, "Radar asociado: Land Roll"],
+    ["Ala Aérea n.º 4 / Catamarca", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 4 / Catamarca", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
 
-    [
-      "Ala Aérea n.º 5 / Tucumán",
-      "Improved HAWK",
-      70,
-      undefined,
-      "Radares asociados: AN/MPQ-46 / AN/MPQ-61",
-    ],
-    [
-      "Ala Aérea n.º 5 / Tucumán",
-      "ZSU-23",
-      2.5,
-      undefined,
-      "La orden no confirma que sea ZSU-23-4 Shilka",
-    ],
-    [
-      "Ala Aérea n.º 5 / Tucumán",
-      "SA-29",
-      6.5,
-      undefined,
-      "Cantidad no indicada en la orden",
-    ],
+    ["Ala Aérea n.º 5 / Tucumán", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 5 / Tucumán", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 5 / Tucumán", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
 
-    [
-      "Ala Aérea n.º 6 / Formosa",
-      "Improved HAWK",
-      70,
-      undefined,
-      "Radares asociados: AN/MPQ-46 / AN/MPQ-61",
-    ],
-    [
-      "Ala Aérea n.º 6 / Formosa",
-      "Pantsir-S1",
-      28,
-      4,
-      "Radar asociado: 1RS2-1E",
-    ],
-    [
-      "Ala Aérea n.º 6 / Formosa",
-      "SA-29",
-      6.5,
-      undefined,
-      "Cantidad no indicada en la orden",
-    ],
-    [
-      "Ala Aérea n.º 6 / Formosa",
-      "ZSU-23",
-      2.5,
-      undefined,
-      "La orden no confirma que sea ZSU-23-4 Shilka",
-    ],
+    ["Ala Aérea n.º 6 / Formosa", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 6 / Formosa", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 6 / Formosa", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 6 / Formosa", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
 
-    [
-      "Ala Aérea n.º 7 / Belén",
-      "S-300 PMU-1",
-      150,
-      undefined,
-      'Radar asociado: 30N6E "Flap Lid"',
-    ],
-    [
-      "Ala Aérea n.º 7 / Belén",
-      "SA-8 Osa-AK",
-      30,
-      5,
-      "Radar asociado: Land Roll",
-    ],
-    [
-      "Ala Aérea n.º 7 / Belén",
-      "SA-29",
-      6.5,
-      undefined,
-      "Cantidad no indicada en la orden",
-    ],
-    [
-      "Ala Aérea n.º 7 / Belén",
-      "ZSU-23",
-      2.5,
-      undefined,
-      "La orden no confirma que sea ZSU-23-4 Shilka",
-    ],
+    ["Ala Aérea n.º 7 / Belén", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 7 / Belén", "SA-8 Osa-AK", 30, 5, "Radar asociado: Land Roll"],
+    ["Ala Aérea n.º 7 / Belén", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 7 / Belén", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
 
-    [
-      "Ala Aérea n.º 8 / Tartagal",
-      "Improved HAWK",
-      70,
-      undefined,
-      "Radares asociados: AN/MPQ-46 / AN/MPQ-61",
-    ],
-    [
-      "Ala Aérea n.º 8 / Tartagal",
-      "SA-29",
-      6.5,
-      undefined,
-      "Cantidad no indicada en la orden",
-    ],
-    [
-      "Ala Aérea n.º 8 / Tartagal",
-      "ZSU-23",
-      2.5,
-      undefined,
-      "La orden no confirma que sea ZSU-23-4 Shilka",
-    ],
+    ["Ala Aérea n.º 8 / Tartagal", "Improved HAWK", 70, undefined, "Radares asociados: AN/MPQ-46 / AN/MPQ-61"],
+    ["Ala Aérea n.º 8 / Tartagal", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
+    ["Ala Aérea n.º 8 / Tartagal", "ZSU-23", 2.5, undefined, "La orden no confirma que sea ZSU-23-4 Shilka"],
 
-    [
-      "Ala Aérea n.º 9 / Las Lomitas",
-      "S-300 PMU-1",
-      150,
-      undefined,
-      'Radar asociado: 30N6E "Flap Lid"',
-    ],
-    [
-      "Ala Aérea n.º 9 / Las Lomitas",
-      "Pantsir-S1",
-      28,
-      4,
-      "Radar asociado: 1RS2-1E",
-    ],
-    [
-      "Ala Aérea n.º 9 / Las Lomitas",
-      "ZSU-23-2",
-      2.5,
-      undefined,
-      "Modelo indicado por la orden; distinto del ZSU-23-4 Shilka",
-    ],
-    [
-      "Ala Aérea n.º 9 / Las Lomitas",
-      "SA-29",
-      6.5,
-      undefined,
-      "Cantidad no indicada en la orden",
-    ],
+    ["Ala Aérea n.º 9 / Las Lomitas", "S-300 PMU-1", 150, undefined, 'Radar asociado: 30N6E "Flap Lid"'],
+    ["Ala Aérea n.º 9 / Las Lomitas", "Pantsir-S1", 28, 4, "Radar asociado: 1RS2-1E"],
+    ["Ala Aérea n.º 9 / Las Lomitas", "ZSU-23-2", 2.5, undefined, "Modelo indicado por la orden; distinto del ZSU-23-4 Shilka"],
+    ["Ala Aérea n.º 9 / Las Lomitas", "SA-29", 6.5, undefined, "Cantidad no indicada en la orden"],
   ].map(([base, nombre, alcanceKm, cantidad, descripcion]) => {
     const referencias: Record<string, string> = {
-      "S-300 PMU-1":
-        'Dato aportado para el ejercicio: 30N6E "Flap Lid", 150 km / 81 MN',
-      "Improved HAWK":
-        "Dato aportado para el ejercicio: AN/MPQ-46 / AN/MPQ-61, 70 km / 38 MN",
+      "S-300 PMU-1": 'Dato aportado para el ejercicio: 30N6E "Flap Lid", 150 km / 81 MN',
+      "Improved HAWK": "Dato aportado para el ejercicio: AN/MPQ-46 / AN/MPQ-61, 70 km / 38 MN",
       "Pantsir-S1": "Dato aportado para el ejercicio: 1RS2-1E, 28 km / 15 MN",
-      "SA-8 Osa-AK":
-        "Dato aportado para el ejercicio: Land Roll, 30 km / 16 MN",
-      "ZSU-23-4 Shilka":
-        'Dato aportado para el ejercicio: RPK-2 "Gun Dish", 20 km / 11 MN',
+      "SA-8 Osa-AK": "Dato aportado para el ejercicio: Land Roll, 30 km / 16 MN",
+      "ZSU-23-4 Shilka": 'Dato aportado para el ejercicio: RPK-2 "Gun Dish", 20 km / 11 MN',
     };
 
     return {
@@ -1770,43 +1236,6 @@ function familiaIconoMedio(elemento: ElementoOperacional) {
     return elemento.iconoTipo;
   }
 
-  if (elemento.tipo === "naval") {
-    if (texto.includes("submarino")) {
-      return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
-    }
-    if (
-      texto.includes("buque") ||
-      texto.includes("fragata") ||
-      texto.includes("corbeta") ||
-      texto.includes("naval") ||
-      texto.includes("barco")
-    ) {
-      return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
-    }
-    return `base_naval__${afiliacionIcono(elemento.bando)}.png`;
-  }
-
-  if (elemento.tipo === "terrestre") {
-    if (
-      texto.includes("logistic") ||
-      texto.includes("logística") ||
-      texto.includes("logistica") ||
-      texto.includes("abastecimiento") ||
-      texto.includes("deposito") ||
-      texto.includes("depósito")
-    ) {
-      return `logistica__${afiliacionIcono(elemento.bando)}.png`;
-    }
-    if (
-      texto.includes("comando") ||
-      texto.includes("coae") ||
-      texto.includes("c2")
-    ) {
-      return `centro_conjunto_de_inteligencia__${afiliacionIcono(elemento.bando)}.png`;
-    }
-    return `equipo_terrestre__${afiliacionIcono(elemento.bando)}.png`;
-  }
-
   if (elemento.tipo === "radar") {
     return `radar__${afiliacionIcono(elemento.bando)}.png`;
   }
@@ -1961,11 +1390,7 @@ function obtenerMaximoSlider(elemento: ElementoOperacional) {
       ? 5000
       : elemento.tipo === "radar"
         ? 1200
-        : elemento.tipo === "naval"
-          ? 1200
-          : elemento.tipo === "terrestre"
-            ? 800
-            : 400;
+        : 400;
 
   return Math.max(base, Math.ceil(valorActual * 1.5));
 }
@@ -1993,17 +1418,14 @@ export default function MapEditor({
   const oceanosRef = useRef<Record<string, maplibregl.Marker>>({});
   const basesRef = useRef<Record<string, maplibregl.Marker>>({});
   const coaeRef = useRef<maplibregl.Marker | null>(null);
-  const coaeEnemigoRef = useRef<maplibregl.Marker | null>(null);
   const comunicacionesRef = useRef<Record<string, maplibregl.Marker>>({});
   const laboratorioTritioRef = useRef<maplibregl.Marker | null>(null);
   const dimensionesTonRef = useRef<Record<string, maplibregl.Marker>>({});
   const medicionMarkersRef = useRef<maplibregl.Marker[]>([]);
   const modoMedicionRef = useRef(false);
-  const modoAtaqueRef = useRef(false);
 
   const [mapReady, setMapReady] = useState(false);
-  const [elementos, setElementos] =
-    useState<ElementoOperacional[]>(initialElements);
+  const [elementos, setElementos] = useState<ElementoOperacional[]>(initialElements);
   const [seleccionadoId, setSeleccionadoId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -2029,70 +1451,27 @@ export default function MapEditor({
     });
   }, [followedElements, initialElements]);
 
-  const [vistaFuerzas, setVistaFuerzas] = useState<VistaFuerzas>(
-    (ajustesIniciales.vistaFuerzas as VistaFuerzas | undefined) ?? "ambas",
-  );
+  const [vistaFuerzas, setVistaFuerzas] = useState<VistaFuerzas>((ajustesIniciales.vistaFuerzas as VistaFuerzas | undefined) ?? "ambas");
 
-  const [mostrarRepublicas, setMostrarRepublicas] = useState(
-    capasIniciales.republicas ?? true,
-  );
-  const [mostrarEntornoGeografico, setMostrarEntornoGeografico] = useState(
-    capasIniciales.entornoGeografico ?? true,
-  );
+  const [mostrarRepublicas, setMostrarRepublicas] = useState(capasIniciales.republicas ?? true);
+  const [mostrarEntornoGeografico, setMostrarEntornoGeografico] =
+    useState(capasIniciales.entornoGeografico ?? true);
   const [mostrarTon, setMostrarTon] = useState(capasIniciales.ton ?? true);
-  const [mostrarBases, setMostrarBases] = useState(
-    capasIniciales.bases ?? true,
-  );
-  const [mostrarComunicaciones, setMostrarComunicaciones] = useState(
-    capasIniciales.comunicaciones ?? false,
-  );
-  const [mostrarAeronaves, setMostrarAeronaves] = useState(
-    capasIniciales.aeronaves ?? true,
-  );
-  const [mostrarRadares, setMostrarRadares] = useState(
-    capasIniciales.radares ?? true,
-  );
-  const [mostrarDefensa, setMostrarDefensa] = useState(
-    capasIniciales.defensa ?? true,
-  );
-  const [mostrarRelieve, setMostrarRelieve] = useState(
-    capasIniciales.relieve ?? false,
-  );
+  const [mostrarBases, setMostrarBases] = useState(capasIniciales.bases ?? true);
+  const [mostrarComunicaciones, setMostrarComunicaciones] = useState(capasIniciales.comunicaciones ?? false);
+  const [mostrarAeronaves, setMostrarAeronaves] = useState(capasIniciales.aeronaves ?? true);
+  const [mostrarRadares, setMostrarRadares] = useState(capasIniciales.radares ?? true);
+  const [mostrarDefensa, setMostrarDefensa] = useState(capasIniciales.defensa ?? true);
+  const [mostrarRelieve, setMostrarRelieve] = useState(capasIniciales.relieve ?? false);
   const [mostrarRios, setMostrarRios] = useState(capasIniciales.rios ?? false);
-  const [mostrarGrilla, setMostrarGrilla] = useState(
-    capasIniciales.grilla ?? false,
-  );
-  const [intervaloGrilla, setIntervaloGrilla] = useState(
-    Number(ajustesIniciales.intervaloGrilla ?? 2),
-  );
-  const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(
-    capasIniciales.dimensionesTon ?? false,
-  );
+  const [mostrarGrilla, setMostrarGrilla] = useState(capasIniciales.grilla ?? false);
+  const [intervaloGrilla, setIntervaloGrilla] = useState(Number(ajustesIniciales.intervaloGrilla ?? 2));
+  const [mostrarDimensionesTon, setMostrarDimensionesTon] = useState(capasIniciales.dimensionesTon ?? false);
   const [modoMedicion, setModoMedicion] = useState(false);
-  const [ordenPaneles, setOrdenPaneles] = useState<PanelId[]>(
-    initialState?.panelOrder?.length
-      ? initialState.panelOrder
-      : ORDEN_PANELES_INICIAL,
-  );
+  const [ordenPaneles, setOrdenPaneles] = useState<PanelId[]>(initialState?.panelOrder?.length ? initialState.panelOrder : ORDEN_PANELES_INICIAL);
   const panelArrastradoRef = useRef<PanelId | null>(null);
   const [puntosMedicion, setPuntosMedicion] = useState<PuntoMedicion[]>([]);
   const [distanciaMedicionKm, setDistanciaMedicionKm] = useState(0);
-  const [modoAtaqueActivo, setModoAtaqueActivo] = useState(false);
-  const [medioAtaque, setMedioAtaque] = useState(
-    (ajustesIniciales.medioAtaque as string | undefined) ??
-      "F-16CJ / AGM-88C HARM",
-  );
-  const [puntosAtaque, setPuntosAtaque] = useState<PuntoAtaque[]>(() =>
-    ((ajustesIniciales.puntosAtaque as PuntoAtaque[] | undefined) ?? []).map(
-      (punto, indice) => ({
-        id: punto.id ?? crearId(),
-        orden: punto.orden ?? indice + 1,
-        coordenadas: punto.coordenadas,
-      }),
-    ),
-  );
-  const [latitudAtaque, setLatitudAtaque] = useState("");
-  const [longitudAtaque, setLongitudAtaque] = useState("");
   const [coordenadasCursor, setCoordenadasCursor] = useState({
     latitud: -35.5,
     longitud: -64.5,
@@ -2103,10 +1482,8 @@ export default function MapEditor({
 
   const [mascarasVisibles, setMascarasVisibles] = useState<
     Record<string, boolean>
-  >(
-    () =>
-      (ajustesIniciales.mascarasVisibles as
-        Record<string, boolean> | undefined) ??
+  >(() =>
+    (ajustesIniciales.mascarasVisibles as Record<string, boolean> | undefined) ??
       Object.fromEntries(
         MASCARAS_RADAR.map((mascara) => [
           mascara.id,
@@ -2117,10 +1494,8 @@ export default function MapEditor({
 
   const [coloresMascaras, setColoresMascaras] = useState<
     Record<string, string>
-  >(
-    () =>
-      (ajustesIniciales.coloresMascaras as
-        Record<string, string> | undefined) ??
+  >(() =>
+    (ajustesIniciales.coloresMascaras as Record<string, string> | undefined) ??
       Object.fromEntries(
         MASCARAS_RADAR.map((mascara) => [mascara.id, mascara.color]),
       ),
@@ -2128,37 +1503,24 @@ export default function MapEditor({
 
   const [coloresRepublicas, setColoresRepublicas] = useState<
     Record<string, string>
-  >(
-    (ajustesIniciales.coloresRepublicas as
-      Record<string, string> | undefined) ?? {
-      ...COLORES_REPUBLICAS,
-    },
-  );
+  >((ajustesIniciales.coloresRepublicas as Record<string, string> | undefined) ?? {
+    ...COLORES_REPUBLICAS,
+  });
 
   const [basesVisibles, setBasesVisibles] = useState<Record<string, boolean>>(
     () =>
       (ajustesIniciales.basesVisibles as Record<string, boolean> | undefined) ??
       Object.fromEntries(
-        TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.map((base) => [base.nombre, true]),
+        [...BASES_PROPIAS, ...BASES_ENEMIGAS].map((base) => [
+          base.nombre,
+          true,
+        ]),
       ),
   );
 
-  const [mostrarLaboratorioTritio, setMostrarLaboratorioTritio] =
-    useState<boolean>(
-      () =>
-        (ajustesIniciales.mostrarLaboratorioTritio as boolean | undefined) ??
-        true,
-    );
-
-  const [mostrarCOAe, setMostrarCOAe] = useState<boolean>(
-    () => (ajustesIniciales.mostrarCOAe as boolean | undefined) ?? true,
-  );
-
-  const [mostrarCOAeEnemigo, setMostrarCOAeEnemigo] = useState<boolean>(
-    () => (ajustesIniciales.mostrarCOAeEnemigo as boolean | undefined) ?? true,
-  );
-
   const [nombrePersonalizado, setNombrePersonalizado] = useState("");
+  const [tipoPersonalizado, setTipoPersonalizado] =
+    useState<TipoElemento>("aeronave");
   const [bandoPersonalizado, setBandoPersonalizado] = useState<Bando>("propio");
   const [basePersonalizada, setBasePersonalizada] = useState(
     BASES_PROPIAS[0]?.nombre ?? "",
@@ -2195,27 +1557,6 @@ export default function MapEditor({
     [elementos, seleccionadoId],
   );
 
-  useEffect(() => {
-    if (readOnly) return;
-
-    function manejarTecla(event: KeyboardEvent) {
-      if (event.key !== "Delete" && event.key !== "Suprimir") return;
-      const objetivo = event.target as HTMLElement | null;
-      if (
-        objetivo &&
-        ["INPUT", "TEXTAREA", "SELECT"].includes(objetivo.tagName)
-      )
-        return;
-      if (!seleccionadoId) return;
-
-      event.preventDefault();
-      eliminarElemento(seleccionadoId);
-    }
-
-    window.addEventListener("keydown", manejarTecla);
-    return () => window.removeEventListener("keydown", manejarTecla);
-  }, [readOnly, seleccionadoId]);
-
   const mostrarControlesPropios =
     vistaFuerzas === "propias" || vistaFuerzas === "ambas";
 
@@ -2237,70 +1578,37 @@ export default function MapEditor({
   const iconosFiltrados = useMemo(() => {
     const termino = busquedaIcono.trim().toLowerCase();
 
-    return catalogoIconos.filter((icono) => {
-      const coincideBando =
-        icono.afiliacion === afiliacionIcono(bandoPersonalizado) ||
-        icono.afiliacion === "neutral" ||
-        icono.afiliacion === "desconocido";
+    return catalogoIconos
+      .filter((icono) => {
+        const coincideBando =
+          icono.afiliacion === afiliacionIcono(bandoPersonalizado) ||
+          icono.afiliacion === "neutral" ||
+          icono.afiliacion === "desconocido";
 
-      const coincideTexto =
-        termino.length === 0 ||
-        icono.nombre.toLowerCase().includes(termino) ||
-        icono.archivo.toLowerCase().includes(termino);
+        const coincideTexto =
+          termino.length === 0 ||
+          icono.nombre.toLowerCase().includes(termino) ||
+          icono.archivo.toLowerCase().includes(termino);
 
-      return coincideBando && coincideTexto;
-    });
+        return coincideBando && coincideTexto;
+      })
+      .slice(0, 120);
   }, [catalogoIconos, busquedaIcono, bandoPersonalizado]);
 
-  function crearAnillosElemento(elemento: ElementoOperacional) {
-    const anillos: GeoJSON.Feature[] = [];
+  function crearAnillo(elemento: ElementoOperacional) {
     const radio = radioAereoRepresentado(elemento);
 
-    if (radio > 0 && debeMostrarAnillo(elemento)) {
-      anillos.push(
-        circle([elemento.longitude, elemento.latitude], radio, {
-          steps: 128,
-          units: "kilometers",
-          properties: {
-            id: elemento.id,
-            nombre: elemento.nombre,
-            tipo: elemento.tipo,
-            bando: elemento.bando,
-            color: elemento.color,
-            clase: "alcance",
-          },
-        }) as GeoJSON.Feature,
-      );
-    }
-
-    if (
-      elemento.tipo === "aeronave" &&
-      elemento.mostrarRadar &&
-      (elemento.alcanceRadarKm ?? 0) > 0 &&
-      bandoVisible(elemento.bando, vistaFuerzas) &&
-      mostrarAeronaves
-    ) {
-      anillos.push(
-        circle(
-          [elemento.longitude, elemento.latitude],
-          elemento.alcanceRadarKm ?? 0,
-          {
-            steps: 128,
-            units: "kilometers",
-            properties: {
-              id: `${elemento.id}-radar`,
-              nombre: `${elemento.nombre} - radar`,
-              tipo: "radar-aeronave",
-              bando: elemento.bando,
-              color: elemento.bando === "propio" ? "#38bdf8" : "#f97316",
-              clase: "radar",
-            },
-          },
-        ) as GeoJSON.Feature,
-      );
-    }
-
-    return anillos;
+    return circle([elemento.longitude, elemento.latitude], radio, {
+      steps: 128,
+      units: "kilometers",
+      properties: {
+        id: elemento.id,
+        nombre: elemento.nombre,
+        tipo: elemento.tipo,
+        bando: elemento.bando,
+        color: elemento.color,
+      },
+    });
   }
 
   function debeMostrarAnillo(elemento: ElementoOperacional) {
@@ -2346,7 +1654,7 @@ export default function MapEditor({
 
     source.setData({
       type: "FeatureCollection",
-      features: lista.flatMap(crearAnillosElemento),
+      features: lista.filter(debeMostrarAnillo).map(crearAnillo),
     });
   }
 
@@ -2458,7 +1766,8 @@ export default function MapEditor({
                 : "#991b1b",
       cantidad: medio.cantidad,
       descripcion: medio.descripcion,
-      terminoDistancia: medio.terminoDistancia ?? "Alcance máximo del sistema",
+      terminoDistancia:
+        medio.terminoDistancia ?? "Alcance máximo del sistema",
       fuenteDistancia: medio.fuenteDistancia,
       referenciaDistancia: medio.referenciaDistancia,
     };
@@ -2488,29 +1797,26 @@ export default function MapEditor({
     const nombre = nombrePersonalizado.trim();
     if (!nombre) return;
 
-    const tipoInferido = inferirTipoPersonalizado(
-      nombre,
-      iconoTipoPersonalizado,
-    );
+    const base = obtenerBase(basePersonalizada);
+    const centro = mapRef.current?.getCenter();
 
     const nuevo: ElementoOperacional = {
       id: crearId(),
       visible: true,
       bando: bandoPersonalizado,
-      tipo: tipoInferido,
+      tipo: tipoPersonalizado,
       nombre,
-      baseOrigen: "Ubicación inicial oceánica",
-      longitude: POSICION_INICIAL_MEDIO_PERSONALIZADO.longitude,
-      latitude: POSICION_INICIAL_MEDIO_PERSONALIZADO.latitude,
-      radioCombateKm: tipoInferido === "aeronave" ? alcancePersonalizado : 0,
-      alcanceKm: tipoInferido === "aeronave" ? 0 : alcancePersonalizado,
+      baseOrigen: base?.nombre ?? "Ubicación personalizada",
+      longitude: base?.longitude ?? centro?.lng ?? -64.5,
+      latitude: base?.latitude ?? centro?.lat ?? -35.5,
+      radioCombateKm:
+        tipoPersonalizado === "aeronave" ? alcancePersonalizado : 0,
+      alcanceKm: tipoPersonalizado === "aeronave" ? 0 : alcancePersonalizado,
       mostrarAnillo: alcancePersonalizado > 0,
       color: colorPersonalizado,
       iconoPersonalizado,
       iconoTipo: iconoTipoPersonalizado,
       descripcion: "Medio personalizado",
-      mostrarRadar: false,
-      alcanceRadarKm: 0,
     };
 
     setElementos((anteriores) => [...anteriores, nuevo]);
@@ -2585,21 +1891,13 @@ export default function MapEditor({
 
     const imagen = document.createElement("img");
     const familia =
-      base.icono ??
-      (base.tipo === "Estación radar"
+      base.tipo === "Estación radar"
         ? "radar"
         : base.tipo === "Centro de comando"
           ? "puesto_de_mando"
           : base.tipo === "Apoyo logístico"
             ? "instalacion"
-            : base.tipo === "Inteligencia"
-              ? "inteligencia_militar"
-              : base.tipo === "Ingenieros"
-                ? "produccion_de_equipos_de_ingenieros"
-                : base.tipo === "Unidad terrestre" ||
-                    base.tipo === "Fuerza de despliegue rápido"
-                  ? "equipo_terrestre"
-                  : ICONO_BASE);
+            : ICONO_BASE;
 
     imagen.src = `/data/iconos/simbologia/${familia}__${afiliacionIcono(
       base.bando,
@@ -2660,8 +1958,6 @@ export default function MapEditor({
         <em>${base.tipo} — ${
           base.bando === "propio" ? "PROPIO" : "ENEMIGO"
         }</em>
-        ${base.escalon ? `<br /><strong>Escalón:</strong> ${base.escalon}` : ""}
-        ${base.detalle ? `<br /><br /><span>${base.detalle}</span>` : ""}
         <hr style="margin:8px 0;border:0;border-top:1px solid #475569" />
         <strong>Aeronaves:</strong><br />${listar(aeronaves)}
         <br /><br />
@@ -2729,10 +2025,7 @@ export default function MapEditor({
       },
 
       onDragStart: (event: DragEvent<HTMLElement>) => {
-        if (readOnly) {
-          event.preventDefault();
-          return;
-        }
+        if (readOnly) { event.preventDefault(); return; }
         panelArrastradoRef.current = id;
 
         event.dataTransfer.effectAllowed = "move";
@@ -2783,321 +2076,6 @@ export default function MapEditor({
       map.getCanvas().style.cursor = modoMedicion ? "crosshair" : "";
     }
   }, [modoMedicion]);
-
-  function agregarPuntoMedicion(coordenadas: PuntoMedicion) {
-    const map = mapRef.current;
-
-    setPuntosMedicion((anteriores) => {
-      const nuevos = [...anteriores, coordenadas];
-      const source = map?.getSource("medicion") as
-        maplibregl.GeoJSONSource | undefined;
-
-      const features: GeoJSON.Feature[] = nuevos.map((coordenada) => ({
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "Point",
-          coordinates: coordenada,
-        },
-      }));
-
-      let distancia = 0;
-
-      if (nuevos.length >= 2) {
-        const linea = lineString(nuevos);
-        distancia = turfLength(linea, {
-          units: "kilometers",
-        });
-        features.push(linea);
-      }
-
-      source?.setData({
-        type: "FeatureCollection",
-        features,
-      });
-
-      setDistanciaMedicionKm(distancia);
-      return nuevos;
-    });
-  }
-
-  function habilitarMedicionSobreMarcador(
-    marker: maplibregl.Marker,
-    coordenadas: PuntoMedicion,
-  ) {
-    marker.getElement().addEventListener("click", (event) => {
-      if (!modoMedicionRef.current) return;
-      event.preventDefault();
-      event.stopPropagation();
-      agregarPuntoMedicion(coordenadas);
-    });
-  }
-
-  function actualizarFuentePlanAtaque(lista: PuntoAtaque[]) {
-    const map = mapRef.current;
-    if (!map) return;
-
-    const source = map.getSource("plan-ataque") as
-      maplibregl.GeoJSONSource | undefined;
-
-    if (!source) return;
-
-    const features: GeoJSON.Feature[] = lista.map((punto, indice) => ({
-      type: "Feature",
-      properties: {
-        id: punto.id,
-        orden: indice + 1,
-        etiqueta: `${indice + 1}`,
-        tipo:
-          indice === lista.length - 1 && lista.length >= 2
-            ? "impacto"
-            : "punto",
-        medio: medioAtaque,
-      },
-      geometry: {
-        type: "Point",
-        coordinates: punto.coordenadas,
-      },
-    }));
-
-    if (lista.length >= 2) {
-      features.unshift({
-        type: "Feature",
-        properties: { tipo: "ruta", medio: medioAtaque },
-        geometry: {
-          type: "LineString",
-          coordinates: lista.map((punto) => punto.coordenadas),
-        },
-      });
-    }
-
-    source.setData({
-      type: "FeatureCollection",
-      features,
-    });
-  }
-
-
-  function elementosPlanAtaqueActual(): ElementoOperacional[] {
-    const routeId = `${workspaceCode ?? "mapa"}-plan-ataque`;
-
-    return puntosAtaque.map((punto, indice) => {
-      const rol =
-        indice === 0
-          ? "origen"
-          : indice === puntosAtaque.length - 1 && puntosAtaque.length >= 2
-            ? "impacto"
-            : "ruta";
-
-      return {
-        id: `${routeId}-${punto.id}`,
-        visible: true,
-        bando: "propio",
-        tipo: "aeronave",
-        nombre: `${medioAtaque || "Medio de ataque"} / ${rol === "impacto" ? "Impacto" : `Punto ${indice + 1}`}`,
-        baseOrigen: "Planificador de ataque aéreo",
-        longitude: punto.coordenadas[0],
-        latitude: punto.coordenadas[1],
-        radioCombateKm: 0,
-        alcanceKm: 0,
-        mostrarAnillo: false,
-        color: rol === "impacto" ? "#f97316" : "#ef4444",
-        descripcion:
-          rol === "impacto"
-            ? "Punto de impacto / explosión del ataque planificado."
-            : "Punto de ruta del ataque planificado.",
-        operationTask: "Ataque aéreo",
-        operationMission: "Plan de ataque trazado por la célula",
-        operationNotes: `Ruta de ataque con ${puntosAtaque.length} punto(s). Medio: ${medioAtaque}.`,
-        sharedWithCommander: true,
-        sharedWithJem: true,
-        sharedWithOtherCells: false,
-        classification: "uso_interno",
-        originWorkspaceCode: workspaceCode,
-        attackRouteId: routeId,
-        attackMedium: medioAtaque,
-        attackPointOrder: indice + 1,
-        attackPointRole: rol,
-      };
-    });
-  }
-
-  function actualizarFuentePlanesAtaqueCompartidos(listaElementos: ElementoOperacional[]) {
-    const map = mapRef.current;
-    if (!map) return;
-
-    const source = map.getSource("planes-ataque-compartidos") as
-      maplibregl.GeoJSONSource | undefined;
-
-    if (!source) return;
-
-    const puntos = listaElementos.filter(
-      (elemento) =>
-        elemento.sharedExternal &&
-        elemento.attackRouteId &&
-        typeof elemento.attackPointOrder === "number",
-    );
-
-    const porRuta = new Map<string, ElementoOperacional[]>();
-    puntos.forEach((elemento) => {
-      const id = elemento.attackRouteId ?? "ruta";
-      porRuta.set(id, [...(porRuta.get(id) ?? []), elemento]);
-    });
-
-    const features: GeoJSON.Feature[] = [];
-
-    porRuta.forEach((grupo, routeId) => {
-      const ordenados = [...grupo].sort(
-        (a, b) => (a.attackPointOrder ?? 0) - (b.attackPointOrder ?? 0),
-      );
-
-      if (ordenados.length >= 2) {
-        features.push({
-          type: "Feature",
-          properties: {
-            tipo: "ruta",
-            routeId,
-            medio: ordenados[0]?.attackMedium ?? "Ataque aéreo",
-            origen: ordenados[0]?.originWorkspaceCode ?? "CELDA",
-          },
-          geometry: {
-            type: "LineString",
-            coordinates: ordenados.map((elemento) => [
-              elemento.longitude,
-              elemento.latitude,
-            ]),
-          },
-        });
-      }
-
-      ordenados.forEach((elemento) => {
-        const rol = elemento.attackPointRole ?? "ruta";
-        features.push({
-          type: "Feature",
-          properties: {
-            tipo: rol === "impacto" ? "impacto" : "punto",
-            routeId,
-            orden: elemento.attackPointOrder ?? 0,
-            etiqueta: `${elemento.originWorkspaceCode ?? "CELDA"}-${elemento.attackPointOrder ?? ""}`,
-            medio: elemento.attackMedium ?? elemento.nombre,
-          },
-          geometry: {
-            type: "Point",
-            coordinates: [elemento.longitude, elemento.latitude],
-          },
-        });
-      });
-    });
-
-    source.setData({
-      type: "FeatureCollection",
-      features,
-    });
-  }
-
-  function iniciarPlanAtaque() {
-    modoAtaqueRef.current = true;
-    setModoAtaqueActivo(true);
-    setModoMedicion(false);
-    modoMedicionRef.current = false;
-  }
-
-  function detenerCargaPlanAtaque() {
-    modoAtaqueRef.current = false;
-    setModoAtaqueActivo(false);
-  }
-
-  function limpiarPlanAtaque() {
-    setPuntosAtaque([]);
-    actualizarFuentePlanAtaque([]);
-    detenerCargaPlanAtaque();
-  }
-
-  function agregarPuntoAtaque(coordenadas: PuntoMedicion) {
-    setPuntosAtaque((anteriores) => {
-      const nuevos = [
-        ...anteriores,
-        {
-          id: crearId(),
-          orden: anteriores.length + 1,
-          coordenadas,
-        },
-      ];
-      actualizarFuentePlanAtaque(nuevos);
-      return nuevos;
-    });
-    setCambiosPendientes(true);
-  }
-
-  function agregarPuntoAtaqueManual() {
-    const lat = Number(latitudAtaque.replace(",", "."));
-    const lng = Number(longitudAtaque.replace(",", "."));
-
-    if (Number.isNaN(lat) || Number.isNaN(lng)) {
-      setMensajeGuardado("Coordenadas de ataque inválidas");
-      return;
-    }
-
-    agregarPuntoAtaque([lng, lat]);
-    setLatitudAtaque("");
-    setLongitudAtaque("");
-  }
-
-  function quitarUltimoPuntoAtaque() {
-    setPuntosAtaque((anteriores) => {
-      const nuevos = anteriores.slice(0, -1).map((punto, indice) => ({
-        ...punto,
-        orden: indice + 1,
-      }));
-      actualizarFuentePlanAtaque(nuevos);
-      return nuevos;
-    });
-    setCambiosPendientes(true);
-  }
-
-  function colocarMedioAtaqueEnPunto() {
-    const ultimoPunto = puntosAtaque[puntosAtaque.length - 1];
-    const lat = Number(latitudAtaque.replace(",", "."));
-    const lng = Number(longitudAtaque.replace(",", "."));
-    const coordenadas =
-      !Number.isNaN(lat) && !Number.isNaN(lng)
-        ? ([lng, lat] as PuntoMedicion)
-        : ultimoPunto?.coordenadas;
-
-    if (!coordenadas) {
-      setMensajeGuardado(
-        "Marcá un punto o cargá coordenadas para colocar el medio.",
-      );
-      return;
-    }
-
-    const nuevo: ElementoOperacional = {
-      id: crearId(),
-      visible: true,
-      bando: "propio",
-      tipo: "aeronave",
-      nombre: medioAtaque.trim() || "Medio de ataque",
-      baseOrigen: "Punto específico de ataque",
-      longitude: coordenadas[0],
-      latitude: coordenadas[1],
-      radioCombateKm: 0,
-      alcanceKm: 0,
-      mostrarAnillo: false,
-      color: "#ef4444",
-      descripcion: "Medio colocado desde el planificador de ataque.",
-      operationTask: "Ataque aéreo",
-      operationMission:
-        "Ataque planificado sobre punto de impacto seleccionado",
-      operationNotes:
-        puntosAtaque.length >= 2
-          ? `Ruta con ${puntosAtaque.length} puntos. El último punto representa impacto/explosión.`
-          : "Medio colocado en punto específico.",
-    };
-
-    setElementos((anteriores) => [...anteriores, nuevo]);
-    setSeleccionadoId(nuevo.id);
-    setCambiosPendientes(true);
-  }
 
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
@@ -3353,11 +2331,7 @@ export default function MapEditor({
       })
         .setLngLat([COAE_RIO_CUARTO.longitude, COAE_RIO_CUARTO.latitude])
         .setPopup(
-          new maplibregl.Popup({
-            offset: 25,
-            maxWidth: "380px",
-            className: "zeus-popup",
-          }).setHTML(`
+          new maplibregl.Popup({ offset: 25, maxWidth: "380px", className: "zeus-popup" }).setHTML(`
             <div style="background:#0f172a;color:white;padding:14px">
               <strong>COAe / Río Cuarto</strong><br />
               Comando de Operaciones Aeroespaciales<br />
@@ -3367,42 +2341,6 @@ export default function MapEditor({
         )
         .addTo(map);
       coaeRef.current = marcadorCOAe;
-      habilitarMedicionSobreMarcador(marcadorCOAe, [
-        COAE_RIO_CUARTO.longitude,
-        COAE_RIO_CUARTO.latitude,
-      ]);
-
-      const marcadorCOAeEnemigo = new maplibregl.Marker({
-        element: crearMarcadorEspecial(
-          COAE_ENEMIGO_INGENIERO_JUAREZ,
-          "C2",
-          "#fca5a5",
-        ),
-        anchor: "center",
-      })
-        .setLngLat([
-          COAE_ENEMIGO_INGENIERO_JUAREZ.longitude,
-          COAE_ENEMIGO_INGENIERO_JUAREZ.latitude,
-        ])
-        .setPopup(
-          new maplibregl.Popup({
-            offset: 25,
-            maxWidth: "380px",
-            className: "zeus-popup",
-          }).setHTML(`
-            <div style="background:#0f172a;color:white;padding:14px">
-              <strong>COAe enemigo / Ingeniero Juárez</strong><br />
-              Comando de Operaciones Aeroespaciales enemigo<br />
-              <em>Punto fijo enemigo de comando y control</em>
-            </div>
-          `),
-        )
-        .addTo(map);
-      coaeEnemigoRef.current = marcadorCOAeEnemigo;
-      habilitarMedicionSobreMarcador(marcadorCOAeEnemigo, [
-        COAE_ENEMIGO_INGENIERO_JUAREZ.longitude,
-        COAE_ENEMIGO_INGENIERO_JUAREZ.latitude,
-      ]);
 
       GRUPOS_COMUNICACIONES.forEach((grupo) => {
         const marcador = new maplibregl.Marker({
@@ -3411,11 +2349,7 @@ export default function MapEditor({
         })
           .setLngLat([grupo.longitude, grupo.latitude])
           .setPopup(
-            new maplibregl.Popup({
-              offset: 25,
-              maxWidth: "380px",
-              className: "zeus-popup",
-            }).setHTML(`
+            new maplibregl.Popup({ offset: 25, maxWidth: "380px", className: "zeus-popup" }).setHTML(`
               <div style="background:#0f172a;color:white;padding:14px">
                 <strong>${grupo.nombre}</strong><br />
                 Grupo de Comunicaciones<br />
@@ -3424,13 +2358,11 @@ export default function MapEditor({
             `),
           )
           .addTo(map);
-        habilitarMedicionSobreMarcador(marcador, [
-          grupo.longitude,
-          grupo.latitude,
-        ]);
         marcador.getElement().style.display = "none";
         comunicacionesRef.current[grupo.nombre] = marcador;
       });
+
+
 
       const iconoLaboratorioTritio = document.createElement("div");
       iconoLaboratorioTritio.style.width = "44px";
@@ -3454,7 +2386,10 @@ export default function MapEditor({
         element: iconoLaboratorioTritio,
         anchor: "center",
       })
-        .setLngLat([LABORATORIO_TRITIO.longitude, LABORATORIO_TRITIO.latitude])
+        .setLngLat([
+          LABORATORIO_TRITIO.longitude,
+          LABORATORIO_TRITIO.latitude,
+        ])
         .setPopup(
           new maplibregl.Popup({
             offset: 25,
@@ -3473,12 +2408,8 @@ export default function MapEditor({
           `),
         )
         .addTo(map);
-      habilitarMedicionSobreMarcador(laboratorioTritioRef.current, [
-        LABORATORIO_TRITIO.longitude,
-        LABORATORIO_TRITIO.latitude,
-      ]);
 
-      TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
+            [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
         const marker = new maplibregl.Marker({
           element: crearIconoBase(base),
           anchor: "center",
@@ -3492,7 +2423,6 @@ export default function MapEditor({
             }).setHTML(mediosDeBase(base)),
           )
           .addTo(map);
-        habilitarMedicionSobreMarcador(marker, [base.longitude, base.latitude]);
 
         basesRef.current[base.nombre] = marker;
       });
@@ -3698,161 +2628,6 @@ export default function MapEditor({
         },
       });
 
-      map.addSource("plan-ataque", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: [],
-        },
-      });
-
-      map.addLayer({
-        id: "plan-ataque-ruta",
-        type: "line",
-        source: "plan-ataque",
-        filter: ["==", ["get", "tipo"], "ruta"],
-        paint: {
-          "line-color": "#ef4444",
-          "line-width": 3.5,
-          "line-opacity": 0.92,
-          "line-dasharray": [1.5, 1.4],
-        },
-      });
-
-      map.addLayer({
-        id: "plan-ataque-puntos",
-        type: "circle",
-        source: "plan-ataque",
-        filter: ["==", ["get", "tipo"], "punto"],
-        paint: {
-          "circle-radius": 7,
-          "circle-color": "#fef2f2",
-          "circle-stroke-color": "#ef4444",
-          "circle-stroke-width": 3,
-        },
-      });
-
-      map.addLayer({
-        id: "plan-ataque-impacto",
-        type: "circle",
-        source: "plan-ataque",
-        filter: ["==", ["get", "tipo"], "impacto"],
-        paint: {
-          "circle-radius": 15,
-          "circle-color": "#f97316",
-          "circle-opacity": 0.9,
-          "circle-stroke-color": "#7f1d1d",
-          "circle-stroke-width": 4,
-        },
-      });
-
-      map.addLayer({
-        id: "plan-ataque-etiquetas",
-        type: "symbol",
-        source: "plan-ataque",
-        filter: [
-          "any",
-          ["==", ["get", "tipo"], "punto"],
-          ["==", ["get", "tipo"], "impacto"],
-        ],
-        layout: {
-          "text-field": [
-            "case",
-            ["==", ["get", "tipo"], "impacto"],
-            ["concat", "💥 ", ["get", "etiqueta"]],
-            ["get", "etiqueta"],
-          ],
-          "text-size": 13,
-          "text-offset": [0, 1.25],
-          "text-anchor": "top",
-          "text-allow-overlap": true,
-        },
-        paint: {
-          "text-color": "#7f1d1d",
-          "text-halo-color": "#ffffff",
-          "text-halo-width": 1.5,
-        },
-      });
-
-      map.addSource("planes-ataque-compartidos", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: [],
-        },
-      });
-
-      map.addLayer({
-        id: "planes-ataque-compartidos-ruta",
-        type: "line",
-        source: "planes-ataque-compartidos",
-        filter: ["==", ["get", "tipo"], "ruta"],
-        paint: {
-          "line-color": "#f97316",
-          "line-width": 3.2,
-          "line-opacity": 0.88,
-          "line-dasharray": [1.2, 1.5],
-        },
-      });
-
-      map.addLayer({
-        id: "planes-ataque-compartidos-puntos",
-        type: "circle",
-        source: "planes-ataque-compartidos",
-        filter: ["==", ["get", "tipo"], "punto"],
-        paint: {
-          "circle-radius": 6,
-          "circle-color": "#fff7ed",
-          "circle-stroke-color": "#f97316",
-          "circle-stroke-width": 2.5,
-        },
-      });
-
-      map.addLayer({
-        id: "planes-ataque-compartidos-impacto",
-        type: "circle",
-        source: "planes-ataque-compartidos",
-        filter: ["==", ["get", "tipo"], "impacto"],
-        paint: {
-          "circle-radius": 14,
-          "circle-color": "#fb923c",
-          "circle-opacity": 0.9,
-          "circle-stroke-color": "#7c2d12",
-          "circle-stroke-width": 4,
-        },
-      });
-
-      map.addLayer({
-        id: "planes-ataque-compartidos-etiquetas",
-        type: "symbol",
-        source: "planes-ataque-compartidos",
-        filter: [
-          "any",
-          ["==", ["get", "tipo"], "punto"],
-          ["==", ["get", "tipo"], "impacto"],
-        ],
-        layout: {
-          "text-field": [
-            "case",
-            ["==", ["get", "tipo"], "impacto"],
-            ["concat", "💥 ", ["get", "etiqueta"]],
-            ["get", "etiqueta"],
-          ],
-          "text-size": 12,
-          "text-offset": [0, 1.2],
-          "text-anchor": "top",
-          "text-allow-overlap": true,
-        },
-        paint: {
-          "text-color": "#7c2d12",
-          "text-halo-color": "#ffffff",
-          "text-halo-width": 1.5,
-        },
-      });
-
-      actualizarFuentePlanAtaque(puntosAtaque);
-      actualizarFuentePlanesAtaqueCompartidos(elementos);
-
       map.on("mousemove", (evento) => {
         setCoordenadasCursor({
           latitud: evento.lngLat.lat,
@@ -3861,14 +2636,45 @@ export default function MapEditor({
       });
 
       map.on("click", (evento) => {
-        if (modoAtaqueRef.current) {
-          agregarPuntoAtaque([evento.lngLat.lng, evento.lngLat.lat]);
-          return;
-        }
-
         if (!modoMedicionRef.current) return;
 
-        agregarPuntoMedicion([evento.lngLat.lng, evento.lngLat.lat]);
+        const nuevoPunto: PuntoMedicion = [
+          evento.lngLat.lng,
+          evento.lngLat.lat,
+        ];
+
+        setPuntosMedicion((anteriores) => {
+          const nuevos = [...anteriores, nuevoPunto];
+          const source = map.getSource("medicion") as
+            maplibregl.GeoJSONSource | undefined;
+
+          const features: GeoJSON.Feature[] = nuevos.map((coordenada) => ({
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Point",
+              coordinates: coordenada,
+            },
+          }));
+
+          let distancia = 0;
+
+          if (nuevos.length >= 2) {
+            const linea = lineString(nuevos);
+            distancia = turfLength(linea, {
+              units: "kilometers",
+            });
+            features.push(linea);
+          }
+
+          source?.setData({
+            type: "FeatureCollection",
+            features,
+          });
+
+          setDistanciaMedicionKm(distancia);
+          return nuevos;
+        });
       });
 
       map.addSource("anillos-operacionales", {
@@ -3914,10 +2720,7 @@ export default function MapEditor({
       Object.values(oceanosRef.current).forEach((marker) => marker.remove());
       Object.values(basesRef.current).forEach((marker) => marker.remove());
       coaeRef.current?.remove();
-      coaeEnemigoRef.current?.remove();
-      Object.values(comunicacionesRef.current).forEach((marker) =>
-        marker.remove(),
-      );
+      Object.values(comunicacionesRef.current).forEach((marker) => marker.remove());
       laboratorioTritioRef.current?.remove();
       Object.values(dimensionesTonRef.current).forEach((marker) =>
         marker.remove(),
@@ -3929,7 +2732,6 @@ export default function MapEditor({
       oceanosRef.current = {};
       basesRef.current = {};
       coaeRef.current = null;
-      coaeEnemigoRef.current = null;
       comunicacionesRef.current = {};
       laboratorioTritioRef.current = null;
       dimensionesTonRef.current = {};
@@ -3946,7 +2748,6 @@ export default function MapEditor({
     if (!map || !map.isStyleLoaded()) return;
 
     actualizarFuenteAnillos(elementos);
-    actualizarFuentePlanesAtaqueCompartidos(elementos);
 
     elementos.forEach((elemento) => {
       const visibleTipo =
@@ -3954,9 +2755,7 @@ export default function MapEditor({
           ? mostrarAeronaves
           : elemento.tipo === "radar"
             ? mostrarRadares
-            : elemento.tipo === "defensa"
-              ? mostrarDefensa
-              : true;
+            : mostrarDefensa;
 
       const visible =
         elemento.visible &&
@@ -4018,23 +2817,17 @@ export default function MapEditor({
           }
           <div style="margin-top:7px;padding-top:7px;border-top:1px solid #475569">
             <strong>${
-              elemento.tipo === "aeronave"
-                ? (elemento.terminoDistancia ?? "Radio de acción")
-                : "Alcance"
+              elemento.tipo === "aeronave" ? (elemento.terminoDistancia ?? "Radio de acción") : "Alcance"
             }:</strong>
             ${distanciaKm > 0 ? formatearDistancia(distanciaKm) : "Sin definir"}
           </div>
-          ${
-            elemento.tipo === "aeronave"
-              ? `
+          ${elemento.tipo === "aeronave" ? `
             <div style="margin-top:5px;color:${elemento.fuenteDistancia === "orden" ? "#86efac" : "#fca5a5"}">
               <strong>Origen:</strong> ${elemento.fuenteDistancia === "orden" ? "Orden de instrucción" : elemento.fuenteDistancia === "externa" ? "Referencia externa / estimación" : "Manual"}
             </div>
             <div style="font-size:11px;color:#cbd5e1">${elemento.referenciaDistancia ?? ""}</div>
             ${elemento.conReabastecimiento ? `<div style="margin-top:5px;color:#67e8f9"><strong>REV:</strong> activado; radio duplicado como hipótesis simplificada.</div>` : ""}
-          `
-              : ""
-          }
+          ` : ""}
           ${
             elemento.bando === "propio" && !imagenMedio
               ? `<div style="margin-top:8px;font-size:11px;color:#94a3b8">Sin fotografía asociada en la presentación A3.</div>`
@@ -4072,15 +2865,7 @@ export default function MapEditor({
         )
         .addTo(map);
 
-      marker.getElement().addEventListener("click", (event) => {
-        if (modoMedicionRef.current) {
-          event.preventDefault();
-          event.stopPropagation();
-          const posicion = marker.getLngLat();
-          agregarPuntoMedicion([posicion.lng, posicion.lat]);
-          return;
-        }
-
+      marker.getElement().addEventListener("click", () => {
         setSeleccionadoId(elemento.id);
       });
 
@@ -4166,7 +2951,7 @@ export default function MapEditor({
   }, [mostrarTon, mapReady]);
 
   useEffect(() => {
-    TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
+    [...BASES_PROPIAS, ...BASES_ENEMIGAS].forEach((base) => {
       const marker = basesRef.current[base.nombre];
       if (!marker) return;
 
@@ -4180,46 +2965,8 @@ export default function MapEditor({
   }, [mostrarBases, vistaFuerzas, basesVisibles, mapReady]);
 
   useEffect(() => {
-    const marcador = coaeRef.current;
-    if (!marcador) return;
-
-    const visibleCOAe =
-      mostrarBases && mostrarCOAe && bandoVisible("propio", vistaFuerzas);
-
-    marcador.getElement().style.display = visibleCOAe ? "flex" : "none";
-  }, [mostrarBases, mostrarCOAe, vistaFuerzas, mapReady]);
-
-  useEffect(() => {
-    const marcador = coaeEnemigoRef.current;
-    if (!marcador) return;
-
-    const visibleCOAeEnemigo =
-      mostrarBases &&
-      mostrarCOAeEnemigo &&
-      bandoVisible("enemigo", vistaFuerzas);
-
-    marcador.getElement().style.display = visibleCOAeEnemigo ? "flex" : "none";
-  }, [mostrarBases, mostrarCOAeEnemigo, vistaFuerzas, mapReady]);
-
-  useEffect(() => {
-    const marcador = laboratorioTritioRef.current;
-    if (!marcador) return;
-
-    const visibleLaboratorioTritio =
-      mostrarBases &&
-      mostrarLaboratorioTritio &&
-      bandoVisible("enemigo", vistaFuerzas);
-
-    marcador.getElement().style.display = visibleLaboratorioTritio
-      ? "flex"
-      : "none";
-  }, [mostrarBases, mostrarLaboratorioTritio, vistaFuerzas, mapReady]);
-
-  useEffect(() => {
     Object.values(comunicacionesRef.current).forEach((marcador) => {
-      marcador.getElement().style.display = mostrarComunicaciones
-        ? "flex"
-        : "none";
+      marcador.getElement().style.display = mostrarComunicaciones ? "flex" : "none";
     });
   }, [mostrarComunicaciones, mapReady]);
 
@@ -4332,15 +3079,6 @@ export default function MapEditor({
     });
   }, [mostrarTon, mostrarDimensionesTon, mapReady]);
 
-  useEffect(() => {
-    if (!mapReady) return;
-    actualizarFuentePlanAtaque(puntosAtaque);
-  }, [mapReady, puntosAtaque, medioAtaque]);
-
-  useEffect(() => {
-    modoAtaqueRef.current = modoAtaqueActivo;
-  }, [modoAtaqueActivo]);
-
   function crearSnapshot(): ZeusMapSnapshot {
     const mapa = mapRef.current;
     const centro = mapa?.getCenter();
@@ -4365,7 +3103,7 @@ export default function MapEditor({
           radares: mostrarRadares,
           defensa: mostrarDefensa,
           relieve: mostrarRelieve,
-          rios: false,
+          rios: mostrarRios,
           grilla: mostrarGrilla,
           dimensionesTon: mostrarDimensionesTon,
         },
@@ -4377,17 +3115,9 @@ export default function MapEditor({
           coloresMascaras,
           coloresRepublicas,
           basesVisibles,
-          mostrarCOAe,
-          mostrarCOAeEnemigo,
-          mostrarLaboratorioTritio,
-          medioAtaque,
-          puntosAtaque,
         },
       },
-      elements: [
-        ...elementos.filter((elemento) => !elemento.attackRouteId),
-        ...elementosPlanAtaqueActual(),
-      ],
+      elements: elementos,
     };
   }
 
@@ -4417,7 +3147,9 @@ export default function MapEditor({
 
   const firmaElementosPropios = useMemo(
     () =>
-      JSON.stringify(elementos.filter((elemento) => !elemento.sharedExternal)),
+      JSON.stringify(
+        elementos.filter((elemento) => !elemento.sharedExternal),
+      ),
     [elementos],
   );
 
@@ -4443,6 +3175,7 @@ export default function MapEditor({
     mostrarRadares,
     mostrarDefensa,
     mostrarRelieve,
+    mostrarRios,
     mostrarGrilla,
     intervaloGrilla,
     mostrarDimensionesTon,
@@ -4451,11 +3184,6 @@ export default function MapEditor({
     coloresMascaras,
     coloresRepublicas,
     basesVisibles,
-    mostrarCOAe,
-    mostrarCOAeEnemigo,
-    mostrarLaboratorioTritio,
-    medioAtaque,
-    puntosAtaque,
     readOnly,
   ]);
 
@@ -4490,17 +3218,12 @@ export default function MapEditor({
 
   return (
     <div className="flex h-screen w-screen">
-      <aside
-        className={`flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white ${readOnly ? "workspace-readonly" : ""}`}
-      >
+      <aside className={`flex w-[420px] flex-col overflow-y-auto bg-slate-950 p-5 text-white ${readOnly ? "workspace-readonly" : ""}`}>
         <h1 className="mb-1 text-xl font-bold" style={{ order: -3 }}>
           EJERCICIO ZEUS (TO NORTE)
         </h1>
         {workspaceLabel && (
-          <h2
-            className="mb-1 text-sm font-semibold text-cyan-300"
-            style={{ order: -2 }}
-          >
+          <h2 className="mb-1 text-sm font-semibold text-cyan-300" style={{ order: -2 }}>
             {workspaceLabel}
           </h2>
         )}
@@ -4516,14 +3239,9 @@ export default function MapEditor({
             : "Los paneles visibles corresponden al perfil de este espacio."}
         </p>
 
-        <div
-          className="sticky top-0 z-20 mb-4 rounded-lg border border-slate-700 bg-slate-950/95 p-3 shadow-lg"
-          style={{ order: -1 }}
-        >
+        <div className="sticky top-0 z-20 mb-4 rounded-lg border border-slate-700 bg-slate-950/95 p-3 shadow-lg" style={{ order: -1 }}>
           <div className="flex items-center justify-between gap-2">
-            <span
-              className={`text-xs font-semibold ${cambiosPendientes ? "text-amber-300" : "text-emerald-300"}`}
-            >
+            <span className={`text-xs font-semibold ${cambiosPendientes ? "text-amber-300" : "text-emerald-300"}`}>
               {mensajeGuardado}
             </span>
             {!readOnly && onSave && (
@@ -4539,10 +3257,7 @@ export default function MapEditor({
           </div>
         </div>
 
-        <section
-          {...propiedadesPanel("fuerzas")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("fuerzas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Fuerzas visibles</h2>
 
           <select
@@ -4558,25 +3273,13 @@ export default function MapEditor({
           </select>
         </section>
 
-        <section
-          {...propiedadesPanel("referencia")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4 text-sm"
-        >
+        <section {...propiedadesPanel("referencia")} className="mb-5 cursor-move rounded bg-slate-900 p-4 text-sm">
           <h2 className="mb-2 font-semibold">↕ Referencia de radios</h2>
-          <div className="mb-2 flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-green-600" />
-            Valor tomado de la orden de instrucción
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-red-600" />
-            Referencia externa o estimación
-          </div>
+          <div className="mb-2 flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-green-600" />Valor tomado de la orden de instrucción</div>
+          <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-red-600" />Referencia externa o estimación</div>
         </section>
 
-        <section
-          {...propiedadesPanel("capas")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("capas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Capas territoriales</h2>
 
           <label className="mb-3 flex items-center gap-2">
@@ -4629,15 +3332,11 @@ export default function MapEditor({
           </label>
 
           <p className="mt-2 text-xs text-slate-400">
-            El COAe de Río Cuarto puede mostrarse u ocultarse desde Bases y
-            estaciones visibles → Propias.
+            El COAe de Río Cuarto permanece visible como punto fijo.
           </p>
         </section>
 
-        <section
-          {...propiedadesPanel("bases")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("bases")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Bases y estaciones visibles</h2>
 
           {mostrarControlesPropios && (
@@ -4645,69 +3344,16 @@ export default function MapEditor({
               <div className="mb-2 flex items-center justify-between gap-2">
                 <strong className="text-sm text-blue-300">Propias</strong>
                 <div className="flex gap-2 text-xs">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setBasesVisibles((a) => ({
-                        ...a,
-                        ...Object.fromEntries(
-                          BASES_PROPIAS.map((b) => [b.nombre, true]),
-                        ),
-                      }))
-                    }
-                    className="rounded bg-blue-700 px-2 py-1"
-                  >
-                    Todas
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setBasesVisibles((a) => ({
-                        ...a,
-                        ...Object.fromEntries(
-                          BASES_PROPIAS.map((b) => [b.nombre, false]),
-                        ),
-                      }))
-                    }
-                    className="rounded bg-slate-700 px-2 py-1"
-                  >
-                    Ninguna
-                  </button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_PROPIAS.map((b) => [b.nombre, true]))}))} className="rounded bg-blue-700 px-2 py-1">Todas</button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_PROPIAS.map((b) => [b.nombre, false]))}))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
                 </div>
               </div>
               {BASES_PROPIAS.map((base) => (
-                <label
-                  key={base.nombre}
-                  className="mb-2 flex items-start gap-2 text-sm last:mb-0"
-                >
-                  <input
-                    type="checkbox"
-                    checked={Boolean(basesVisibles[base.nombre])}
-                    onChange={(event) =>
-                      setBasesVisibles((a) => ({
-                        ...a,
-                        [base.nombre]: event.target.checked,
-                      }))
-                    }
-                  />
+                <label key={base.nombre} className="mb-2 flex items-start gap-2 text-sm last:mb-0">
+                  <input type="checkbox" checked={Boolean(basesVisibles[base.nombre])} onChange={(event) => setBasesVisibles((a) => ({ ...a, [base.nombre]: event.target.checked }))} />
                   <span>{base.nombre}</span>
                 </label>
               ))}
-
-              <label className="mt-3 flex items-start gap-2 border-t border-blue-900 pt-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={mostrarCOAe}
-                  onChange={(event) => setMostrarCOAe(event.target.checked)}
-                />
-                <span>
-                  <strong className="text-cyan-300">COAe / Río Cuarto</strong>
-                  <br />
-                  <span className="text-xs text-slate-400">
-                    Centro de operaciones aeroespaciales propio
-                  </span>
-                </span>
-              </label>
             </div>
           )}
 
@@ -4716,106 +3362,21 @@ export default function MapEditor({
               <div className="mb-2 flex items-center justify-between gap-2">
                 <strong className="text-sm text-orange-300">Enemigas</strong>
                 <div className="flex gap-2 text-xs">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setBasesVisibles((a) => ({
-                        ...a,
-                        ...Object.fromEntries(
-                          BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((b) => [
-                            b.nombre,
-                            true,
-                          ]),
-                        ),
-                      }))
-                    }
-                    className="rounded bg-orange-700 px-2 py-1"
-                  >
-                    Todas
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setBasesVisibles((a) => ({
-                        ...a,
-                        ...Object.fromEntries(
-                          BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((b) => [
-                            b.nombre,
-                            false,
-                          ]),
-                        ),
-                      }))
-                    }
-                    className="rounded bg-slate-700 px-2 py-1"
-                  >
-                    Ninguna
-                  </button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_ENEMIGAS.map((b) => [b.nombre, true]))}))} className="rounded bg-orange-700 px-2 py-1">Todas</button>
+                  <button type="button" onClick={() => setBasesVisibles((a) => ({...a, ...Object.fromEntries(BASES_ENEMIGAS.map((b) => [b.nombre, false]))}))} className="rounded bg-slate-700 px-2 py-1">Ninguna</button>
                 </div>
               </div>
-              {BASES_Y_ESTABLECIMIENTOS_ENEMIGOS.map((base) => (
-                <label
-                  key={base.nombre}
-                  className="mb-2 flex items-start gap-2 text-sm last:mb-0"
-                >
-                  <input
-                    type="checkbox"
-                    checked={Boolean(basesVisibles[base.nombre])}
-                    onChange={(event) =>
-                      setBasesVisibles((a) => ({
-                        ...a,
-                        [base.nombre]: event.target.checked,
-                      }))
-                    }
-                  />
+              {BASES_ENEMIGAS.map((base) => (
+                <label key={base.nombre} className="mb-2 flex items-start gap-2 text-sm last:mb-0">
+                  <input type="checkbox" checked={Boolean(basesVisibles[base.nombre])} onChange={(event) => setBasesVisibles((a) => ({ ...a, [base.nombre]: event.target.checked }))} />
                   <span>{base.nombre}</span>
                 </label>
               ))}
-
-              <label className="mt-3 flex items-start gap-2 border-t border-orange-900 pt-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={mostrarLaboratorioTritio}
-                  onChange={(event) =>
-                    setMostrarLaboratorioTritio(event.target.checked)
-                  }
-                />
-                <span>
-                  <strong className="text-red-300">
-                    ☢ {LABORATORIO_TRITIO.nombre}
-                  </strong>
-                  <br />
-                  <span className="text-xs text-slate-400">
-                    Objetivo estratégico enemigo
-                  </span>
-                </span>
-              </label>
-
-              <label className="mt-3 flex items-start gap-2 border-t border-orange-900 pt-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={mostrarCOAeEnemigo}
-                  onChange={(event) =>
-                    setMostrarCOAeEnemigo(event.target.checked)
-                  }
-                />
-                <span>
-                  <strong className="text-orange-300">
-                    COAe enemigo / Ingeniero Juárez
-                  </strong>
-                  <br />
-                  <span className="text-xs text-slate-400">
-                    Centro de comando y control enemigo
-                  </span>
-                </span>
-              </label>
             </div>
           )}
         </section>
 
-        <section
-          {...propiedadesPanel("mascaras")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("mascaras")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Coberturas y máscaras</h2>
 
           {mostrarControlesPropios && (
@@ -4875,9 +3436,7 @@ export default function MapEditor({
           {mostrarControlesEnemigos && (
             <div className="rounded border border-orange-700 p-3">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <strong className="text-sm text-orange-300">
-                  Radar enemigas
-                </strong>
+                <strong className="text-sm text-orange-300">Radar enemigas</strong>
                 <div className="flex gap-2 text-xs">
                   <button
                     type="button"
@@ -4934,22 +3493,16 @@ export default function MapEditor({
             <div className="mt-4 rounded border border-red-700 p-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <div>
-                  <strong className="text-sm text-red-300">
-                    Sistemas de defensa antiaérea enemigos
-                  </strong>
-                  <p className="mt-1 text-xs text-slate-400">
-                    Coberturas reales importadas de los KMZ. Al activarlas se
-                    oculta el círculo nominal del S-300 para mostrar claramente
-                    la geometría irregular condicionada por el terreno.
-                  </p>
+                  <strong className="text-sm text-red-300">Sistemas de defensa antiaérea enemigos</strong>
+                  <p className="mt-1 text-xs text-slate-400">Coberturas reales importadas de los KMZ. Al activarlas se oculta el círculo nominal del S-300 para mostrar claramente la geometría irregular condicionada por el terreno.</p>
                 </div>
                 <div className="flex gap-2 text-xs">
                   <button
                     type="button"
                     onClick={() =>
-                      MASCARAS_RADAR.filter(
-                        (mascara) => mascara.categoria === "defensa_antiaerea",
-                      ).forEach((mascara) => cambiarMascara(mascara.id, true))
+                      MASCARAS_RADAR.filter((mascara) => mascara.categoria === "defensa_antiaerea").forEach((mascara) =>
+                        cambiarMascara(mascara.id, true),
+                      )
                     }
                     className="rounded bg-red-700 px-2 py-1"
                   >
@@ -4958,9 +3511,9 @@ export default function MapEditor({
                   <button
                     type="button"
                     onClick={() =>
-                      MASCARAS_RADAR.filter(
-                        (mascara) => mascara.categoria === "defensa_antiaerea",
-                      ).forEach((mascara) => cambiarMascara(mascara.id, false))
+                      MASCARAS_RADAR.filter((mascara) => mascara.categoria === "defensa_antiaerea").forEach((mascara) =>
+                        cambiarMascara(mascara.id, false),
+                      )
                     }
                     className="rounded bg-slate-700 px-2 py-1"
                   >
@@ -5002,15 +3555,11 @@ export default function MapEditor({
           )}
 
           <p className="mt-3 text-xs text-slate-400">
-            Las máscaras radar conservan sus archivos originales. La cobertura
-            ALFA del S-300 fue corregida y trasladada al emplazamiento de Belén.
+            Las máscaras radar conservan sus archivos originales. La cobertura ALFA del S-300 fue corregida y trasladada al emplazamiento de Belén.
           </p>
         </section>
 
-        <section
-          {...propiedadesPanel("colores")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("colores")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Colores de las repúblicas</h2>
           {Object.keys(COLORES_REPUBLICAS).map((nombre) => (
             <label
@@ -5033,10 +3582,7 @@ export default function MapEditor({
           ))}
         </section>
 
-        <section
-          {...propiedadesPanel("cartografia")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("cartografia")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Cartografía y coordenadas</h2>
 
           <button
@@ -5053,7 +3599,16 @@ export default function MapEditor({
               checked={mostrarRelieve}
               onChange={(event) => setMostrarRelieve(event.target.checked)}
             />
-            Relieve
+            Relieve físico sin nombres
+          </label>
+
+          <label className="mb-3 flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={mostrarRios}
+              onChange={(event) => setMostrarRios(event.target.checked)}
+            />
+            Ríos y cursos de agua
           </label>
 
           <label className="mb-3 flex items-center gap-2">
@@ -5107,10 +3662,7 @@ export default function MapEditor({
           </div>
         </section>
 
-        <section
-          {...propiedadesPanel("medicion")}
-          className="mb-5 cursor-move rounded border border-yellow-600 bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("medicion")} className="mb-5 cursor-move rounded border border-yellow-600 bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold text-yellow-300">
             ↕ Medición de distancias
           </h2>
@@ -5154,10 +3706,7 @@ export default function MapEditor({
           </p>
         </section>
 
-        <section
-          {...propiedadesPanel("visibilidad")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("visibilidad")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Visibilidad de medios</h2>
 
           <label className="mb-3 flex items-center gap-2">
@@ -5466,43 +4015,8 @@ export default function MapEditor({
           </div>
         )}
 
-        <section
-          {...propiedadesPanel("elementos")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("elementos")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Elementos visibles</h2>
-          {elementos.length > 0 && (
-            <div className="mb-3 flex flex-wrap gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() =>
-                  setElementos((anteriores) =>
-                    anteriores.map((elemento) => ({
-                      ...elemento,
-                      visible: true,
-                    })),
-                  )
-                }
-                className="rounded bg-emerald-700 px-2 py-1"
-              >
-                Ver todos
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setElementos((anteriores) =>
-                    anteriores.map((elemento) => ({
-                      ...elemento,
-                      visible: false,
-                    })),
-                  )
-                }
-                className="rounded bg-slate-700 px-2 py-1"
-              >
-                Ocultar todos
-              </button>
-            </div>
-          )}
           {elementos.length === 0 ? (
             <p className="text-xs text-slate-400">
               Todavía no agregaste medios.
@@ -5532,10 +4046,7 @@ export default function MapEditor({
           )}
         </section>
 
-        <section
-          {...propiedadesPanel("personalizado")}
-          className="mb-5 cursor-move rounded border border-emerald-700 bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("personalizado")} className="mb-5 cursor-move rounded border border-emerald-700 bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold text-emerald-300">
             ↕ Agregar medio personalizado
           </h2>
@@ -5550,30 +4061,66 @@ export default function MapEditor({
             className="mb-3 w-full rounded bg-slate-800 p-2"
           />
 
+          <div className="mb-3 grid grid-cols-2 gap-2">
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-300">
+                Tipo de medio
+              </label>
+              <select
+                value={tipoPersonalizado}
+                onChange={(event) =>
+                  setTipoPersonalizado(event.target.value as TipoElemento)
+                }
+                className="w-full rounded bg-slate-800 p-2"
+              >
+                <option value="aeronave">Aeronave / medio aéreo</option>
+                <option value="radar">Radar / sensor</option>
+                <option value="defensa">Defensa antiaérea</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-300">
+                Bando
+              </label>
+              <select
+                value={bandoPersonalizado}
+                onChange={(event) => {
+                  const bando = event.target.value as Bando;
+                  setBandoPersonalizado(bando);
+                  const bases =
+                    bando === "propio" ? BASES_PROPIAS : BASES_ENEMIGAS;
+                  setBasePersonalizada(bases[0]?.nombre ?? "");
+                }}
+                className="w-full rounded bg-slate-800 p-2"
+              >
+                <option value="propio">Propio</option>
+                <option value="enemigo">Enemigo</option>
+              </select>
+            </div>
+          </div>
+
           <label className="mb-1 block text-xs font-semibold text-slate-300">
-            Bando
+            Base o ubicación inicial
           </label>
           <select
-            value={bandoPersonalizado}
-            onChange={(event) =>
-              setBandoPersonalizado(event.target.value as Bando)
-            }
+            value={basePersonalizada}
+            onChange={(event) => setBasePersonalizada(event.target.value)}
             className="mb-3 w-full rounded bg-slate-800 p-2"
           >
-            <option value="propio">Propio</option>
-            <option value="enemigo">Enemigo</option>
+            {(bandoPersonalizado === "propio"
+              ? BASES_PROPIAS
+              : BASES_ENEMIGAS
+            ).map((base) => (
+              <option key={base.nombre} value={base.nombre}>
+                {base.nombre}
+              </option>
+            ))}
           </select>
-
-          <p className="mb-3 rounded bg-slate-800 p-2 text-xs text-slate-300">
-            El medio se ubicará inicialmente en el océano próximo al teatro de
-            operaciones. Luego podés arrastrarlo al punto exacto. El tipo se
-            infiere por el nombre o por el icono elegido.
-          </p>
 
           <div className="mb-3 grid grid-cols-[1fr_76px] gap-2">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-300">
-                Radio de alcance
+                Radio o alcance
               </label>
               <input
                 type="number"
@@ -5682,10 +4229,7 @@ export default function MapEditor({
           </button>
         </section>
 
-        <section
-          {...propiedadesPanel("desplegados")}
-          className="mb-5 cursor-move rounded bg-slate-900 p-4"
-        >
+        <section {...propiedadesPanel("desplegados")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <label className="mb-2 block text-sm font-semibold">
             ↕ Elementos desplegados
           </label>
@@ -5708,841 +4252,164 @@ export default function MapEditor({
           </select>
         </section>
 
-        {workspaceCode === "a3" && (
-          <section className="mb-5 rounded border border-red-900 bg-slate-900 p-4">
-            <h2 className="mb-3 font-semibold text-red-300">
-              Planificador de ataque aéreo
-            </h2>
-            <label className="mb-3 block text-sm">
-              <span className="mb-1 block text-slate-300">
-                Medio / paquete de ataque
-              </span>
-              <input
-                value={medioAtaque}
-                onChange={(event) => {
-                  setMedioAtaque(event.target.value);
-                  setCambiosPendientes(true);
-                }}
+        {seleccionado?.sharedExternal && (
+          <section className="mb-5 rounded border border-amber-700 bg-amber-950/40 p-4 text-sm text-amber-200">
+            <p className="font-semibold">Elemento compartido por {seleccionado.originWorkspaceCode?.toUpperCase() ?? "otra célula"}</p>
+            <p className="mt-1 text-xs">Se muestra en la vista consolidada. No se guarda ni modifica desde este espacio.</p>
+          </section>
+        )}
+
+        {workspaceCode === "a3" && seleccionado && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("operaciones")} className="mb-5 space-y-4 rounded border border-cyan-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-cyan-300">Ficha de operaciones</h2>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Misión / efecto</span><input value={seleccionado.operationMission ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationMission: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Fase</span><input value={seleccionado.operationPhase ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationPhase: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Prioridad</span><select value={seleccionado.operationPriority ?? "normal"} onChange={(e) => actualizarElemento(seleccionado.id, { operationPriority: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="baja">Baja</option><option value="normal">Normal</option><option value="alta">Alta</option><option value="critica">Crítica</option></select></label>
+            </div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Tarea</span><input value={seleccionado.operationTask ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationTask: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <div className="grid grid-cols-2 gap-3"><label className="block text-sm"><span className="mb-1 block text-slate-300">Inicio</span><input type="datetime-local" value={seleccionado.operationStart ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationStart: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label><label className="block text-sm"><span className="mb-1 block text-slate-300">Fin</span><input type="datetime-local" value={seleccionado.operationEnd ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationEnd: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label></div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Indicativo</span><input value={seleccionado.callSign ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { callSign: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Observaciones</span><textarea rows={3} value={seleccionado.operationNotes ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { operationNotes: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+          </section>
+        )}
+
+        {workspaceCode === "a1" && seleccionado && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("personal")} className="mb-5 space-y-4 rounded border border-pink-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-pink-300">Situación de personal</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Asignados</span><input type="number" min="0" value={seleccionado.personnelAssigned ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { personnelAssigned: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Disponibles</span><input type="number" min="0" value={seleccionado.personnelAvailable ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { personnelAvailable: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Bajas</span><input type="number" min="0" value={seleccionado.personnelCasualties ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { personnelCasualties: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+              <label className="block text-sm"><span className="mb-1 block text-slate-300">Reemplazos</span><input type="number" min="0" value={seleccionado.personnelReplacements ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { personnelReplacements: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+            </div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Estado sanitario</span><select value={seleccionado.medicalStatus ?? "normal"} onChange={(e) => actualizarElemento(seleccionado.id, { medicalStatus: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="normal">Normal</option><option value="degradado">Degradado</option><option value="critico">Crítico</option></select></label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={seleccionado.evacuationRequired ?? false} onChange={(e) => actualizarElemento(seleccionado.id, { evacuationRequired: e.target.checked })} /> Requiere evacuación sanitaria</label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Novedades</span><textarea rows={3} value={seleccionado.personnelNotes ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { personnelNotes: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+          </section>
+        )}
+
+        {workspaceCode === "a4" && seleccionado && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("logistica")} className="mb-5 space-y-4 rounded border border-emerald-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-emerald-300">Situación logística</h2>
+            <div className="grid grid-cols-2 gap-3"><label className="block text-sm"><span className="mb-1 block text-slate-300">Combustible %</span><input type="number" min="0" max="100" value={seleccionado.fuelPercent ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { fuelPercent: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label><label className="block text-sm"><span className="mb-1 block text-slate-300">Armamento %</span><input type="number" min="0" max="100" value={seleccionado.ammunitionPercent ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { ammunitionPercent: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label></div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Estado del material</span><select value={seleccionado.materialStatus ?? "operativo"} onChange={(e) => actualizarElemento(seleccionado.id, { materialStatus: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="operativo">Operativo</option><option value="degradado">Degradado</option><option value="no_operativo">No operativo</option></select></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Transportes disponibles</span><input type="number" min="0" value={seleccionado.transportAvailable ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { transportAvailable: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Prioridad de reabastecimiento</span><select value={seleccionado.resupplyPriority ?? "normal"} onChange={(e) => actualizarElemento(seleccionado.id, { resupplyPriority: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="baja">Baja</option><option value="normal">Normal</option><option value="alta">Alta</option><option value="critica">Crítica</option></select></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Observaciones logísticas</span><textarea rows={3} value={seleccionado.logisticsNotes ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { logisticsNotes: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+          </section>
+        )}
+
+        {workspaceCode === "a5" && seleccionado && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("comunicaciones")} className="mb-5 space-y-4 rounded border border-sky-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-sky-300">Situación de comunicaciones</h2>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Tipo de nodo</span><input value={seleccionado.communicationNodeType ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { communicationNodeType: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <div className="grid grid-cols-2 gap-3"><label className="block text-sm"><span className="mb-1 block text-slate-300">Red</span><input value={seleccionado.networkName ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { networkName: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label><label className="block text-sm"><span className="mb-1 block text-slate-300">Frecuencia / canal</span><input value={seleccionado.frequency ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { frequency: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label></div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Estado del enlace</span><select value={seleccionado.linkStatus ?? "operativo"} onChange={(e) => actualizarElemento(seleccionado.id, { linkStatus: e.target.value })} className="w-full rounded bg-slate-800 p-2"><option value="operativo">Operativo</option><option value="degradado">Degradado</option><option value="interrumpido">Interrumpido</option></select></label>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Cobertura (km)</span><input type="number" min="0" value={seleccionado.coverageKm ?? 0} onChange={(e) => actualizarElemento(seleccionado.id, { coverageKm: Number(e.target.value) })} className="w-full rounded bg-slate-800 p-2" /></label>
+            <div className="grid grid-cols-2 gap-3"><label className="block text-sm"><span className="mb-1 block text-slate-300">Cifrado</span><input value={seleccionado.encryptionStatus ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { encryptionStatus: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label><label className="block text-sm"><span className="mb-1 block text-slate-300">Redundancia</span><input value={seleccionado.redundancy ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { redundancy: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label></div>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Observaciones</span><textarea rows={3} value={seleccionado.communicationsNotes ?? ""} onChange={(e) => actualizarElemento(seleccionado.id, { communicationsNotes: e.target.value })} className="w-full rounded bg-slate-800 p-2" /></label>
+          </section>
+        )}
+
+        {workspaceCode === "a2" && seleccionado && seleccionado.bando === "enemigo" && (
+          <section {...propiedadesPanel("inteligencia")} className="mb-5 space-y-4 rounded border border-red-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-red-300">Información de inteligencia</h2>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Estado del dato</span>
+              <select
+                value={seleccionado.intelligenceStatus ?? "pendiente"}
+                onChange={(event) => actualizarElemento(seleccionado.id, { intelligenceStatus: event.target.value as EstadoInteligencia })}
                 className="w-full rounded bg-slate-800 p-2"
-                placeholder="Ej.: F-16CJ / AGM-88C HARM"
+              >
+                <option value="pendiente">Pendiente</option>
+                <option value="estimado">Estimado</option>
+                <option value="probable">Probable</option>
+                <option value="confirmado">Confirmado</option>
+                <option value="descartado">Descartado</option>
+              </select>
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Nivel de confianza</span>
+              <select
+                value={seleccionado.confidenceLevel ?? "media"}
+                onChange={(event) => actualizarElemento(seleccionado.id, { confidenceLevel: event.target.value as NivelConfianza })}
+                className="w-full rounded bg-slate-800 p-2"
+              >
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+              </select>
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Fecha y hora de la información</span>
+              <input
+                type="datetime-local"
+                value={seleccionado.informationDate ? seleccionado.informationDate.slice(0, 16) : ""}
+                onChange={(event) => actualizarElemento(seleccionado.id, { informationDate: event.target.value ? new Date(event.target.value).toISOString() : undefined })}
+                className="w-full rounded bg-slate-800 p-2"
               />
             </label>
 
-            <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
-              <button
-                type="button"
-                onClick={
-                  modoAtaqueActivo ? detenerCargaPlanAtaque : iniciarPlanAtaque
-                }
-                className={`rounded px-3 py-2 font-semibold ${modoAtaqueActivo ? "bg-red-700" : "bg-emerald-700"}`}
-              >
-                {modoAtaqueActivo ? "Detener marcado" : "Marcar ruta en mapa"}
-              </button>
-              <button
-                type="button"
-                onClick={colocarMedioAtaqueEnPunto}
-                className="rounded bg-cyan-700 px-3 py-2 font-semibold"
-              >
-                Colocar medio en punto
-              </button>
-            </div>
-
-            <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Fuente</span>
               <input
-                value={latitudAtaque}
-                onChange={(event) => setLatitudAtaque(event.target.value)}
-                className="rounded bg-slate-800 p-2"
-                placeholder="Latitud"
+                type="text"
+                value={seleccionado.sourceDescription ?? ""}
+                onChange={(event) => actualizarElemento(seleccionado.id, { sourceDescription: event.target.value })}
+                placeholder="Descripción general de la fuente"
+                className="w-full rounded bg-slate-800 p-2"
               />
-              <input
-                value={longitudAtaque}
-                onChange={(event) => setLongitudAtaque(event.target.value)}
-                className="rounded bg-slate-800 p-2"
-                placeholder="Longitud"
+            </label>
+
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Observaciones de inteligencia</span>
+              <textarea
+                value={seleccionado.intelligenceNotes ?? ""}
+                onChange={(event) => actualizarElemento(seleccionado.id, { intelligenceNotes: event.target.value })}
+                rows={4}
+                className="w-full rounded bg-slate-800 p-2"
               />
-            </div>
+            </label>
 
-            <div className="mb-3 grid grid-cols-3 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={agregarPuntoAtaqueManual}
-                className="rounded bg-slate-700 px-2 py-2"
+            <label className="block text-sm">
+              <span className="mb-1 block text-slate-300">Clasificación</span>
+              <select
+                value={seleccionado.classification ?? "uso_interno"}
+                onChange={(event) => actualizarElemento(seleccionado.id, { classification: event.target.value as ClasificacionInteligencia })}
+                className="w-full rounded bg-slate-800 p-2"
               >
-                Agregar coordenada
-              </button>
-              <button
-                type="button"
-                onClick={quitarUltimoPuntoAtaque}
-                className="rounded bg-slate-700 px-2 py-2"
-              >
-                Quitar último
-              </button>
-              <button
-                type="button"
-                onClick={limpiarPlanAtaque}
-                className="rounded bg-slate-700 px-2 py-2"
-              >
-                Limpiar ruta
-              </button>
-            </div>
+                <option value="uso_interno">Uso interno</option>
+                <option value="compartible">Compartible</option>
+                <option value="restringido">Restringido</option>
+              </select>
+            </label>
 
-            <div className="rounded bg-slate-950 p-3 text-xs text-slate-300">
-              <p>
-                Ruta actual: <strong>{puntosAtaque.length}</strong> punto(s). La
-                línea se muestra punteada y el último punto se representa como
-                impacto/explosión cuando hay dos o más puntos.
-              </p>
-              {puntosAtaque.length > 0 && (
-                <ol className="mt-2 max-h-36 list-decimal overflow-auto pl-5">
-                  {puntosAtaque.map((punto, indice) => (
-                    <li key={punto.id}>
-                      {indice === puntosAtaque.length - 1 &&
-                      puntosAtaque.length >= 2
-                        ? "💥 Impacto: "
-                        : "Punto: "}
-                      {punto.coordenadas[1].toFixed(5)},{" "}
-                      {punto.coordenadas[0].toFixed(5)}
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </div>
-          </section>
-        )}
-
-        {seleccionado?.sharedExternal && (
-          <section className="mb-5 rounded border border-amber-700 bg-amber-950/40 p-4 text-sm text-amber-200">
-            <p className="font-semibold">
-              Elemento compartido por{" "}
-              {seleccionado.originWorkspaceCode?.toUpperCase() ?? "otra célula"}
-            </p>
-            <p className="mt-1 text-xs">
-              Se muestra en la vista consolidada. No se guarda ni modifica desde
-              este espacio.
-            </p>
-          </section>
-        )}
-
-        {workspaceCode === "a3" &&
-          seleccionado &&
-          !seleccionado.sharedExternal && (
-            <section
-              {...propiedadesPanel("operaciones")}
-              className="mb-5 space-y-4 rounded border border-cyan-900 bg-slate-900 p-4"
-            >
-              <h2 className="font-semibold text-cyan-300">
-                Ficha de operaciones
-              </h2>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Misión / efecto
-                </span>
-                <input
-                  value={seleccionado.operationMission ?? ""}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      operationMission: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Fase</span>
-                  <input
-                    value={seleccionado.operationPhase ?? ""}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        operationPhase: e.target.value,
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Prioridad</span>
-                  <select
-                    value={seleccionado.operationPriority ?? "normal"}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        operationPriority: e.target.value,
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  >
-                    <option value="baja">Baja</option>
-                    <option value="normal">Normal</option>
-                    <option value="alta">Alta</option>
-                    <option value="critica">Crítica</option>
-                  </select>
-                </label>
-              </div>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Tarea</span>
-                <input
-                  value={seleccionado.operationTask ?? ""}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      operationTask: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Inicio</span>
-                  <input
-                    type="datetime-local"
-                    value={seleccionado.operationStart ?? ""}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        operationStart: e.target.value,
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Fin</span>
-                  <input
-                    type="datetime-local"
-                    value={seleccionado.operationEnd ?? ""}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        operationEnd: e.target.value,
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-              </div>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Indicativo</span>
-                <input
-                  value={seleccionado.callSign ?? ""}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      callSign: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Observaciones</span>
-                <textarea
-                  rows={3}
-                  value={seleccionado.operationNotes ?? ""}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      operationNotes: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-            </section>
-          )}
-
-        {workspaceCode === "a1" &&
-          seleccionado &&
-          !seleccionado.sharedExternal && (
-            <section
-              {...propiedadesPanel("personal")}
-              className="mb-5 space-y-4 rounded border border-pink-900 bg-slate-900 p-4"
-            >
-              <h2 className="font-semibold text-pink-300">
-                Situación de personal
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Asignados</span>
-                  <input
-                    type="number"
-                    min="0"
-                    value={seleccionado.personnelAssigned ?? 0}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        personnelAssigned: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Disponibles</span>
-                  <input
-                    type="number"
-                    min="0"
-                    value={seleccionado.personnelAvailable ?? 0}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        personnelAvailable: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Bajas</span>
-                  <input
-                    type="number"
-                    min="0"
-                    value={seleccionado.personnelCasualties ?? 0}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        personnelCasualties: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Reemplazos</span>
-                  <input
-                    type="number"
-                    min="0"
-                    value={seleccionado.personnelReplacements ?? 0}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        personnelReplacements: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-              </div>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Estado sanitario
-                </span>
-                <select
-                  value={seleccionado.medicalStatus ?? "normal"}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      medicalStatus: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                >
-                  <option value="normal">Normal</option>
-                  <option value="degradado">Degradado</option>
-                  <option value="critico">Crítico</option>
-                </select>
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={seleccionado.evacuationRequired ?? false}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      evacuationRequired: e.target.checked,
-                    })
-                  }
-                />{" "}
-                Requiere evacuación sanitaria
-              </label>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Novedades</span>
-                <textarea
-                  rows={3}
-                  value={seleccionado.personnelNotes ?? ""}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      personnelNotes: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-            </section>
-          )}
-
-        {workspaceCode === "a4" &&
-          seleccionado &&
-          !seleccionado.sharedExternal && (
-            <section
-              {...propiedadesPanel("logistica")}
-              className="mb-5 space-y-4 rounded border border-emerald-900 bg-slate-900 p-4"
-            >
-              <h2 className="font-semibold text-emerald-300">
-                Situación logística
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">
-                    Combustible %
-                  </span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={seleccionado.fuelPercent ?? 0}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        fuelPercent: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Armamento %</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={seleccionado.ammunitionPercent ?? 0}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        ammunitionPercent: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-              </div>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Estado del material
-                </span>
-                <select
-                  value={seleccionado.materialStatus ?? "operativo"}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      materialStatus: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                >
-                  <option value="operativo">Operativo</option>
-                  <option value="degradado">Degradado</option>
-                  <option value="no_operativo">No operativo</option>
-                </select>
-              </label>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Transportes disponibles
-                </span>
-                <input
-                  type="number"
-                  min="0"
-                  value={seleccionado.transportAvailable ?? 0}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      transportAvailable: Number(e.target.value),
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Prioridad de reabastecimiento
-                </span>
-                <select
-                  value={seleccionado.resupplyPriority ?? "normal"}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      resupplyPriority: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                >
-                  <option value="baja">Baja</option>
-                  <option value="normal">Normal</option>
-                  <option value="alta">Alta</option>
-                  <option value="critica">Crítica</option>
-                </select>
-              </label>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Observaciones logísticas
-                </span>
-                <textarea
-                  rows={3}
-                  value={seleccionado.logisticsNotes ?? ""}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      logisticsNotes: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-            </section>
-          )}
-
-        {workspaceCode === "a5" &&
-          seleccionado &&
-          !seleccionado.sharedExternal && (
-            <section
-              {...propiedadesPanel("comunicaciones")}
-              className="mb-5 space-y-4 rounded border border-sky-900 bg-slate-900 p-4"
-            >
-              <h2 className="font-semibold text-sky-300">
-                Situación de comunicaciones
-              </h2>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Tipo de nodo</span>
-                <input
-                  value={seleccionado.communicationNodeType ?? ""}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      communicationNodeType: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Red</span>
-                  <input
-                    value={seleccionado.networkName ?? ""}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        networkName: e.target.value,
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">
-                    Frecuencia / canal
-                  </span>
-                  <input
-                    value={seleccionado.frequency ?? ""}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        frequency: e.target.value,
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-              </div>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Estado del enlace
-                </span>
-                <select
-                  value={seleccionado.linkStatus ?? "operativo"}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      linkStatus: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                >
-                  <option value="operativo">Operativo</option>
-                  <option value="degradado">Degradado</option>
-                  <option value="interrumpido">Interrumpido</option>
-                </select>
-              </label>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Cobertura (km)
-                </span>
-                <input
-                  type="number"
-                  min="0"
-                  value={seleccionado.coverageKm ?? 0}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      coverageKm: Number(e.target.value),
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Cifrado</span>
-                  <input
-                    value={seleccionado.encryptionStatus ?? ""}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        encryptionStatus: e.target.value,
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block text-slate-300">Redundancia</span>
-                  <input
-                    value={seleccionado.redundancy ?? ""}
-                    onChange={(e) =>
-                      actualizarElemento(seleccionado.id, {
-                        redundancy: e.target.value,
-                      })
-                    }
-                    className="w-full rounded bg-slate-800 p-2"
-                  />
-                </label>
-              </div>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Observaciones</span>
-                <textarea
-                  rows={3}
-                  value={seleccionado.communicationsNotes ?? ""}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      communicationsNotes: e.target.value,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-            </section>
-          )}
-
-        {workspaceCode === "a2" &&
-          seleccionado &&
-          seleccionado.bando === "enemigo" && (
-            <section
-              {...propiedadesPanel("inteligencia")}
-              className="mb-5 space-y-4 rounded border border-red-900 bg-slate-900 p-4"
-            >
-              <h2 className="font-semibold text-red-300">
-                Información de inteligencia
-              </h2>
-
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Estado del dato
-                </span>
-                <select
-                  value={seleccionado.intelligenceStatus ?? "pendiente"}
-                  onChange={(event) =>
-                    actualizarElemento(seleccionado.id, {
-                      intelligenceStatus: event.target
-                        .value as EstadoInteligencia,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                >
-                  <option value="pendiente">Pendiente</option>
-                  <option value="estimado">Estimado</option>
-                  <option value="probable">Probable</option>
-                  <option value="confirmado">Confirmado</option>
-                  <option value="descartado">Descartado</option>
-                </select>
-              </label>
-
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Nivel de confianza
-                </span>
-                <select
-                  value={seleccionado.confidenceLevel ?? "media"}
-                  onChange={(event) =>
-                    actualizarElemento(seleccionado.id, {
-                      confidenceLevel: event.target.value as NivelConfianza,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                >
-                  <option value="baja">Baja</option>
-                  <option value="media">Media</option>
-                  <option value="alta">Alta</option>
-                </select>
-              </label>
-
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Fecha y hora de la información
-                </span>
-                <input
-                  type="datetime-local"
-                  value={
-                    seleccionado.informationDate
-                      ? seleccionado.informationDate.slice(0, 16)
-                      : ""
-                  }
-                  onChange={(event) =>
-                    actualizarElemento(seleccionado.id, {
-                      informationDate: event.target.value
-                        ? new Date(event.target.value).toISOString()
-                        : undefined,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Fuente</span>
-                <input
-                  type="text"
-                  value={seleccionado.sourceDescription ?? ""}
-                  onChange={(event) =>
-                    actualizarElemento(seleccionado.id, {
-                      sourceDescription: event.target.value,
-                    })
-                  }
-                  placeholder="Descripción general de la fuente"
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">
-                  Observaciones de inteligencia
-                </span>
-                <textarea
-                  value={seleccionado.intelligenceNotes ?? ""}
-                  onChange={(event) =>
-                    actualizarElemento(seleccionado.id, {
-                      intelligenceNotes: event.target.value,
-                    })
-                  }
-                  rows={4}
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </label>
-
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Clasificación</span>
-                <select
-                  value={seleccionado.classification ?? "uso_interno"}
-                  onChange={(event) =>
-                    actualizarElemento(seleccionado.id, {
-                      classification: event.target
-                        .value as ClasificacionInteligencia,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                >
-                  <option value="uso_interno">Uso interno</option>
-                  <option value="compartible">Compartible</option>
-                  <option value="restringido">Restringido</option>
-                </select>
-              </label>
-
-              <div className="space-y-2 rounded bg-slate-800 p-3 text-sm">
-                <p className="font-semibold">Compartir con</p>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={seleccionado.sharedWithCommander ?? false}
-                    onChange={(event) =>
-                      actualizarElemento(seleccionado.id, {
-                        sharedWithCommander: event.target.checked,
-                      })
-                    }
-                  />{" "}
-                  Comandante
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={seleccionado.sharedWithJem ?? false}
-                    onChange={(event) =>
-                      actualizarElemento(seleccionado.id, {
-                        sharedWithJem: event.target.checked,
-                      })
-                    }
-                  />{" "}
-                  JEM
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={seleccionado.sharedWithOtherCells ?? false}
-                    onChange={(event) =>
-                      actualizarElemento(seleccionado.id, {
-                        sharedWithOtherCells: event.target.checked,
-                      })
-                    }
-                  />{" "}
-                  Otras células
-                </label>
-                {seleccionado.classification === "restringido" && (
-                  <p className="text-xs text-amber-300">
-                    Los elementos restringidos no serán compartidos aunque las
-                    casillas estén marcadas.
-                  </p>
-                )}
-              </div>
-            </section>
-          )}
-
-        {seleccionado &&
-          ["a1", "a2", "a3", "a4", "a5"].includes(workspaceCode ?? "") &&
-          !seleccionado.sharedExternal && (
-            <section
-              {...propiedadesPanel("compartir")}
-              className="mb-5 space-y-3 rounded border border-violet-900 bg-slate-900 p-4"
-            >
-              <h2 className="font-semibold text-violet-300">
-                Compartición del elemento
-              </h2>
-              <label className="block text-sm">
-                <span className="mb-1 block text-slate-300">Clasificación</span>
-                <select
-                  value={seleccionado.classification ?? "uso_interno"}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      classification: e.target
-                        .value as ClasificacionInteligencia,
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                >
-                  <option value="uso_interno">Uso interno</option>
-                  <option value="compartible">Compartible</option>
-                  <option value="restringido">Restringido</option>
-                </select>
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={seleccionado.sharedWithCommander ?? false}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      sharedWithCommander: e.target.checked,
-                    })
-                  }
-                />{" "}
-                Compartir con Comandante
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={seleccionado.sharedWithJem ?? false}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      sharedWithJem: e.target.checked,
-                    })
-                  }
-                />{" "}
-                Compartir con JEM
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={seleccionado.sharedWithOtherCells ?? false}
-                  onChange={(e) =>
-                    actualizarElemento(seleccionado.id, {
-                      sharedWithOtherCells: e.target.checked,
-                    })
-                  }
-                />{" "}
-                Compartir con otras células
-              </label>
+            <div className="space-y-2 rounded bg-slate-800 p-3 text-sm">
+              <p className="font-semibold">Compartir con</p>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={seleccionado.sharedWithCommander ?? false} onChange={(event) => actualizarElemento(seleccionado.id, { sharedWithCommander: event.target.checked })} /> Comandante</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={seleccionado.sharedWithJem ?? false} onChange={(event) => actualizarElemento(seleccionado.id, { sharedWithJem: event.target.checked })} /> JEM</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={seleccionado.sharedWithOtherCells ?? false} onChange={(event) => actualizarElemento(seleccionado.id, { sharedWithOtherCells: event.target.checked })} /> Otras células</label>
               {seleccionado.classification === "restringido" && (
-                <p className="text-xs text-amber-300">
-                  La clasificación restringida anula toda compartición al
-                  guardar.
-                </p>
+                <p className="text-xs text-amber-300">Los elementos restringidos no serán compartidos aunque las casillas estén marcadas.</p>
               )}
-            </section>
-          )}
+            </div>
+          </section>
+        )}
+
+        {seleccionado && ["a1", "a2", "a3", "a4", "a5"].includes(workspaceCode ?? "") && !seleccionado.sharedExternal && (
+          <section {...propiedadesPanel("compartir")} className="mb-5 space-y-3 rounded border border-violet-900 bg-slate-900 p-4">
+            <h2 className="font-semibold text-violet-300">Compartición del elemento</h2>
+            <label className="block text-sm"><span className="mb-1 block text-slate-300">Clasificación</span><select value={seleccionado.classification ?? "uso_interno"} onChange={(e) => actualizarElemento(seleccionado.id, { classification: e.target.value as ClasificacionInteligencia })} className="w-full rounded bg-slate-800 p-2"><option value="uso_interno">Uso interno</option><option value="compartible">Compartible</option><option value="restringido">Restringido</option></select></label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={seleccionado.sharedWithCommander ?? false} onChange={(e) => actualizarElemento(seleccionado.id, { sharedWithCommander: e.target.checked })} /> Compartir con Comandante</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={seleccionado.sharedWithJem ?? false} onChange={(e) => actualizarElemento(seleccionado.id, { sharedWithJem: e.target.checked })} /> Compartir con JEM</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={seleccionado.sharedWithOtherCells ?? false} onChange={(e) => actualizarElemento(seleccionado.id, { sharedWithOtherCells: e.target.checked })} /> Compartir con otras células</label>
+            {seleccionado.classification === "restringido" && <p className="text-xs text-amber-300">La clasificación restringida anula toda compartición al guardar.</p>}
+          </section>
+        )}
 
         {seleccionado && (
           <section className="space-y-4 rounded bg-slate-900 p-4">
@@ -6573,39 +4440,6 @@ export default function MapEditor({
                 </p>
               )}
             </div>
-
-            {seleccionado.tipo === "aeronave" && (
-              <div className="rounded border border-cyan-800 bg-slate-900 p-3 text-sm">
-                <label className="mb-3 flex items-center gap-2 text-cyan-200">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(seleccionado.mostrarRadar)}
-                    onChange={(event) =>
-                      actualizarElemento(seleccionado.id, {
-                        mostrarRadar: event.target.checked,
-                      })
-                    }
-                  />
-                  Mostrar alcance radar de la aeronave
-                </label>
-
-                <label className="mb-1 block text-xs text-slate-300">
-                  Alcance radar
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  step={1}
-                  value={seleccionado.alcanceRadarKm ?? 0}
-                  onChange={(event) =>
-                    actualizarElemento(seleccionado.id, {
-                      alcanceRadarKm: Math.max(0, Number(event.target.value)),
-                    })
-                  }
-                  className="w-full rounded bg-slate-800 p-2"
-                />
-              </div>
-            )}
 
             <label className="flex items-center gap-2">
               <input
@@ -6698,46 +4532,24 @@ export default function MapEditor({
             </div>
 
             {seleccionado.tipo === "aeronave" && (
-              <div
-                className={`rounded border p-3 text-sm ${seleccionado.fuenteDistancia === "orden" ? "border-green-600 bg-green-950/40" : "border-red-600 bg-red-950/40"}`}
-              >
-                <p
-                  className={
-                    seleccionado.fuenteDistancia === "orden"
-                      ? "text-green-300"
-                      : "text-red-300"
-                  }
-                >
+              <div className={`rounded border p-3 text-sm ${seleccionado.fuenteDistancia === "orden" ? "border-green-600 bg-green-950/40" : "border-red-600 bg-red-950/40"}`}>
+                <p className={seleccionado.fuenteDistancia === "orden" ? "text-green-300" : "text-red-300"}>
                   <strong>Origen del valor:</strong>{" "}
-                  {seleccionado.fuenteDistancia === "orden"
-                    ? "Orden de instrucción"
-                    : seleccionado.fuenteDistancia === "externa"
-                      ? "Referencia externa / estimación"
-                      : "Carga manual"}
+                  {seleccionado.fuenteDistancia === "orden" ? "Orden de instrucción" : seleccionado.fuenteDistancia === "externa" ? "Referencia externa / estimación" : "Carga manual"}
                 </p>
-                <p className="mt-1 text-xs text-slate-300">
-                  {seleccionado.referenciaDistancia}
-                </p>
+                <p className="mt-1 text-xs text-slate-300">{seleccionado.referenciaDistancia}</p>
                 {seleccionado.permiteReabastecimiento && (
                   <label className="mt-3 flex items-center gap-2 text-cyan-200">
                     <input
                       type="checkbox"
                       checked={Boolean(seleccionado.conReabastecimiento)}
-                      onChange={(event) =>
-                        actualizarElemento(seleccionado.id, {
-                          conReabastecimiento: event.target.checked,
-                        })
-                      }
+                      onChange={(event) => actualizarElemento(seleccionado.id, { conReabastecimiento: event.target.checked })}
                     />
                     Con reabastecimiento en vuelo: duplicar radio de acción
                   </label>
                 )}
                 {seleccionado.conReabastecimiento && (
-                  <p className="mt-2 text-xs text-cyan-300">
-                    Radio representado con REV:{" "}
-                    {formatearDistancia(radioAereoRepresentado(seleccionado))}.
-                    Es una hipótesis simplificada de planeamiento.
-                  </p>
+                  <p className="mt-2 text-xs text-cyan-300">Radio representado con REV: {formatearDistancia(radioAereoRepresentado(seleccionado))}. Es una hipótesis simplificada de planeamiento.</p>
                 )}
               </div>
             )}
