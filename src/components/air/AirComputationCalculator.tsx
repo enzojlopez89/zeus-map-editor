@@ -274,12 +274,25 @@ function performanceScore(sideData: PerformanceData, other: PerformanceData) {
   ];
   return entries.reduce((sum, [v, r, w]) => sum + relativeScore(v, r) * w, 0) / 100;
 }
+function finiteNumber(value: unknown, fallback = 0) {
+  const normalized = typeof value === "string" ? value.replace(",", ".").trim() : value;
+  const number = Number(normalized);
+  return Number.isFinite(number) ? number : fallback;
+}
 function generationScore(data: GenerationData) {
-  const byAircraft = data.aviones * data.salidasAvion;
-  const byPilots = data.pilotos * data.salidasPiloto;
-  const base = Math.min(byAircraft, byPilots, data.mro || Infinity);
-  const logistics = Math.min(data.mroPiloto || Infinity, data.mroLogDia || Infinity, data.mroLogDiaNoche || Infinity);
-  return Math.max(0, base * Math.max(0, data.todoTiempo) * Math.max(0.01, logistics));
+  const todoTiempo = Math.max(0, finiteNumber(data.todoTiempo, 1));
+  const byAircraft = Math.max(0, finiteNumber(data.aviones)) * Math.max(0, finiteNumber(data.salidasAvion));
+  const byPilots = Math.max(0, finiteNumber(data.pilotos)) * Math.max(0, finiteNumber(data.salidasPiloto));
+  const mro = Math.max(0, finiteNumber(data.mro));
+
+  // El Excel toma como capacidad de generar salidas el menor valor entre
+  // la capacidad por aeronaves, la capacidad por pilotos y el MRO.
+  // MRO Piloto y MRO Logístico se muestran como referencias de apoyo,
+  // pero no se multiplican por el resultado porque eso sobredimensionaría
+  // artificialmente la generación de salidas.
+  const limits = [byAircraft, byPilots, mro].filter((value) => value > 0);
+  if (limits.length === 0 || todoTiempo === 0) return 0;
+  return Math.min(...limits) * todoTiempo;
 }
 function survivalScore(data: SurvivalData) {
   const detectionChoice = data.ata * 1 + data.cobertura80 * 0.8 + data.cobertura50a80 * 0.65 + data.coberturaBajo50 * 0.45;
@@ -318,9 +331,15 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
     const genE = generationScore(generation.enemigo);
     const survP = survivalScore(survival.propio);
     const survE = survivalScore(survival.enemigo);
-    const ceacmP = iecaP * (genP / Math.max(genE, 1)) * survP;
-    const ceacmE = iecaE * (genE / Math.max(genP, 1)) * survE;
-    return { p, ep, a, ea, aa, eaa, as, eas, iecaP, iecaE, genP, genE, survP, survE, ceacmP, ceacmE, ratio: ceacmP / Math.max(ceacmE, 0.01) };
+    // Fórmula original del Cómputo Aéreo ZEUS:
+    // CEACM = (IECA × 40 %) + (Generación de salidas × 30 %)
+    //       + (Capacidad de supervivencia × 30 %).
+    // La supervivencia permanece expresada entre 0 y 1, como en el Excel.
+    const ceacmP = iecaP * 0.4 + genP * 0.3 + survP * 0.3;
+    const ceacmE = iecaE * 0.4 + genE * 0.3 + survE * 0.3;
+    const ratioIeca = iecaE > 0 ? iecaP / iecaE : null;
+    const ratio = ceacmE > 0 ? ceacmP / ceacmE : null;
+    return { p, ep, a, ea, aa, eaa, as, eas, iecaP, iecaE, genP, genE, survP, survE, ceacmP, ceacmE, ratioIeca, ratio };
   }, [performance, avionics, airAir, airSurface, generation, survival]);
 
   function updateGroup(setter: React.Dispatch<React.SetStateAction<Group[]>>, groupId: string, metricId: string, side: Side, value: number) {
@@ -329,7 +348,7 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
 
   async function save() {
     setStatus("Guardando...");
-    const content = { version: "air-computation-v3", title: "Cómputo Aéreo ZEUS I", status: "borrador", comparisonName, aircraft, performance, avionics, airAir, airSurface, generation, survival };
+    const content = { version: "air-computation-v4", title: "Cómputo Aéreo ZEUS I", status: "borrador", comparisonName, aircraft, performance, avionics, airAir, airSurface, generation, survival };
     const response = await fetch(`/api/workspaces/${workspaceCode}/pcr/save`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, analysisKey: "computo-aereo-principal", content, result: results }) });
     const json = await response.json();
     setStatus(response.ok && json.ok ? `Guardado · versión ${json.version}` : (json.error || "Error al guardar"));
@@ -341,7 +360,7 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
         const response = await fetch(`/api/workspaces/${workspaceCode}/pcr/load`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, analysisKey: "computo-aereo-principal" }) });
         const json = await response.json();
         const content = json.analysis?.content;
-        if (content?.version === "air-computation-v3") {
+        if (content?.version === "air-computation-v3" || content?.version === "air-computation-v4") {
           if (content.aircraft) setAircraft(content.aircraft);
           if (content.comparisonName) setComparisonName(content.comparisonName);
           if (content.performance) setPerformance(content.performance);
@@ -372,7 +391,20 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
       </div>
     </section>
 
-    <section className="mb-5 grid gap-3 md:grid-cols-4"><Result label="IECA propio" value={results.iecaP}/><Result label="IECA enemigo" value={results.iecaE}/><Result label="CEACM propio" value={results.ceacmP}/><Result label="Relación propia/enemiga" value={results.ratio}/></section>
+    <section className="mb-5 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <Result label="IECA propio" value={results.iecaP}/>
+      <Result label="IECA enemigo" value={results.iecaE}/>
+      <Result label="Relación IECA propia/enemiga" value={results.ratioIeca}/>
+      <Result label="CEACM propio" value={results.ceacmP}/>
+      <Result label="CEACM enemigo" value={results.ceacmE}/>
+      <Result label="Relación CEACM propia/enemiga" value={results.ratio}/>
+    </section>
+    <CalculationDiagnostic
+      ieca={{ propio: results.iecaP, enemigo: results.iecaE }}
+      generation={{ propio: results.genP, enemigo: results.genE }}
+      survival={{ propio: results.survP, enemigo: results.survE }}
+      ceacm={{ propio: results.ceacmP, enemigo: results.ceacmE }}
+    />
 
     <PerformanceSection data={performance} setData={setPerformance} scores={{ propio: results.p, enemigo: results.ep }} />
     <GroupedSection title="Aviónica" groups={avionics} scores={{ propio: results.a, enemigo: results.ea }} onChange={(g, m, s, v) => updateGroup(setAvionics, g, m, s, v)} />
@@ -386,7 +418,30 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
 function AircraftInput({ label, value, side, onChange }: { label: string; value: string; side: Side; onChange: (value: string) => void }) {
   return <label className={`text-center font-bold ${side === "propio" ? "text-blue-300" : "text-red-300"}`}>{label}<input value={value} onChange={(e) => onChange(e.target.value)} className={`mt-2 w-full rounded border bg-slate-950 p-3 text-center text-white ${side === "propio" ? "border-blue-700" : "border-red-700"}`} placeholder="Escriba la aeronave" /></label>;
 }
-function Result({ label, value }: { label: string; value: number }) { return <div className="rounded-xl border border-cyan-800 bg-cyan-950/30 p-4 text-center"><p className="text-sm text-cyan-200">{label}</p><p className="text-3xl font-bold">{Number.isFinite(value) ? value.toFixed(2) : "0.00"}</p></div>; }
+function Result({ label, value }: { label: string; value: number | null }) {
+  return <div className="rounded-xl border border-cyan-800 bg-cyan-950/30 p-4 text-center"><p className="text-sm text-cyan-200">{label}</p><p className="text-3xl font-bold">{value !== null && Number.isFinite(value) ? value.toFixed(2) : "—"}</p></div>;
+}
+function CalculationDiagnostic({ ieca, generation, survival, ceacm }: {
+  ieca: { propio: number; enemigo: number };
+  generation: { propio: number; enemigo: number };
+  survival: { propio: number; enemigo: number };
+  ceacm: { propio: number; enemigo: number };
+}) {
+  const invalid: string[] = [];
+  if (generation.propio <= 0) invalid.push("La generación de salidas propia es 0. Revise aeronaves, salidas por aeronave, pilotos, salidas por piloto y MRO propios.");
+  if (generation.enemigo <= 0) invalid.push("La generación de salidas enemiga es 0. Revise aeronaves, salidas por aeronave, pilotos, salidas por piloto y MRO enemigos.");
+  if (survival.propio <= 0) invalid.push("La supervivencia propia es 0. Revise los datos de detección, cazas, SAM y AAA.");
+  if (survival.enemigo <= 0) invalid.push("La supervivencia enemiga es 0. Revise los datos de detección, cazas, SAM y AAA.");
+  return <section className="mb-5 rounded-xl border border-slate-700 bg-slate-900 p-4">
+    <h2 className="mb-3 text-center text-lg font-bold">Comprobación del cálculo</h2>
+    <p className="text-center text-sm text-slate-300">CEACM = IECA × 0,40 + Generación de salidas × 0,30 + Supervivencia × 0,30</p>
+    <div className="mt-3 grid gap-3 md:grid-cols-2">
+      <p className="rounded bg-slate-950 p-3 text-center text-sm">Propio: {ieca.propio.toFixed(2)} × 0,40 + {generation.propio.toFixed(2)} × 0,30 + {survival.propio.toFixed(4)} × 0,30 = <strong>{ceacm.propio.toFixed(2)}</strong></p>
+      <p className="rounded bg-slate-950 p-3 text-center text-sm">Enemigo: {ieca.enemigo.toFixed(2)} × 0,40 + {generation.enemigo.toFixed(2)} × 0,30 + {survival.enemigo.toFixed(4)} × 0,30 = <strong>{ceacm.enemigo.toFixed(2)}</strong></p>
+    </div>
+    {invalid.length > 0 && <div className="mt-3 rounded border border-amber-700 bg-amber-950/40 p-3 text-sm text-amber-200">{invalid.map((message) => <p key={message}>• {message}</p>)}</div>}
+  </section>;
+}
 function NumberPair({ label, unit, help, values, onChange }: { label: string; unit: string; help: string; values: { propio: number; enemigo: number }; onChange: (side: Side, value: number) => void }) {
   return <div className="rounded-lg border border-slate-700 bg-slate-950 p-3"><h3 className="text-left font-bold">{label}</h3><p className="mb-3 text-left text-xs text-slate-400">{help}</p><div className="grid grid-cols-2 gap-3">{(["propio", "enemigo"] as Side[]).map((side) => <label key={side} className="text-center text-sm capitalize">{side}<input type="number" step="any" value={values[side]} onChange={(e) => onChange(side, Number(e.target.value))} className={`mt-1 w-full rounded border bg-slate-900 p-2 text-center ${side === "propio" ? "border-blue-700" : "border-red-700"}`} /><span className="text-xs text-slate-400">{unit}</span></label>)}</div></div>;
 }
