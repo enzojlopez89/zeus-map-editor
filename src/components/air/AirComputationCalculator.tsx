@@ -305,6 +305,31 @@ function survivalScore(data: SurvivalData) {
   return Math.min(1, Math.max(0, detectionSurvival * fighterThreat * samThreat * aaaThreat));
 }
 
+type SavedAirComparison = {
+  analysis_key: string;
+  title: string;
+  status: string;
+  version: number;
+  updated_at: string;
+  result?: Record<string, unknown>;
+};
+
+function comparisonKey(name: string) {
+  const slug = name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 45) || "comparacion";
+  return `computo-aereo-${slug}-${Date.now()}`;
+}
+
+function ratioText(value: number | null) {
+  if (value === null || !Number.isFinite(value)) return "—";
+  return `${value.toFixed(2).replace(".", ",")} a 1`;
+}
+
 export default function AirComputationCalculator({ workspaceCode, token }: Props) {
   const [performance, setPerformance] = useState({ propio: pPropio, enemigo: pEnemigo });
   const [avionics, setAvionics] = useState(avionicsInitial);
@@ -315,6 +340,8 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
   const [aircraft, setAircraft] = useState({ propio: "F-16C Block 40", enemigo: "MiG-29" });
   const [comparisonName, setComparisonName] = useState("Confrontación principal");
   const [status, setStatus] = useState("Sin guardar");
+  const [savedComparisons, setSavedComparisons] = useState<SavedAirComparison[]>([]);
+  const [selectedKey, setSelectedKey] = useState("");
 
   const results = useMemo(() => {
     const p = performanceScore(performance.propio, performance.enemigo);
@@ -331,10 +358,6 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
     const genE = generationScore(generation.enemigo);
     const survP = survivalScore(survival.propio);
     const survE = survivalScore(survival.enemigo);
-    // Fórmula original del Cómputo Aéreo ZEUS:
-    // CEACM = (IECA × 40 %) + (Generación de salidas × 30 %)
-    //       + (Capacidad de supervivencia × 30 %).
-    // La supervivencia permanece expresada entre 0 y 1, como en el Excel.
     const ceacmP = iecaP * 0.4 + genP * 0.3 + survP * 0.3;
     const ceacmE = iecaE * 0.4 + genE * 0.3 + survE * 0.3;
     const ratioIeca = iecaE > 0 ? iecaP / iecaE : null;
@@ -346,30 +369,105 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
     setter((old) => old.map((group) => group.id === groupId ? { ...group, metrics: group.metrics.map((metric) => metric.id === metricId ? { ...metric, [side]: value } : metric) } : group));
   }
 
-  async function save() {
-    setStatus("Guardando...");
-    const content = { version: "air-computation-v4", title: "Cómputo Aéreo ZEUS I", status: "borrador", comparisonName, aircraft, performance, avionics, airAir, airSurface, generation, survival };
-    const response = await fetch(`/api/workspaces/${workspaceCode}/pcr/save`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, analysisKey: "computo-aereo-principal", content, result: results }) });
+  function applyContent(content: any, version?: number) {
+    if (!content) return;
+    if (content.aircraft) setAircraft(content.aircraft);
+    if (content.comparisonName) setComparisonName(content.comparisonName);
+    if (content.performance) setPerformance(content.performance);
+    if (content.avionics) setAvionics(content.avionics);
+    if (content.airAir) setAirAir(content.airAir);
+    if (content.airSurface) setAirSurface(content.airSurface);
+    if (content.generation) setGeneration(content.generation);
+    if (content.survival) setSurvival(content.survival);
+    if (version) setStatus(`Comparación cargada · versión ${version}`);
+  }
+
+  async function refreshComparisons(preferredKey?: string) {
+    const response = await fetch(`/api/workspaces/${workspaceCode}/pcr/load`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, analysisKey: preferredKey || "computo-aereo-principal" }),
+    });
     const json = await response.json();
-    setStatus(response.ok && json.ok ? `Guardado · versión ${json.version}` : (json.error || "Error al guardar"));
+    if (!response.ok || !json.ok) throw new Error(json.error || "No se pudieron cargar las comparaciones.");
+    const comparisons = (json.analyses || []).filter((item: SavedAirComparison) => item.analysis_key === "computo-aereo-principal" || item.analysis_key.startsWith("computo-aereo-"));
+    setSavedComparisons(comparisons);
+    return json;
+  }
+
+  async function loadComparison(key: string) {
+    if (!key) return;
+    setStatus("Cargando comparación...");
+    try {
+      const response = await fetch(`/api/workspaces/${workspaceCode}/pcr/load`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, analysisKey: key }),
+      });
+      const json = await response.json();
+      if (!response.ok || !json.ok || !json.analysis) throw new Error(json.error || "No se encontró la comparación.");
+      applyContent(json.analysis.content, json.analysis.version);
+      setSelectedKey(key);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Error al cargar");
+    }
+  }
+
+  async function save(asNew = false) {
+    if (!comparisonName.trim()) {
+      setStatus("Escriba un nombre para la comparación antes de guardarla.");
+      return;
+    }
+    setStatus("Guardando...");
+    const key = asNew || !selectedKey ? comparisonKey(comparisonName) : selectedKey;
+    const content = { version: "air-computation-v5", title: comparisonName.trim(), status: "borrador", comparisonName: comparisonName.trim(), aircraft, performance, avionics, airAir, airSurface, generation, survival };
+    try {
+      const response = await fetch(`/api/workspaces/${workspaceCode}/pcr/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, analysisKey: key, content, result: results }),
+      });
+      const json = await response.json();
+      if (!response.ok || !json.ok) throw new Error(json.error || "Error al guardar");
+      setSelectedKey(key);
+      await refreshComparisons(key);
+      setStatus(`Guardado: ${comparisonName.trim()} · versión ${json.version}`);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Error al guardar");
+    }
+  }
+
+  function duplicateKeeping(side: Side) {
+    setSelectedKey("");
+    setComparisonName(`${aircraft[side]} vs nueva aeronave`);
+    if (side === "propio") {
+      setAircraft((old) => ({ propio: old.propio, enemigo: "" }));
+      setPerformance((old) => ({ propio: old.propio, enemigo: structuredClone(pEnemigo) }));
+      setAvionics((old) => old.map((group, index) => ({ ...group, metrics: group.metrics.map((metric, metricIndex) => ({ ...metric, enemigo: avionicsInitial[index].metrics[metricIndex].enemigo })) })));
+      setAirAir((old) => old.map((group, index) => ({ ...group, metrics: group.metrics.map((metric, metricIndex) => ({ ...metric, enemigo: aaInitial[index].metrics[metricIndex].enemigo })) })));
+      setAirSurface((old) => old.map((group, index) => ({ ...group, metrics: group.metrics.map((metric, metricIndex) => ({ ...metric, enemigo: asInitial[index].metrics[metricIndex].enemigo })) })));
+      setGeneration((old) => ({ propio: old.propio, enemigo: structuredClone(generationEnemy) }));
+      setSurvival((old) => ({ propio: old.propio, enemigo: structuredClone(survivalEnemy) }));
+    } else {
+      setAircraft((old) => ({ propio: "", enemigo: old.enemigo }));
+      setPerformance((old) => ({ propio: structuredClone(pPropio), enemigo: old.enemigo }));
+      setAvionics((old) => old.map((group, index) => ({ ...group, metrics: group.metrics.map((metric, metricIndex) => ({ ...metric, propio: avionicsInitial[index].metrics[metricIndex].propio })) })));
+      setAirAir((old) => old.map((group, index) => ({ ...group, metrics: group.metrics.map((metric, metricIndex) => ({ ...metric, propio: aaInitial[index].metrics[metricIndex].propio })) })));
+      setAirSurface((old) => old.map((group, index) => ({ ...group, metrics: group.metrics.map((metric, metricIndex) => ({ ...metric, propio: asInitial[index].metrics[metricIndex].propio })) })));
+      setGeneration((old) => ({ propio: structuredClone(generationOwn), enemigo: old.enemigo }));
+      setSurvival((old) => ({ propio: structuredClone(survivalOwn), enemigo: old.enemigo }));
+    }
+    setStatus(`Nueva comparación creada conservando los valores ${side === "propio" ? "propios" : "enemigos"}. Modifique la otra aeronave y guarde con un nombre nuevo.`);
   }
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(`/api/workspaces/${workspaceCode}/pcr/load`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, analysisKey: "computo-aereo-principal" }) });
-        const json = await response.json();
-        const content = json.analysis?.content;
-        if (content?.version === "air-computation-v3" || content?.version === "air-computation-v4") {
-          if (content.aircraft) setAircraft(content.aircraft);
-          if (content.comparisonName) setComparisonName(content.comparisonName);
-          if (content.performance) setPerformance(content.performance);
-          if (content.avionics) setAvionics(content.avionics);
-          if (content.airAir) setAirAir(content.airAir);
-          if (content.airSurface) setAirSurface(content.airSurface);
-          if (content.generation) setGeneration(content.generation);
-          if (content.survival) setSurvival(content.survival);
-          setStatus(`Cargado · versión ${json.analysis.version}`);
+        const json = await refreshComparisons();
+        const initial = json.analysis;
+        if (initial?.content && ["air-computation-v3", "air-computation-v4", "air-computation-v5"].includes(initial.content.version)) {
+          applyContent(initial.content, initial.version);
+          setSelectedKey(initial.analysis_key);
         }
       } catch {}
     })();
@@ -377,10 +475,22 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
 
   return <main className="min-h-screen bg-slate-950 p-4 text-white"><div className="mx-auto max-w-7xl">
     <header className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-700 bg-slate-900 p-4">
-      <div><p className="text-xs font-bold uppercase tracking-widest text-cyan-300">A3 · EJERCICIO ZEUS</p><h1 className="text-2xl font-bold">Cómputo Aéreo</h1><p className="text-sm text-slate-300">Modelo separado del PCR, reconstruido con todas las variables de Performance, Aviónica, Armamento, Generación de Salidas y Supervivencia del Excel.</p></div>
-      <div className="flex gap-2"><Link href={`/espacio/${workspaceCode}/${token}`} className="rounded bg-slate-700 px-3 py-2">Mapa</Link><Link href={`/espacio/${workspaceCode}/${token}/ppc/pcr`} className="rounded bg-violet-700 px-3 py-2">Cálculo PCR</Link><button onClick={save} className="rounded bg-emerald-700 px-4 py-2 font-bold">Guardar</button></div>
+      <div><p className="text-xs font-bold uppercase tracking-widest text-cyan-300">A3 · EJERCICIO ZEUS</p><h1 className="text-2xl font-bold">Cómputo Aéreo</h1><p className="text-sm text-slate-300">Comparaciones independientes, identificadas por nombre y recuperables desde el historial.</p></div>
+      <div className="flex flex-wrap gap-2"><Link href={`/espacio/${workspaceCode}/${token}`} className="rounded bg-slate-700 px-3 py-2">Mapa</Link><Link href={`/espacio/${workspaceCode}/${token}/ppc/pcr`} className="rounded bg-violet-700 px-3 py-2">Cálculo PCR</Link><button onClick={() => save(false)} className="rounded bg-emerald-700 px-4 py-2 font-bold">Actualizar seleccionada</button><button onClick={() => save(true)} className="rounded bg-cyan-700 px-4 py-2 font-bold">Guardar como nueva</button></div>
     </header>
     <div className="mb-4 rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm text-emerald-300">{status}</div>
+
+    <section className="mb-5 rounded-xl border border-cyan-800 bg-slate-900 p-4">
+      <h2 className="mb-3 text-center text-xl font-bold">Comparaciones guardadas</h2>
+      <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+        <select value={selectedKey} onChange={(event) => loadComparison(event.target.value)} className="w-full rounded border border-slate-600 bg-slate-950 p-3 text-center">
+          <option value="">Nueva comparación sin guardar</option>
+          {savedComparisons.map((item) => <option key={item.analysis_key} value={item.analysis_key}>{item.title} · v{item.version} · {new Date(item.updated_at).toLocaleString("es-AR")}</option>)}
+        </select>
+        <button disabled={!selectedKey} onClick={() => loadComparison(selectedKey)} className="rounded bg-slate-700 px-4 py-2 font-bold disabled:opacity-40">Ver seleccionada</button>
+      </div>
+      <p className="mt-2 text-center text-xs text-slate-400">“Guardar como nueva” conserva la comparación anterior. “Actualizar seleccionada” incrementa su versión.</p>
+    </section>
 
     <section className="mb-5 rounded-xl border border-slate-700 bg-slate-900 p-4">
       <h2 className="mb-4 text-center text-xl font-bold">Aeronaves a confrontar</h2>
@@ -389,15 +499,19 @@ export default function AirComputationCalculator({ workspaceCode, token }: Props
         <AircraftInput label="Aeronave propia" value={aircraft.propio} side="propio" onChange={(value) => setAircraft((old) => ({ ...old, propio: value }))} />
         <AircraftInput label="Aeronave enemiga" value={aircraft.enemigo} side="enemigo" onChange={(value) => setAircraft((old) => ({ ...old, enemigo: value }))} />
       </div>
+      <div className="mt-4 flex flex-wrap justify-center gap-3">
+        <button onClick={() => duplicateKeeping("propio")} className="rounded border border-blue-600 bg-blue-950 px-4 py-2 font-bold text-blue-200">Nueva conservando aeronave y valores propios</button>
+        <button onClick={() => duplicateKeeping("enemigo")} className="rounded border border-red-600 bg-red-950 px-4 py-2 font-bold text-red-200">Nueva conservando aeronave y valores enemigos</button>
+      </div>
     </section>
 
     <section className="mb-5 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
       <Result label="IECA propio" value={results.iecaP}/>
       <Result label="IECA enemigo" value={results.iecaE}/>
-      <Result label="Relación IECA propia/enemiga" value={results.ratioIeca}/>
+      <RatioResult label={`Relación IECA ${aircraft.propio || "propio"}/${aircraft.enemigo || "enemigo"}`} value={results.ratioIeca}/>
       <Result label="CEACM propio" value={results.ceacmP}/>
       <Result label="CEACM enemigo" value={results.ceacmE}/>
-      <Result label="Relación CEACM propia/enemiga" value={results.ratio}/>
+      <RatioResult label={`Relación CEACM ${aircraft.propio || "propio"}/${aircraft.enemigo || "enemigo"}`} value={results.ratio}/>
     </section>
     <CalculationDiagnostic
       ieca={{ propio: results.iecaP, enemigo: results.iecaE }}
@@ -420,6 +534,9 @@ function AircraftInput({ label, value, side, onChange }: { label: string; value:
 }
 function Result({ label, value }: { label: string; value: number | null }) {
   return <div className="rounded-xl border border-cyan-800 bg-cyan-950/30 p-4 text-center"><p className="text-sm text-cyan-200">{label}</p><p className="text-3xl font-bold">{value !== null && Number.isFinite(value) ? value.toFixed(2) : "—"}</p></div>;
+}
+function RatioResult({ label, value }: { label: string; value: number | null }) {
+  return <div className="rounded-xl border border-amber-700 bg-amber-950/30 p-4 text-center"><p className="text-sm text-amber-200">{label}</p><p className="text-3xl font-bold">{ratioText(value)}</p></div>;
 }
 function CalculationDiagnostic({ ieca, generation, survival, ceacm }: {
   ieca: { propio: number; enemigo: number };
