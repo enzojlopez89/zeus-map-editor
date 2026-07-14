@@ -30,6 +30,8 @@ type RoutePoint = {
 type MissionPackage = {
   id: string;
   name: string;
+  phase: CampaignPhase;
+  baseId: string;
   aircraft: string;
   quantity: number;
   speedKt: number;
@@ -52,6 +54,44 @@ type PointSite = {
   detail: string;
 };
 
+
+
+type CampaignPhase = "fase-1" | "fase-2" | "fase-3" | "fase-4";
+
+type BaseSite = {
+  id: string;
+  name: string;
+  longitude: number;
+  latitude: number;
+  altitudeMeters: number;
+  side: Side;
+  aircraft?: string[];
+};
+
+type H24Platform = {
+  id: string;
+  name: string;
+  aircraft: string;
+  speedKt: number;
+  altitudeFt: number;
+  visible: boolean;
+  showRoute: boolean;
+  closed: boolean;
+  route: RoutePoint[];
+};
+
+type EnemyAsset = {
+  id: string;
+  name: string;
+  kind: "s300" | "radar" | "runway";
+  longitude: number;
+  latitude: number;
+  altitudeMeters: number;
+  headingDeg?: number;
+  lengthMeters?: number;
+  widthMeters?: number;
+};
+
 type Coverage = {
   id: string;
   name: string;
@@ -60,6 +100,52 @@ type Coverage = {
   kind: "radar" | "s300";
   color: string;
 };
+
+
+
+const campaignPhases: Array<{ id: CampaignPhase; short: string; title: string; period: string; detail: string }> = [
+  { id: "fase-1", short: "I", title: "Preparación", period: "P–M–A–D", detail: "Concepción, preparación, movilización y alerta estratégica." },
+  { id: "fase-2", short: "II", title: "Tomar la iniciativa", period: "D–D+1", detail: "Apertura, SEAD, OCA y obtención del grado de control aeroespacial." },
+  { id: "fase-3", short: "III", title: "Dominar", period: "D+2–D+9", detail: "Ataques estratégicos, reataques, BDA y sostenimiento del control." },
+  { id: "fase-4", short: "IV", title: "Estabilización", period: "D+10–repliegue", detail: "Reorganización, transición y repliegue de las fuerzas." },
+];
+
+const bases3D: BaseSite[] = [
+  { id: "base-la-rioja", name: "1.º Brigada Aérea / La Rioja", longitude: -66.793409, latitude: -29.376201, altitudeMeters: 438, side: "propio", aircraft: ["C-130J", "KC-130J", "LJ-60", "DHC-6"] },
+  { id: "base-villa-mercedes", name: "2.º Brigada Aérea / Villa Mercedes", longitude: -65.370632, latitude: -33.738415, altitudeMeters: 485, side: "propio", aircraft: ["F-16C Block 40", "AMX A-1M", "T-6 TEXAN II", "HERMES 450"] },
+  { id: "base-cordoba", name: "3.º Brigada Aérea / Córdoba", longitude: -64.207857, latitude: -31.319799, altitudeMeters: 489, side: "propio", aircraft: ["AMX A-1M", "E-99M ERIEYE", "KC-135"] },
+  { id: "base-mendoza", name: "4.º Brigada Aérea / Mendoza", longitude: -68.84, latitude: -32.89, altitudeMeters: 704, side: "propio", aircraft: ["F-16C Block 40", "F-16D Block 42", "KC-135"] },
+  { id: "base-general-acha", name: "5.º Brigada Aérea / General Acha", longitude: -64.639206, latitude: -37.425428, altitudeMeters: 277, side: "propio", aircraft: ["F-16CJ Block 50", "IAI HARPY", "EC-130H COMPASS CALL", "HERMES 450"] },
+  { id: "base-malargue", name: "Base Aérea Militar Malargüe", longitude: -69.58, latitude: -35.47, altitudeMeters: 1425, side: "propio" },
+  { id: "enemy-resistencia", name: "Ala Aérea n.º 1 / Resistencia", longitude: -58.99, latitude: -27.45, altitudeMeters: 52, side: "enemigo" },
+  { id: "enemy-saenz-pena", name: "Ala Aérea n.º 2 / Sáenz Peña", longitude: -60.44, latitude: -26.79, altitudeMeters: 92, side: "enemigo" },
+  { id: "enemy-salta", name: "Ala Aérea n.º 3 / Salta", longitude: -65.49, latitude: -24.86, altitudeMeters: 1246, side: "enemigo" },
+  { id: "enemy-catamarca", name: "Ala Aérea n.º 4 / Catamarca", longitude: -65.75, latitude: -28.6, altitudeMeters: 454, side: "enemigo" },
+  { id: "enemy-tucuman", name: "Ala Aérea n.º 5 / Tucumán", longitude: -65.1, latitude: -26.84, altitudeMeters: 456, side: "enemigo" },
+  { id: "enemy-formosa", name: "Ala Aérea n.º 6 / Formosa", longitude: -58.23, latitude: -26.21, altitudeMeters: 59, side: "enemigo" },
+  { id: "enemy-belen", name: "Ala Aérea n.º 7 / Belén", longitude: -67.03, latitude: -27.65, altitudeMeters: 1260, side: "enemigo" },
+  { id: "enemy-tartagal", name: "Ala Aérea n.º 8 / Tartagal", longitude: -63.82, latitude: -22.52, altitudeMeters: 450, side: "enemigo" },
+  { id: "enemy-las-lomitas", name: "Ala Aérea n.º 9 / Las Lomitas", longitude: -60.551518, latitude: -24.730022, altitudeMeters: 130, side: "enemigo" },
+];
+
+const enemyAssets: EnemyAsset[] = [
+  { id: "s300-belen-site", name: "S-300 ALFA / Belén", kind: "s300", longitude: -67.03, latitude: -27.65, altitudeMeters: 1260 },
+  { id: "s300-catamarca-site", name: "S-300 BRAVO / Catamarca", kind: "s300", longitude: -65.75, latitude: -28.6, altitudeMeters: 454 },
+  { id: "s300-salta-site", name: "S-300 CHARLY / Salta", kind: "s300", longitude: -65.49, latitude: -24.86, altitudeMeters: 1246 },
+  { id: "s300-lomitas-site", name: "S-300 DELTA / Las Lomitas", kind: "s300", longitude: -60.551518, latitude: -24.730022, altitudeMeters: 130 },
+  { id: "radar-cafayate-site", name: "Radar enemigo / Cafayate", kind: "radar", longitude: -65.925964, latitude: -26.062598, altitudeMeters: 1683 },
+  { id: "radar-oran-site", name: "Radar enemigo / Orán", kind: "radar", longitude: -64.375962, latitude: -23.15641, altitudeMeters: 337 },
+  { id: "radar-lomitas-site", name: "Radar enemigo / Las Lomitas", kind: "radar", longitude: -60.551518, latitude: -24.730022, altitudeMeters: 130 },
+  { id: "runway-salta", name: "Pista Ala Aérea n.º 3 / Salta", kind: "runway", longitude: -65.49, latitude: -24.86, altitudeMeters: 1246, headingDeg: 20, lengthMeters: 3000, widthMeters: 45 },
+  { id: "runway-catamarca", name: "Pista Ala Aérea n.º 4 / Catamarca", kind: "runway", longitude: -65.75, latitude: -28.6, altitudeMeters: 454, headingDeg: 15, lengthMeters: 2800, widthMeters: 45 },
+  { id: "runway-tucuman", name: "Pista Ala Aérea n.º 5 / Tucumán", kind: "runway", longitude: -65.1, latitude: -26.84, altitudeMeters: 456, headingDeg: 20, lengthMeters: 2900, widthMeters: 45 },
+  { id: "runway-belen", name: "Pista Ala Aérea n.º 7 / Belén", kind: "runway", longitude: -67.03, latitude: -27.65, altitudeMeters: 1260, headingDeg: 5, lengthMeters: 2200, widthMeters: 35 },
+];
+
+const initialH24Platforms: H24Platform[] = [
+  { id: "h24-awacs", name: "AWACS H24", aircraft: "E-99M ERIEYE", speedKt: 400, altitudeFt: 28000, visible: true, showRoute: true, closed: true, route: [] },
+  { id: "h24-ew", name: "Guerra electrónica H24", aircraft: "EC-130H COMPASS CALL", speedKt: 300, altitudeFt: 25000, visible: true, showRoute: true, closed: true, route: [] },
+];
 
 const pointSites: PointSite[] = [
   { id: "pos-radar-la-rioja", name: "Radar propio · La Rioja", longitude: -66.793409, latitude: -29.376201, altitudeMeters: 438, side: "propio", kind: "radar", detail: "Posición del radar propio asociado a la 1.ª Brigada Aérea." },
@@ -113,6 +199,8 @@ const initialPackages: MissionPackage[] = [
   {
     id: "pkg-sead-f16",
     name: "SEAD F-16CJ · Catamarca",
+    phase: "fase-2",
+    baseId: "base-cordoba",
     aircraft: "F-16CJ Block 50",
     quantity: 2,
     speedKt: 480,
@@ -161,6 +249,37 @@ function interpolateRoute(route: RoutePoint[], progress: number) {
   return [last.longitude, last.latitude] as [number, number];
 }
 
+function metersToDegrees(latitude: number, eastMeters: number, northMeters: number) {
+  const lat = northMeters / 111320;
+  const lon = eastMeters / (111320 * Math.cos((latitude * Math.PI) / 180));
+  return [lon, lat] as [number, number];
+}
+
+function orientedRectangle(asset: EnemyAsset) {
+  const length = asset.lengthMeters ?? (asset.kind === "runway" ? 2600 : asset.kind === "s300" ? 90 : 45);
+  const width = asset.widthMeters ?? (asset.kind === "runway" ? 45 : asset.kind === "s300" ? 55 : 25);
+  const angle = ((asset.headingDeg ?? 0) * Math.PI) / 180;
+  const corners = [[-width / 2, -length / 2], [width / 2, -length / 2], [width / 2, length / 2], [-width / 2, length / 2], [-width / 2, -length / 2]];
+  return corners.map(([x, y]) => {
+    const east = x * Math.cos(angle) + y * Math.sin(angle);
+    const north = -x * Math.sin(angle) + y * Math.cos(angle);
+    const [dlon, dlat] = metersToDegrees(asset.latitude, east, north);
+    return [asset.longitude + dlon, asset.latitude + dlat];
+  });
+}
+
+function aircraftGlyph(name: string) {
+  const normalized = name.toLowerCase();
+  if (normalized.includes("f-16")) return "F-16";
+  if (normalized.includes("amx")) return "AMX";
+  if (normalized.includes("e-99")) return "E99";
+  if (normalized.includes("kc-135")) return "K135";
+  if (normalized.includes("130")) return "C130";
+  if (normalized.includes("hermes")) return "UAV";
+  if (normalized.includes("harpy")) return "HARPY";
+  return "AC";
+}
+
 function formatDuration(hours: number) {
   if (!Number.isFinite(hours) || hours <= 0) return "—";
   const minutes = Math.round(hours * 60);
@@ -178,12 +297,20 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const siteMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
+  const baseMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
+  const assetMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
   const routeMarkersRef = useRef<maplibregl.Marker[]>([]);
   const aircraftMarkerRef = useRef<maplibregl.Marker | null>(null);
   const orbitMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
+  const h24MarkersRef = useRef<Record<string, maplibregl.Marker>>({});
   const satelliteMarkerRef = useRef<maplibregl.Marker | null>(null);
   const animationRef = useRef<number | null>(null);
   const animationStartRef = useRef<number | null>(null);
+  const drawingRouteRef = useRef(false);
+  const drawingH24RouteRef = useRef(false);
+  const selectedPackageIdRef = useRef(initialPackages[0].id);
+  const selectedH24IdRef = useRef(initialH24Platforms[0].id);
+  const nextPointKindRef = useRef<PointKind>("navegacion");
 
   const [visible, setVisible] = useState<Record<string, boolean>>(Object.fromEntries(coverages.map((c) => [c.id, true])));
   const [siteVisible, setSiteVisible] = useState<Record<string, boolean>>(Object.fromEntries(pointSites.map((s) => [s.id, true])));
@@ -202,10 +329,23 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const [satelliteProgress, setSatelliteProgress] = useState(0);
   const [showTonWall, setShowTonWall] = useState(true);
   const [showRepublicWalls, setShowRepublicWalls] = useState(true);
-  const [wallHeightMeters, setWallHeightMeters] = useState(8000);
   const [wallOpacity, setWallOpacity] = useState(0.3);
+  const [tonWallHeightMeters, setTonWallHeightMeters] = useState(30000);
+  const [republicWallHeightMeters, setRepublicWallHeightMeters] = useState(20000);
+  const [selectedPhase, setSelectedPhase] = useState<CampaignPhase>("fase-2");
+  const [showOwnBases, setShowOwnBases] = useState(true);
+  const [showEnemyBases, setShowEnemyBases] = useState(true);
+  const [showEnemyAssets, setShowEnemyAssets] = useState(true);
+  const [showReferenceMarkers, setShowReferenceMarkers] = useState(true);
+  const [h24Platforms, setH24Platforms] = useState<H24Platform[]>(initialH24Platforms);
+  const [selectedH24Id, setSelectedH24Id] = useState(initialH24Platforms[0].id);
+  const [drawingH24Route, setDrawingH24Route] = useState(false);
+  const [showPhaseOnly, setShowPhaseOnly] = useState(true);
+  const [aircraftScaleMode, setAircraftScaleMode] = useState<"dynamic" | "fixed">("dynamic");
 
-  const selectedPackage = packages.find((item) => item.id === selectedPackageId) ?? packages[0];
+  const phasePackages = useMemo(() => showPhaseOnly ? packages.filter((item) => item.phase === selectedPhase) : packages, [packages, selectedPhase, showPhaseOnly]);
+  const selectedPackage = packages.find((item) => item.id === selectedPackageId) ?? phasePackages[0] ?? packages[0];
+  const selectedH24 = h24Platforms.find((item) => item.id === selectedH24Id) ?? h24Platforms[0];
   const selectedDistance = useMemo(() => routeDistanceNm(selectedPackage?.route ?? []), [selectedPackage]);
   const selectedHours = selectedPackage && selectedPackage.speedKt > 0 ? selectedDistance / selectedPackage.speedKt : 0;
   const impactPoint = selectedPackage?.route.find((point) => point.kind === "impacto");
@@ -261,6 +401,18 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     });
   }, []);
 
+  useEffect(() => { drawingRouteRef.current = drawingRoute; }, [drawingRoute]);
+  useEffect(() => { drawingH24RouteRef.current = drawingH24Route; }, [drawingH24Route]);
+  useEffect(() => { selectedPackageIdRef.current = selectedPackageId; }, [selectedPackageId]);
+  useEffect(() => { selectedH24IdRef.current = selectedH24Id; }, [selectedH24Id]);
+  useEffect(() => { nextPointKindRef.current = nextPointKind; }, [nextPointKind]);
+  useEffect(() => {
+    if (showPhaseOnly && selectedPackage?.phase !== selectedPhase) {
+      const first = packages.find((item) => item.phase === selectedPhase);
+      if (first) setSelectedPackageId(first.id);
+    }
+  }, [selectedPhase, showPhaseOnly, packages, selectedPackage?.phase]);
+
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
     const map = new maplibregl.Map({
@@ -301,7 +453,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
         source: "ton-wall",
         paint: {
           "fill-extrusion-color": "#7dd3fc",
-          "fill-extrusion-height": wallHeightMeters,
+          "fill-extrusion-height": tonWallHeightMeters,
           "fill-extrusion-base": 0,
           "fill-extrusion-opacity": wallOpacity,
           "fill-extrusion-vertical-gradient": true,
@@ -316,13 +468,60 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
         source: "republic-walls",
         paint: {
           "fill-extrusion-color": "#fbbf24",
-          "fill-extrusion-height": wallHeightMeters,
+          "fill-extrusion-height": republicWallHeightMeters,
           "fill-extrusion-base": 0,
           "fill-extrusion-opacity": wallOpacity * 0.9,
           "fill-extrusion-vertical-gradient": true,
         },
       });
       map.addLayer({ id: "republic-walls-base-line", type: "line", source: "republic-walls", paint: { "line-color": "#fde68a", "line-width": 1.5, "line-opacity": 0.8 } });
+
+      map.addSource("enemy-assets-3d", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: enemyAssets.map((asset) => ({
+            type: "Feature",
+            properties: { id: asset.id, name: asset.name, kind: asset.kind, height: asset.kind === "runway" ? 1.2 : asset.kind === "s300" ? 16 : 22, color: asset.kind === "runway" ? "#64748b" : asset.kind === "s300" ? "#991b1b" : "#f97316" },
+            geometry: { type: "Polygon", coordinates: [orientedRectangle(asset)] },
+          })),
+        },
+      });
+      map.addLayer({
+        id: "enemy-assets-extrusion",
+        type: "fill-extrusion",
+        source: "enemy-assets-3d",
+        paint: {
+          "fill-extrusion-color": ["get", "color"],
+          "fill-extrusion-height": ["get", "height"],
+          "fill-extrusion-base": 0,
+          "fill-extrusion-opacity": 0.9,
+        },
+      });
+      map.addLayer({ id: "enemy-assets-outline", type: "line", source: "enemy-assets-3d", paint: { "line-color": "#f8fafc", "line-width": 1.2, "line-opacity": 0.75 } });
+
+      initialH24Platforms.forEach((platform) => {
+        map.addSource(`h24-route-${platform.id}`, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+        map.addLayer({ id: `h24-route-line-${platform.id}`, type: "line", source: `h24-route-${platform.id}`, paint: { "line-color": platform.id === "h24-awacs" ? "#22d3ee" : "#a78bfa", "line-width": 3, "line-dasharray": [2, 1.5] } });
+      });
+
+      bases3D.forEach((base) => {
+        const element = document.createElement("button");
+        element.type = "button";
+        element.title = base.name;
+        element.innerHTML = `<span style="display:block;font-size:10px;font-weight:900;line-height:10px">${base.side === "propio" ? "A" : "E"}</span><span style="display:block;font-size:16px;line-height:14px">✈</span>`;
+        Object.assign(element.style, { width: "34px", height: "34px", borderRadius: "3px", border: `3px solid ${base.side === "propio" ? "#60a5fa" : "#fb923c"}`, background: "#f8fafc", color: base.side === "propio" ? "#1d4ed8" : "#c2410c", cursor: "pointer", boxShadow: "0 0 0 2px rgba(15,23,42,.9),0 4px 12px rgba(0,0,0,.6)" });
+        const popup = new maplibregl.Popup({ offset: 18 }).setHTML(`<div style="min-width:250px;color:#0f172a"><strong>${base.name}</strong><br/><strong>Bando:</strong> ${base.side}<br/><strong>Coordenadas:</strong> ${base.latitude.toFixed(6)}, ${base.longitude.toFixed(6)}<br/><strong>Altura:</strong> ${base.altitudeMeters.toLocaleString("es-AR")} m s. n. m.<br/>${base.aircraft?.length ? `<strong>Medios:</strong> ${base.aircraft.join(", ")}<br/>` : ""}<em>Seleccione “Usar como base de salida” desde el panel.</em></div>`);
+        baseMarkersRef.current[base.id] = new maplibregl.Marker({ element, anchor: "bottom" }).setLngLat([base.longitude, base.latitude]).setPopup(popup).addTo(map);
+      });
+
+      enemyAssets.forEach((asset) => {
+        const element = document.createElement("div");
+        element.title = asset.name;
+        element.innerHTML = `<div style="height:72px;width:2px;background:linear-gradient(to top,rgba(248,250,252,.1),rgba(248,250,252,.9));margin:0 auto"></div><div style="transform:translateX(-50%);white-space:nowrap;border:2px solid #fff;background:${asset.kind === "runway" ? "#475569" : asset.kind === "s300" ? "#991b1b" : "#c2410c"};color:#fff;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900">${asset.kind === "runway" ? "PISTA" : asset.kind === "s300" ? "S-300" : "RADAR"}</div>`;
+        Object.assign(element.style, { display: "block", cursor: "pointer", filter: "drop-shadow(0 2px 3px #000)" });
+        assetMarkersRef.current[asset.id] = new maplibregl.Marker({ element, anchor: "bottom" }).setLngLat([asset.longitude, asset.latitude]).setPopup(new maplibregl.Popup({ offset: 76 }).setHTML(`<div style="color:#0f172a"><strong>${asset.name}</strong><br/>Objeto 3D a escala aproximada para selección de blanco.<br/><strong>Coordenadas:</strong> ${asset.latitude.toFixed(6)}, ${asset.longitude.toFixed(6)}<br/><strong>Altura:</strong> ${asset.altitudeMeters.toLocaleString("es-AR")} m s. n. m.</div>`)).addTo(map);
+      });
 
       pointSites.forEach((site) => {
         const element = document.createElement("button");
@@ -335,8 +534,8 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       });
 
       const aircraftElement = document.createElement("div");
-      aircraftElement.textContent = "✈";
-      Object.assign(aircraftElement.style, { fontSize: "36px", color: "#fde047", textShadow: "0 2px 5px #000", transform: "rotate(0deg)", display: "none" });
+      aircraftElement.innerHTML = `<div data-aircraft-body style="width:58px;height:26px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:linear-gradient(135deg,#f8fafc,#64748b 48%,#0f172a);border:1px solid rgba(255,255,255,.8);filter:drop-shadow(0 4px 5px #000);transform:perspective(90px) rotateX(52deg)"></div><div data-aircraft-label style="margin-top:-4px;text-align:center;font-size:9px;font-weight:900;color:#fde047;text-shadow:0 1px 3px #000">F-16</div>`;
+      Object.assign(aircraftElement.style, { display: "none", transformOrigin: "center center" });
       aircraftMarkerRef.current = new maplibregl.Marker({ element: aircraftElement, anchor: "center" }).setLngLat([-64.2, -31.3]).addTo(map);
 
       const satelliteElement = document.createElement("div");
@@ -344,32 +543,32 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       Object.assign(satelliteElement.style, { fontSize: "34px", filter: "drop-shadow(0 2px 4px #000)" });
       satelliteMarkerRef.current = new maplibregl.Marker({ element: satelliteElement, anchor: "center" }).setLngLat([-70.2, -31]).addTo(map);
 
-      const orbitDefinitions = [
-        { id: "awacs", icon: "✈", center: [-65.7, -29.8] as [number, number], label: "E-99M H24" },
-        { id: "ew", icon: "✦", center: [-66.5, -30.7] as [number, number], label: "EC-130H H24" },
-      ];
-      orbitDefinitions.forEach((orbit) => {
+      initialH24Platforms.forEach((platform) => {
         const element = document.createElement("div");
-        element.textContent = orbit.icon;
-        element.title = orbit.label;
-        Object.assign(element.style, { fontSize: "30px", color: "#67e8f9", textShadow: "0 2px 4px #000" });
-        orbitMarkersRef.current[orbit.id] = new maplibregl.Marker({ element, anchor: "center" }).setLngLat(orbit.center).addTo(map);
+        element.innerHTML = `<div style="width:48px;height:22px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:${platform.id === "h24-awacs" ? "linear-gradient(135deg,#cffafe,#0891b2)" : "linear-gradient(135deg,#ede9fe,#7c3aed)"};filter:drop-shadow(0 3px 4px #000);transform:perspective(80px) rotateX(50deg)"></div><div style="font-size:9px;font-weight:900;text-align:center;color:#fff;text-shadow:0 1px 3px #000">${aircraftGlyph(platform.aircraft)}</div>`;
+        element.title = platform.name;
+        h24MarkersRef.current[platform.id] = new maplibregl.Marker({ element, anchor: "center" }).setLngLat(platform.id === "h24-awacs" ? [-65.7, -29.8] : [-66.5, -30.7]).addTo(map);
       });
-      setStatus("Simulador listo: seleccione un paquete y trace su ruta sobre el mapa");
+
+      setStatus("Simulador listo: seleccione una fase, una base y trace las rutas sobre el mapa");
     });
 
     map.on("click", (event) => {
-      if (!drawingRoute) return;
+      if (drawingH24RouteRef.current) {
+        setH24Platforms((current) => current.map((platform) => platform.id === selectedH24IdRef.current ? { ...platform, route: [...platform.route, { id: crypto.randomUUID(), longitude: event.lngLat.lng, latitude: event.lngLat.lat, kind: "navegacion", name: "Punto de órbita", altitudeFt: platform.altitudeFt }] } : platform));
+        return;
+      }
+      if (!drawingRouteRef.current) return;
       setPackages((current) => current.map((pkg) => {
-        if (pkg.id !== selectedPackageId) return pkg;
+        if (pkg.id !== selectedPackageIdRef.current) return pkg;
         let route = pkg.route;
-        if (nextPointKind === "impacto") route = route.map((point) => point.kind === "impacto" ? { ...point, kind: "navegacion" as PointKind, name: "Punto de navegación" } : point);
+        if (nextPointKindRef.current === "impacto") route = route.map((point) => point.kind === "impacto" ? { ...point, kind: "navegacion" as PointKind, name: "Punto de navegación" } : point);
         const point: RoutePoint = {
           id: crypto.randomUUID(),
           longitude: event.lngLat.lng,
           latitude: event.lngLat.lat,
-          kind: nextPointKind,
-          name: pointKindLabels[nextPointKind],
+          kind: nextPointKindRef.current,
+          name: pointKindLabels[nextPointKindRef.current],
           altitudeFt: pkg.cruiseAltitudeFt,
         };
         return { ...pkg, route: [...route, point] };
@@ -381,7 +580,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       routeMarkersRef.current.forEach((m) => m.remove());
       Object.values(siteMarkersRef.current).forEach((m) => m.remove());
-      Object.values(orbitMarkersRef.current).forEach((m) => m.remove());
+      Object.values(h24MarkersRef.current).forEach((m) => m.remove());
+      Object.values(baseMarkersRef.current).forEach((m) => m.remove());
+      Object.values(assetMarkersRef.current).forEach((m) => m.remove());
       aircraftMarkerRef.current?.remove();
       satelliteMarkerRef.current?.remove();
       map.remove();
@@ -411,8 +612,53 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   useEffect(() => { const map = mapRef.current; if (!map) return; coverages.forEach((coverage) => { const id = `${coverage.id}-fill`; if (map.getLayer(id)) map.setPaintProperty(id, "fill-opacity", opacity); }); }, [opacity]);
 
   useEffect(() => {
-    Object.values(orbitMarkersRef.current).forEach((marker) => { marker.getElement().style.display = showH24 ? "block" : "none"; });
-  }, [showH24]);
+    h24Platforms.forEach((platform) => {
+      const marker = h24MarkersRef.current[platform.id];
+      if (marker) marker.getElement().style.display = showH24 && platform.visible ? "block" : "none";
+      const map = mapRef.current;
+      const layerId = `h24-route-line-${platform.id}`;
+      if (map?.getLayer(layerId)) map.setLayoutProperty(layerId, "visibility", showH24 && platform.showRoute ? "visible" : "none");
+    });
+  }, [showH24, h24Platforms]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    h24Platforms.forEach((platform) => {
+      const source = map.getSource(`h24-route-${platform.id}`) as maplibregl.GeoJSONSource | undefined;
+      const route = platform.route.length >= 2 ? (platform.closed ? [...platform.route, platform.route[0]] : platform.route) : [];
+      source?.setData({ type: "FeatureCollection", features: route.length >= 2 ? [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: route.map((point) => [point.longitude, point.latitude]) } }] : [] });
+    });
+  }, [h24Platforms]);
+
+  useEffect(() => {
+    bases3D.forEach((base) => {
+      const marker = baseMarkersRef.current[base.id];
+      if (marker) marker.getElement().style.display = base.side === "propio" ? (showOwnBases ? "block" : "none") : (showEnemyBases ? "block" : "none");
+    });
+  }, [showOwnBases, showEnemyBases]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map?.getLayer("enemy-assets-extrusion")) map.setLayoutProperty("enemy-assets-extrusion", "visibility", showEnemyAssets ? "visible" : "none");
+    if (map?.getLayer("enemy-assets-outline")) map.setLayoutProperty("enemy-assets-outline", "visibility", showEnemyAssets ? "visible" : "none");
+    Object.values(assetMarkersRef.current).forEach((marker) => { marker.getElement().style.display = showEnemyAssets && showReferenceMarkers ? "block" : "none"; });
+  }, [showEnemyAssets, showReferenceMarkers]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const marker = aircraftMarkerRef.current;
+    if (!map || !marker) return;
+    const applyScale = () => {
+      const zoom = map.getZoom();
+      const scale = aircraftScaleMode === "dynamic" ? Math.max(0.65, Math.min(1.8, 0.55 + zoom * 0.13)) : 1;
+      marker.getElement().style.transform = `scale(${scale})`;
+      Object.values(h24MarkersRef.current).forEach((m) => { m.getElement().style.transform = `scale(${Math.max(0.6, scale * 0.88)})`; });
+    };
+    applyScale();
+    map.on("zoom", applyScale);
+    return () => { map.off("zoom", applyScale); };
+  }, [aircraftScaleMode]);
 
   useEffect(() => {
     const marker = satelliteMarkerRef.current;
@@ -437,14 +683,14 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     const map = mapRef.current;
     if (!map) return;
     if (map.getLayer("ton-wall-extrusion")) {
-      map.setPaintProperty("ton-wall-extrusion", "fill-extrusion-height", wallHeightMeters);
+      map.setPaintProperty("ton-wall-extrusion", "fill-extrusion-height", tonWallHeightMeters);
       map.setPaintProperty("ton-wall-extrusion", "fill-extrusion-opacity", wallOpacity);
     }
     if (map.getLayer("republic-walls-extrusion")) {
-      map.setPaintProperty("republic-walls-extrusion", "fill-extrusion-height", wallHeightMeters);
+      map.setPaintProperty("republic-walls-extrusion", "fill-extrusion-height", republicWallHeightMeters);
       map.setPaintProperty("republic-walls-extrusion", "fill-extrusion-opacity", wallOpacity * 0.9);
     }
-  }, [wallHeightMeters, wallOpacity]);
+  }, [tonWallHeightMeters, republicWallHeightMeters, wallOpacity]);
 
   useEffect(() => {
     const route = selectedPackage?.route ?? [];
@@ -454,17 +700,21 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       marker.setLngLat(position);
       marker.getElement().style.display = selectedPackage?.visible ? "block" : "none";
       marker.getElement().title = `${selectedPackage.name} · ${selectedPackage.quantity} ${selectedPackage.aircraft}`;
+      const label = marker.getElement().querySelector("[data-aircraft-label]");
+      if (label) label.textContent = aircraftGlyph(selectedPackage.aircraft);
     } else if (marker) marker.getElement().style.display = "none";
   }, [selectedPackage, simulationProgress]);
 
   useEffect(() => {
-    const awacs = orbitMarkersRef.current.awacs;
-    const ew = orbitMarkersRef.current.ew;
-    const angle = simulationProgress * Math.PI * 2;
-    awacs?.setLngLat([-65.7 + Math.cos(angle) * 0.7, -29.8 + Math.sin(angle) * 0.22]);
-    ew?.setLngLat([-66.5 + Math.cos(angle + Math.PI) * 0.55, -30.7 + Math.sin(angle + Math.PI) * 0.18]);
+    h24Platforms.forEach((platform, index) => {
+      const marker = h24MarkersRef.current[platform.id];
+      if (!marker) return;
+      const route = platform.route.length >= 2 ? (platform.closed ? [...platform.route, platform.route[0]] : platform.route) : [];
+      const position = route.length ? interpolateRoute(route, (simulationProgress + index * 0.22) % 1) : null;
+      if (position) marker.setLngLat(position);
+    });
     setSatelliteProgress((simulationProgress * 1.7) % 1);
-  }, [simulationProgress]);
+  }, [simulationProgress, h24Platforms]);
 
   useEffect(() => {
     satelliteMarkerRef.current?.setLngLat([-70.2 + satelliteProgress * 7.7, -31 + satelliteProgress * 7.5]);
@@ -493,17 +743,19 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   }, [isPlaying, selectedHours, simulationSpeed, impactPoint, impactArrival]);
 
   const saveScenario = () => {
-    localStorage.setItem("zeus-simulator-moa1", JSON.stringify({ packages, savedAt: new Date().toISOString() }));
+    localStorage.setItem("zeus-simulator-moa1", JSON.stringify({ packages, h24Platforms, selectedPhase, savedAt: new Date().toISOString() }));
     setStatus("Modo de Acción N.º 1 guardado en este equipo");
   };
   const loadScenario = () => {
     const raw = localStorage.getItem("zeus-simulator-moa1");
     if (!raw) { setStatus("No hay una simulación guardada en este equipo"); return; }
     try {
-      const parsed = JSON.parse(raw) as { packages?: MissionPackage[] };
+      const parsed = JSON.parse(raw) as { packages?: MissionPackage[]; h24Platforms?: H24Platform[]; selectedPhase?: CampaignPhase };
       if (parsed.packages?.length) {
         setPackages(parsed.packages);
         setSelectedPackageId(parsed.packages[0].id);
+        if (parsed.h24Platforms?.length) setH24Platforms(parsed.h24Platforms);
+        if (parsed.selectedPhase) setSelectedPhase(parsed.selectedPhase);
         setStatus("Simulación guardada recuperada");
       }
     } catch { setStatus("El archivo de simulación guardado no es válido"); }
@@ -511,7 +763,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
 
   const addPackage = () => {
     const id = crypto.randomUUID();
-    const next: MissionPackage = { ...initialPackages[0], id, name: `Paquete ${packages.length + 1}`, route: [] };
+    const next: MissionPackage = { ...initialPackages[0], id, name: `Paquete ${packages.length + 1}`, phase: selectedPhase, route: [] };
     setPackages((current) => [...current, next]);
     setSelectedPackageId(id);
   };
@@ -540,13 +792,22 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
           <p className="mb-4 rounded border border-emerald-800 bg-emerald-950/40 p-2 text-sm text-emerald-200">{status}</p>
 
           <div className="mb-4 rounded border border-slate-700 bg-slate-950/60 p-3">
-            <div className="text-center text-xs font-bold text-slate-300">P ─ M ─ A (Alerta Estratégica) ─ D ─ D+1 ─ D+9 ─ D+10</div>
-            <div className="mt-2 text-center text-sm font-bold text-amber-300">FASE II · MOMENTO I — OFENSIVA</div>
+            <div className="mb-3 text-center text-xs font-bold text-slate-300">P ─ M ─ A (Alerta Estratégica) ─ D ─ D+1 ─ D+9 ─ D+10</div>
+            <div className="grid grid-cols-4 gap-1">
+              {campaignPhases.map((phase) => (
+                <button key={phase.id} onClick={() => { setSelectedPhase(phase.id); setSimulationProgress(0); setIsPlaying(false); }} className={`rounded border px-1 py-2 text-[10px] font-bold ${selectedPhase === phase.id ? "border-amber-300 bg-amber-500 text-slate-950" : "border-slate-600 bg-slate-800 text-slate-200"}`} title={`${phase.title}: ${phase.detail}`}>
+                  <span className="block text-sm">{phase.short}</span>{phase.period}
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 text-center text-sm font-bold text-amber-300">FASE {campaignPhases.find((phase) => phase.id === selectedPhase)?.short} · {campaignPhases.find((phase) => phase.id === selectedPhase)?.title.toUpperCase()}</div>
+            <p className="mt-1 text-center text-xs text-slate-400">{campaignPhases.find((phase) => phase.id === selectedPhase)?.detail}</p>
+            <label className="mt-3 flex items-center justify-center gap-2 text-xs"><input type="checkbox" checked={showPhaseOnly} onChange={(e) => setShowPhaseOnly(e.target.checked)} />Mostrar solo paquetes de esta fase</label>
           </div>
 
           <h2 className="mb-2 font-bold">Paquetes</h2>
           <select value={selectedPackageId} onChange={(e) => { setSelectedPackageId(e.target.value); setSimulationProgress(0); setIsPlaying(false); }} className="mb-2 w-full rounded bg-slate-800 p-2">
-            {packages.map((pkg) => <option key={pkg.id} value={pkg.id}>{pkg.name}</option>)}
+            {phasePackages.map((pkg) => <option key={pkg.id} value={pkg.id}>{pkg.name}</option>)}
           </select>
           <div className="mb-4 grid grid-cols-3 gap-2 text-xs">
             <button onClick={addPackage} className="rounded bg-blue-700 p-2">+ Paquete</button>
@@ -556,6 +817,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
 
           <div className="space-y-3 rounded border border-slate-700 p-3">
             <label className="block text-xs">Nombre<input value={selectedPackage.name} onChange={(e) => updatePackage({ name: e.target.value })} className="mt-1 w-full rounded bg-slate-800 p-2 text-sm" /></label>
+            <label className="block text-xs">Fase del paquete<select value={selectedPackage.phase} onChange={(e) => updatePackage({ phase: e.target.value as CampaignPhase })} className="mt-1 w-full rounded bg-slate-800 p-2 text-sm">{campaignPhases.map((phase) => <option key={phase.id} value={phase.id}>Fase {phase.short} — {phase.title}</option>)}</select></label>
+            <label className="block text-xs">Base de salida<select value={selectedPackage.baseId} onChange={(e) => updatePackage({ baseId: e.target.value })} className="mt-1 w-full rounded bg-slate-800 p-2 text-sm">{bases3D.filter((base) => base.side === "propio").map((base) => <option key={base.id} value={base.id}>{base.name}</option>)}</select></label>
+            <button onClick={() => { const base = bases3D.find((item) => item.id === selectedPackage.baseId); if (!base) return; const salida: RoutePoint = { id: crypto.randomUUID(), longitude: base.longitude, latitude: base.latitude, kind: "salida", name: base.name, altitudeFt: selectedPackage.cruiseAltitudeFt }; updatePackage({ route: selectedPackage.route.length ? [salida, ...selectedPackage.route.filter((point) => point.kind !== "salida")] : [salida] }); mapRef.current?.flyTo({ center: [base.longitude, base.latitude], zoom: 8, pitch: 72 }); }} className="w-full rounded bg-blue-800 p-2 text-xs font-bold">Usar base como punto de salida</button>
             <label className="block text-xs">Aeronave<select value={selectedPackage.aircraft} onChange={(e) => { const values = aircraftDefaults[e.target.value]; updatePackage({ aircraft: e.target.value, speedKt: values.speedKt, cruiseAltitudeFt: values.altitudeFt }); }} className="mt-1 w-full rounded bg-slate-800 p-2 text-sm">{Object.keys(aircraftDefaults).map((name) => <option key={name}>{name}</option>)}</select></label>
             <div className="grid grid-cols-2 gap-2">
               <label className="block text-xs">Cantidad<input type="number" min="1" value={selectedPackage.quantity} onChange={(e) => updatePackage({ quantity: Number(e.target.value) })} className="mt-1 w-full rounded bg-slate-800 p-2 text-center" /></label>
@@ -609,16 +873,39 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
           </div>
 
           <h2 className="mb-2 mt-5 font-bold">Capas de simulación</h2>
-          <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showH24} onChange={(e) => setShowH24(e.target.checked)} />Aeronaves H24 en órbita</label>
           <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showSatellite} onChange={(e) => setShowSatellite(e.target.checked)} />Satélite y trayectoria orbital</label>
           <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={selectedPackage.visible} onChange={(e) => updatePackage({ visible: e.target.checked })} />Mostrar paquete seleccionado</label>
+          <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showOwnBases} onChange={(e) => setShowOwnBases(e.target.checked)} />Bases propias</label>
+          <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showEnemyBases} onChange={(e) => setShowEnemyBases(e.target.checked)} />Bases enemigas</label>
+          <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showEnemyAssets} onChange={(e) => setShowEnemyAssets(e.target.checked)} />Sistemas enemigos y pistas 3D</label>
+          <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showReferenceMarkers} onChange={(e) => setShowReferenceMarkers(e.target.checked)} />Marcadores verticales de referencia</label>
+          <label className="mb-2 block rounded border border-slate-700 p-2 text-sm">Escala de aeronaves<select value={aircraftScaleMode} onChange={(e) => setAircraftScaleMode(e.target.value as "dynamic" | "fixed")} className="mt-1 w-full rounded bg-slate-800 p-2"><option value="dynamic">Dinámica según zoom</option><option value="fixed">Fija</option></select></label>
+
+          <details open className="mt-4 rounded border border-violet-800 bg-violet-950/20 p-3">
+            <summary className="cursor-pointer font-bold text-violet-200">Trayectorias de aeronaves H24</summary>
+            <label className="mt-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={showH24} onChange={(e) => setShowH24(e.target.checked)} />Mostrar plataformas H24</label>
+            <select value={selectedH24Id} onChange={(e) => setSelectedH24Id(e.target.value)} className="mt-3 w-full rounded bg-slate-800 p-2 text-sm">{h24Platforms.map((platform) => <option key={platform.id} value={platform.id}>{platform.name}</option>)}</select>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+              <label>Velocidad (kt)<input type="number" value={selectedH24.speedKt} onChange={(e) => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, speedKt: Number(e.target.value) } : platform))} className="mt-1 w-full rounded bg-slate-800 p-2 text-center" /></label>
+              <label>Altura (ft)<input type="number" value={selectedH24.altitudeFt} onChange={(e) => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, altitudeFt: Number(e.target.value) } : platform))} className="mt-1 w-full rounded bg-slate-800 p-2 text-center" /></label>
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+              <button onClick={() => { setDrawingH24Route((value) => !value); setDrawingRoute(false); }} className={`rounded p-2 font-bold ${drawingH24Route ? "bg-amber-500 text-slate-950" : "bg-violet-700"}`}>{drawingH24Route ? "Finalizar órbita" : "Trazar trayectoria"}</button>
+              <button onClick={() => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, route: [] } : platform))} className="rounded bg-red-900 p-2">Limpiar</button>
+            </div>
+            <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={selectedH24.closed} onChange={(e) => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, closed: e.target.checked } : platform))} />Cerrar circuito automáticamente</label>
+            <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={selectedH24.visible} onChange={(e) => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, visible: e.target.checked } : platform))} />Mostrar aeronave</label>
+            <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={selectedH24.showRoute} onChange={(e) => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, showRoute: e.target.checked } : platform))} />Mostrar trayectoria</label>
+            <p className="mt-2 text-xs text-slate-400">Puntos cargados: {selectedH24.route.length}. La trayectoria puede ser libre y cerrada para mantener la órbita durante toda la simulación.</p>
+          </details>
 
           <details open className="mt-4 rounded border border-cyan-800 bg-cyan-950/20 p-3">
             <summary className="cursor-pointer font-bold text-cyan-200">Límites 3D de la campaña</summary>
             <p className="mt-2 text-xs text-slate-300">Muros traslúcidos que siguen los contornos del Teatro de Operaciones y de las repúblicas, sin nombres ni rótulos sobre el relieve.</p>
             <label className="mt-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={showTonWall} onChange={(e) => setShowTonWall(e.target.checked)} />Límite vertical del TON</label>
             <label className="mt-2 flex items-center gap-2 text-sm"><input type="checkbox" checked={showRepublicWalls} onChange={(e) => setShowRepublicWalls(e.target.checked)} />Fronteras entre repúblicas</label>
-            <label className="mt-3 block text-sm font-bold">Altura de las barreras: {(wallHeightMeters / 1000).toFixed(1)} km<input type="range" min="3000" max="15000" step="500" value={wallHeightMeters} onChange={(e) => setWallHeightMeters(Number(e.target.value))} className="mt-2 w-full" /></label>
+            <label className="mt-3 block text-sm font-bold">Altura del TON: {(tonWallHeightMeters / 1000).toFixed(0)} km<input type="range" min="10000" max="60000" step="1000" value={tonWallHeightMeters} onChange={(e) => setTonWallHeightMeters(Number(e.target.value))} className="mt-2 w-full" /></label>
+            <label className="mt-3 block text-sm font-bold">Altura de fronteras: {(republicWallHeightMeters / 1000).toFixed(0)} km<input type="range" min="5000" max="40000" step="1000" value={republicWallHeightMeters} onChange={(e) => setRepublicWallHeightMeters(Number(e.target.value))} className="mt-2 w-full" /></label>
             <label className="mt-3 block text-sm font-bold">Transparencia: {Math.round(wallOpacity * 100)} %<input type="range" min="0.1" max="0.6" step="0.02" value={wallOpacity} onChange={(e) => setWallOpacity(Number(e.target.value))} className="mt-2 w-full" /></label>
           </details>
 
