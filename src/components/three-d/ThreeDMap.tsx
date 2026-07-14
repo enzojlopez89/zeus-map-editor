@@ -70,6 +70,7 @@ type BaseSite = {
 
 type H24Platform = {
   id: string;
+  quantity: number;
   name: string;
   aircraft: string;
   speedKt: number;
@@ -374,11 +375,23 @@ const enemyAssets: EnemyAsset[] = [
     lengthMeters: 2200,
     widthMeters: 35,
   },
+  {
+    id: "tritio-plant-site",
+    name: "Planta de procesamiento de tritio",
+    kind: "radar",
+    longitude: -66.80665833333333,
+    latitude: -25.0827,
+    altitudeMeters: 3950,
+    headingDeg: 0,
+    lengthMeters: 120,
+    widthMeters: 80,
+  },
 ];
 
 const initialH24Platforms: H24Platform[] = [
   {
     id: "h24-awacs",
+    quantity: 2,
     name: "AWACS H24",
     aircraft: "E-99M ERIEYE",
     speedKt: 400,
@@ -391,6 +404,7 @@ const initialH24Platforms: H24Platform[] = [
   },
   {
     id: "h24-ew",
+    quantity: 2,
     name: "Guerra electrónica H24",
     aircraft: "EC-130H COMPASS CALL",
     speedKt: 300,
@@ -603,9 +617,163 @@ const aircraftDefaults: Record<
   "HERMES 450": { speedKt: 80, altitudeFt: 15000 },
 };
 
+const routePoint = (
+  longitude: number,
+  latitude: number,
+  kind: PointKind,
+  name: string,
+  altitudeFt: number,
+  speedToNextKt: number,
+): RoutePoint => ({
+  id: crypto.randomUUID(),
+  longitude,
+  latitude,
+  kind,
+  name,
+  altitudeFt,
+  speedToNextKt,
+});
+
+function suggestedAttackRoute(
+  baseId: string,
+  targetId: string,
+  altitudeFt: number,
+  speedKt: number,
+): RoutePoint[] {
+  const base = bases3D.find((item) => item.id === baseId)!;
+  const target = enemyAssets.find((item) => item.id === targetId)!;
+  const westBias = target.longitude < -66 ? -0.65 : -0.4;
+  const southBias = target.latitude < -27 ? -0.45 : -0.65;
+  const launchLon = target.longitude + westBias;
+  const launchLat = target.latitude + southBias * 0.35;
+  const ingressLon = launchLon - 0.55;
+  const ingressLat = launchLat + southBias;
+  const reunionLon =
+    base.longitude + (target.longitude - base.longitude) * 0.22 - 0.35;
+  const reunionLat = base.latitude + (target.latitude - base.latitude) * 0.22;
+  return [
+    routePoint(
+      base.longitude,
+      base.latitude,
+      "salida",
+      `Salida · ${base.name}`,
+      altitudeFt,
+      Math.min(speedKt, 440),
+    ),
+    routePoint(
+      reunionLon,
+      reunionLat,
+      "reunion",
+      "Reunión del paquete",
+      altitudeFt,
+      speedKt,
+    ),
+    routePoint(
+      ingressLon,
+      ingressLat,
+      "navegacion",
+      "Navegación de baja exposición",
+      altitudeFt,
+      Math.min(650, speedKt + 80),
+    ),
+    routePoint(
+      launchLon,
+      launchLat,
+      "lanzamiento",
+      "Lanzamiento de armamento",
+      Math.max(8000, altitudeFt - 6000),
+      Math.min(750, speedKt + 120),
+    ),
+    routePoint(
+      target.longitude,
+      target.latitude,
+      "impacto",
+      `Impacto · ${target.name}`,
+      Math.max(1000, altitudeFt - 12000),
+      Math.min(850, speedKt + 160),
+    ),
+    routePoint(
+      ingressLon - 0.75,
+      ingressLat - 0.45,
+      "escape",
+      "Escape del área de amenaza",
+      Math.max(10000, altitudeFt - 3000),
+      Math.min(900, speedKt + 220),
+    ),
+    routePoint(
+      base.longitude,
+      base.latitude,
+      "recuperacion",
+      `Recuperación · ${base.name}`,
+      altitudeFt,
+      speedKt,
+    ),
+  ];
+}
+
+function suggestedOrbitRoute(
+  baseId: string,
+  longitude: number,
+  latitude: number,
+  altitudeFt: number,
+  speedKt: number,
+): RoutePoint[] {
+  const base = bases3D.find((item) => item.id === baseId)!;
+  return [
+    routePoint(
+      base.longitude,
+      base.latitude,
+      "salida",
+      `Salida · ${base.name}`,
+      altitudeFt,
+      speedKt,
+    ),
+    routePoint(
+      longitude - 0.45,
+      latitude,
+      "navegacion",
+      "Ingreso a estación",
+      altitudeFt,
+      speedKt,
+    ),
+    routePoint(
+      longitude + 0.45,
+      latitude + 0.18,
+      "navegacion",
+      "Órbita · tramo norte",
+      altitudeFt,
+      speedKt,
+    ),
+    routePoint(
+      longitude + 0.45,
+      latitude - 0.18,
+      "navegacion",
+      "Órbita · tramo sur",
+      altitudeFt,
+      speedKt,
+    ),
+    routePoint(
+      longitude - 0.45,
+      latitude,
+      "navegacion",
+      "Órbita · cierre",
+      altitudeFt,
+      speedKt,
+    ),
+    routePoint(
+      base.longitude,
+      base.latitude,
+      "recuperacion",
+      `Recuperación · ${base.name}`,
+      altitudeFt,
+      speedKt,
+    ),
+  ];
+}
+
 const initialPackages: MissionPackage[] = [
   {
-    id: "pkg-sead-f16",
+    id: "pkg-sead-f16-cat",
     name: "SEAD F-16CJ · Catamarca",
     phase: "fase-2",
     baseId: "base-cordoba",
@@ -617,7 +785,327 @@ const initialPackages: MissionPackage[] = [
     weaponsPerAircraft: 2,
     departureTime: "21:20",
     visible: true,
-    route: [],
+    targetAssetId: "s300-catamarca-site",
+    route: suggestedAttackRoute(
+      "base-cordoba",
+      "s300-catamarca-site",
+      24000,
+      480,
+    ),
+  },
+  {
+    id: "pkg-sead-amx-cat",
+    name: "SEAD AMX · Catamarca",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "AMX A-1M",
+    quantity: 2,
+    speedKt: 420,
+    cruiseAltitudeFt: 18000,
+    weapon: "MAR-1",
+    weaponsPerAircraft: 4,
+    departureTime: "21:15",
+    visible: true,
+    targetAssetId: "s300-catamarca-site",
+    route: suggestedAttackRoute(
+      "base-cordoba",
+      "s300-catamarca-site",
+      18000,
+      420,
+    ),
+  },
+  {
+    id: "pkg-oca-cat",
+    name: "OCA · Catamarca",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "AMX A-1M",
+    quantity: 4,
+    speedKt: 420,
+    cruiseAltitudeFt: 18000,
+    weapon: "GBU-10",
+    weaponsPerAircraft: 2,
+    departureTime: "21:25",
+    visible: true,
+    targetAssetId: "runway-catamarca",
+    route: suggestedAttackRoute("base-cordoba", "runway-catamarca", 18000, 420),
+  },
+  {
+    id: "pkg-sead-f16-belen",
+    name: "SEAD F-16CJ · Belén",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "F-16CJ Block 50",
+    quantity: 2,
+    speedKt: 480,
+    cruiseAltitudeFt: 24000,
+    weapon: "AGM-88C HARM",
+    weaponsPerAircraft: 2,
+    departureTime: "21:10",
+    visible: true,
+    targetAssetId: "s300-belen-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-belen-site", 24000, 480),
+  },
+  {
+    id: "pkg-sead-amx-belen",
+    name: "SEAD AMX · Belén",
+    phase: "fase-2",
+    baseId: "base-villa-mercedes",
+    aircraft: "AMX A-1M",
+    quantity: 2,
+    speedKt: 420,
+    cruiseAltitudeFt: 18000,
+    weapon: "MAR-1",
+    weaponsPerAircraft: 4,
+    departureTime: "21:00",
+    visible: true,
+    targetAssetId: "s300-belen-site",
+    route: suggestedAttackRoute(
+      "base-villa-mercedes",
+      "s300-belen-site",
+      18000,
+      420,
+    ),
+  },
+  {
+    id: "pkg-oca-belen",
+    name: "OCA · Belén",
+    phase: "fase-2",
+    baseId: "base-villa-mercedes",
+    aircraft: "AMX A-1M",
+    quantity: 4,
+    speedKt: 420,
+    cruiseAltitudeFt: 18000,
+    weapon: "GBU-10",
+    weaponsPerAircraft: 2,
+    departureTime: "21:05",
+    visible: true,
+    targetAssetId: "runway-belen",
+    route: suggestedAttackRoute(
+      "base-villa-mercedes",
+      "runway-belen",
+      18000,
+      420,
+    ),
+  },
+  {
+    id: "pkg-oca-tuc",
+    name: "OCA · Tucumán",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "AMX A-1M",
+    quantity: 4,
+    speedKt: 420,
+    cruiseAltitudeFt: 18000,
+    weapon: "GBU-10",
+    weaponsPerAircraft: 2,
+    departureTime: "14:10",
+    visible: true,
+    targetAssetId: "runway-tucuman",
+    route: suggestedAttackRoute("base-cordoba", "runway-tucuman", 18000, 420),
+  },
+  {
+    id: "pkg-strike-tuc",
+    name: "Strike F-16C · Tucumán",
+    phase: "fase-2",
+    baseId: "base-villa-mercedes",
+    aircraft: "F-16C Block 40",
+    quantity: 4,
+    speedKt: 480,
+    cruiseAltitudeFt: 24000,
+    weapon: "GBU-38 JDAM",
+    weaponsPerAircraft: 4,
+    departureTime: "13:55",
+    visible: true,
+    targetAssetId: "runway-tucuman",
+    route: suggestedAttackRoute(
+      "base-villa-mercedes",
+      "runway-tucuman",
+      24000,
+      480,
+    ),
+  },
+  {
+    id: "pkg-sead-amx-caf",
+    name: "SEAD AMX · Cafayate",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "AMX A-1M",
+    quantity: 2,
+    speedKt: 420,
+    cruiseAltitudeFt: 18000,
+    weapon: "MAR-1",
+    weaponsPerAircraft: 2,
+    departureTime: "13:45",
+    visible: true,
+    targetAssetId: "radar-cafayate-site",
+    route: suggestedAttackRoute(
+      "base-cordoba",
+      "radar-cafayate-site",
+      18000,
+      420,
+    ),
+  },
+  {
+    id: "pkg-sead-f16-caf",
+    name: "SEAD F-16CJ · Cafayate",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "F-16CJ Block 50",
+    quantity: 2,
+    speedKt: 480,
+    cruiseAltitudeFt: 24000,
+    weapon: "AGM-88C HARM",
+    weaponsPerAircraft: 2,
+    departureTime: "13:50",
+    visible: true,
+    targetAssetId: "radar-cafayate-site",
+    route: suggestedAttackRoute(
+      "base-cordoba",
+      "radar-cafayate-site",
+      24000,
+      480,
+    ),
+  },
+  {
+    id: "pkg-oca-salta",
+    name: "OCA · Salta",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "AMX A-1M",
+    quantity: 4,
+    speedKt: 420,
+    cruiseAltitudeFt: 18000,
+    weapon: "GBU-10",
+    weaponsPerAircraft: 2,
+    departureTime: "06:30",
+    visible: true,
+    targetAssetId: "runway-salta",
+    route: suggestedAttackRoute("base-cordoba", "runway-salta", 18000, 420),
+  },
+  {
+    id: "pkg-strike-salta",
+    name: "Strike F-16C · Salta",
+    phase: "fase-2",
+    baseId: "base-mendoza",
+    aircraft: "F-16C Block 40",
+    quantity: 4,
+    speedKt: 480,
+    cruiseAltitudeFt: 24000,
+    weapon: "GBU-38 JDAM",
+    weaponsPerAircraft: 4,
+    departureTime: "06:15",
+    visible: true,
+    targetAssetId: "runway-salta",
+    route: suggestedAttackRoute("base-mendoza", "runway-salta", 24000, 480),
+  },
+  {
+    id: "pkg-sead-f16-salta",
+    name: "SEAD F-16CJ · Salta",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "F-16CJ Block 50",
+    quantity: 2,
+    speedKt: 480,
+    cruiseAltitudeFt: 24000,
+    weapon: "AGM-88C HARM",
+    weaponsPerAircraft: 4,
+    departureTime: "06:10",
+    visible: true,
+    targetAssetId: "s300-salta-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-salta-site", 24000, 480),
+  },
+  {
+    id: "pkg-sead-amx-salta",
+    name: "SEAD AMX · Salta",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "AMX A-1M",
+    quantity: 2,
+    speedKt: 420,
+    cruiseAltitudeFt: 18000,
+    weapon: "MAR-1",
+    weaponsPerAircraft: 6,
+    departureTime: "06:00",
+    visible: true,
+    targetAssetId: "s300-salta-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-salta-site", 18000, 420),
+  },
+  {
+    id: "pkg-strike-tritio",
+    name: "Strike principal · Planta de tritio",
+    phase: "fase-3",
+    baseId: "base-mendoza",
+    aircraft: "F-16C Block 40",
+    quantity: 8,
+    speedKt: 480,
+    cruiseAltitudeFt: 24000,
+    weapon: "GBU-10 Paveway II",
+    weaponsPerAircraft: 2,
+    departureTime: "04:30",
+    visible: true,
+    targetAssetId: "radar-oran-site",
+    route: suggestedAttackRoute("base-mendoza", "radar-oran-site", 24000, 480),
+  },
+  {
+    id: "pkg-dca-vm",
+    name: "Defensa contraaérea · Villa Mercedes",
+    phase: "fase-2",
+    baseId: "base-villa-mercedes",
+    aircraft: "F-16C Block 40",
+    quantity: 2,
+    speedKt: 480,
+    cruiseAltitudeFt: 26000,
+    weapon: "AIM-120",
+    weaponsPerAircraft: 4,
+    departureTime: "20:55",
+    visible: true,
+    route: suggestedOrbitRoute("base-villa-mercedes", -65.9, -29.9, 26000, 480),
+  },
+  {
+    id: "pkg-rev-cba",
+    name: "REV KC-135 · Córdoba",
+    phase: "fase-2",
+    baseId: "base-cordoba",
+    aircraft: "KC-135",
+    quantity: 2,
+    speedKt: 430,
+    cruiseAltitudeFt: 26000,
+    weapon: "Sin armamento",
+    weaponsPerAircraft: 0,
+    departureTime: "20:35",
+    visible: true,
+    route: suggestedOrbitRoute("base-cordoba", -66.1, -30.5, 26000, 430),
+  },
+  {
+    id: "pkg-rev-vm",
+    name: "REV KC-130J · Villa Mercedes",
+    phase: "fase-2",
+    baseId: "base-villa-mercedes",
+    aircraft: "KC-130J",
+    quantity: 4,
+    speedKt: 300,
+    cruiseAltitudeFt: 20000,
+    weapon: "Sin armamento",
+    weaponsPerAircraft: 0,
+    departureTime: "20:00",
+    visible: true,
+    route: suggestedOrbitRoute("base-villa-mercedes", -66.4, -30.8, 20000, 300),
+  },
+  {
+    id: "pkg-bda",
+    name: "BDA · Hermes 450",
+    phase: "fase-3",
+    baseId: "base-la-rioja",
+    aircraft: "HERMES 450",
+    quantity: 2,
+    speedKt: 80,
+    cruiseAltitudeFt: 15000,
+    weapon: "Sin armamento",
+    weaponsPerAircraft: 0,
+    departureTime: "08:00",
+    visible: true,
+    route: suggestedOrbitRoute("base-la-rioja", -66.2, -27.2, 15000, 80),
   },
 ];
 
@@ -703,6 +1191,16 @@ function coverageAssetId(coverageId: string) {
     "s300-delta": "s300-lomitas-site",
   };
   return mapping[coverageId];
+}
+
+function pointSiteAssetId(siteId: string) {
+  const mapping: Record<string, string> = {
+    "pos-radar-cafayate": "radar-cafayate-site",
+    "pos-radar-las-lomitas": "radar-lomitas-site",
+    "pos-radar-oran": "radar-oran-site",
+    "planta-tritio": "tritio-plant-site",
+  };
+  return mapping[siteId];
 }
 
 function interpolateRoute(route: RoutePoint[], progress: number) {
@@ -795,9 +1293,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const baseMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
   const assetMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
   const routeMarkersRef = useRef<maplibregl.Marker[]>([]);
-  const aircraftMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const aircraftMarkersRef = useRef<maplibregl.Marker[]>([]);
   const orbitMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
-  const h24MarkersRef = useRef<Record<string, maplibregl.Marker>>({});
+  const h24MarkersRef = useRef<Record<string, maplibregl.Marker[]>>({});
   const satelliteMarkerRef = useRef<maplibregl.Marker | null>(null);
   const animationRef = useRef<number | null>(null);
   const animationStartRef = useRef<number | null>(null);
@@ -1308,18 +1806,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
           .addTo(map);
       });
 
-      const aircraftElement = document.createElement("div");
-      aircraftElement.innerHTML = `<div data-aircraft-body style="width:58px;height:26px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:linear-gradient(135deg,#f8fafc,#64748b 48%,#0f172a);border:1px solid rgba(255,255,255,.8);filter:drop-shadow(0 4px 5px #000);transform:perspective(90px) rotateX(52deg)"></div><div data-aircraft-label style="margin-top:-4px;text-align:center;font-size:9px;font-weight:900;color:#fde047;text-shadow:0 1px 3px #000">F-16</div>`;
-      Object.assign(aircraftElement.style, {
-        display: "none",
-        transformOrigin: "center center",
-      });
-      aircraftMarkerRef.current = new maplibregl.Marker({
-        element: aircraftElement,
-        anchor: "center",
-      })
-        .setLngLat([-64.2, -31.3])
-        .addTo(map);
+      aircraftMarkersRef.current = [];
 
       const satelliteElement = document.createElement("div");
       satelliteElement.textContent = "🛰️";
@@ -1335,17 +1822,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
         .addTo(map);
 
       initialH24Platforms.forEach((platform) => {
-        const element = document.createElement("div");
-        element.innerHTML = `<div style="width:48px;height:22px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:${platform.id === "h24-awacs" ? "linear-gradient(135deg,#cffafe,#0891b2)" : "linear-gradient(135deg,#ede9fe,#7c3aed)"};filter:drop-shadow(0 3px 4px #000);transform:perspective(80px) rotateX(50deg)"></div><div style="font-size:9px;font-weight:900;text-align:center;color:#fff;text-shadow:0 1px 3px #000">${aircraftGlyph(platform.aircraft)}</div>`;
-        element.title = platform.name;
-        h24MarkersRef.current[platform.id] = new maplibregl.Marker({
-          element,
-          anchor: "center",
-        })
-          .setLngLat(
-            platform.id === "h24-awacs" ? [-65.7, -29.8] : [-66.5, -30.7],
-          )
-          .addTo(map);
+        h24MarkersRef.current[platform.id] = [];
       });
 
       setStatus(
@@ -1412,10 +1889,12 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       routeMarkersRef.current.forEach((m) => m.remove());
       Object.values(siteMarkersRef.current).forEach((m) => m.remove());
-      Object.values(h24MarkersRef.current).forEach((m) => m.remove());
+      Object.values(h24MarkersRef.current)
+        .flat()
+        .forEach((m) => m.remove());
       Object.values(baseMarkersRef.current).forEach((m) => m.remove());
       Object.values(assetMarkersRef.current).forEach((m) => m.remove());
-      aircraftMarkerRef.current?.remove();
+      aircraftMarkersRef.current.forEach((m) => m.remove());
       satelliteMarkerRef.current?.remove();
       map.remove();
       mapRef.current = null;
@@ -1472,10 +1951,15 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
 
   useEffect(() => {
     h24Platforms.forEach((platform) => {
-      const marker = h24MarkersRef.current[platform.id];
-      if (marker)
+      const markers = h24MarkersRef.current[platform.id] ?? [];
+      markers.forEach((marker, index) => {
         marker.getElement().style.display =
-          showH24 && platform.visible ? "block" : "none";
+          showH24 &&
+          platform.visible &&
+          index < Math.max(1, platform.quantity || 1)
+            ? "block"
+            : "none";
+      });
       const map = mapRef.current;
       const layerId = `h24-route-line-${platform.id}`;
       if (map?.getLayer(layerId))
@@ -1604,18 +2088,21 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
 
   useEffect(() => {
     const map = mapRef.current;
-    const marker = aircraftMarkerRef.current;
-    if (!map || !marker) return;
+    if (!map) return;
     const applyScale = () => {
       const zoom = map.getZoom();
       const scale =
         aircraftScaleMode === "dynamic"
           ? Math.max(0.65, Math.min(1.8, 0.55 + zoom * 0.13))
           : 1;
-      marker.getElement().style.transform = `scale(${scale})`;
-      Object.values(h24MarkersRef.current).forEach((m) => {
-        m.getElement().style.transform = `scale(${Math.max(0.6, scale * 0.88)})`;
+      aircraftMarkersRef.current.forEach((marker) => {
+        marker.getElement().style.transform = `scale(${scale})`;
       });
+      Object.values(h24MarkersRef.current)
+        .flat()
+        .forEach((marker) => {
+          marker.getElement().style.transform = `scale(${Math.max(0.6, scale * 0.88)})`;
+        });
     };
     applyScale();
     map.on("zoom", applyScale);
@@ -1688,22 +2175,43 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   }, [tonWallHeightMeters, republicWallHeightMeters, wallOpacity]);
 
   useEffect(() => {
-    const route = selectedPackage?.route ?? [];
-    const position = interpolateRouteByTime(
-      route,
-      simulationProgress,
-      selectedPackage?.speedKt ?? 1,
-    );
-    const marker = aircraftMarkerRef.current;
-    if (marker && position) {
-      marker.setLngLat(position);
-      marker.getElement().style.display = selectedPackage?.visible
-        ? "block"
-        : "none";
-      marker.getElement().title = `${selectedPackage.name} · ${selectedPackage.quantity} ${selectedPackage.aircraft}`;
+    const map = mapRef.current;
+    if (!map) return;
+    const quantity = Math.max(1, Math.min(12, selectedPackage?.quantity ?? 1));
+    while (aircraftMarkersRef.current.length < quantity) {
+      const index = aircraftMarkersRef.current.length;
+      const element = document.createElement("div");
+      element.innerHTML = `<div data-aircraft-body style="width:58px;height:26px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:linear-gradient(135deg,#f8fafc,#64748b 48%,#0f172a);border:1px solid rgba(255,255,255,.8);filter:drop-shadow(0 4px 5px #000);transform:perspective(90px) rotateX(52deg)"></div><div data-aircraft-label style="margin-top:-4px;text-align:center;font-size:9px;font-weight:900;color:#fde047;text-shadow:0 1px 3px #000">${aircraftGlyph(selectedPackage?.aircraft ?? "F-16")}</div>`;
+      element.style.display = "none";
+      element.title = `Aeronave ${index + 1}`;
+      aircraftMarkersRef.current.push(
+        new maplibregl.Marker({ element, anchor: "center" })
+          .setLngLat([-64.2, -31.3])
+          .addTo(map),
+      );
+    }
+    aircraftMarkersRef.current.forEach((marker, index) => {
+      const route = selectedPackage?.route ?? [];
+      const position = interpolateRouteByTime(
+        route,
+        simulationProgress,
+        selectedPackage?.speedKt ?? 1,
+      );
+      if (!position || index >= quantity || !selectedPackage?.visible) {
+        marker.getElement().style.display = "none";
+        return;
+      }
+      const row = Math.floor(index / 3);
+      const col = index % 3;
+      const offsetLon = (col - 1) * 0.025;
+      const offsetLat = (row - Math.floor(quantity / 6)) * 0.018;
+      marker.setLngLat([position[0] + offsetLon, position[1] + offsetLat]);
+      marker.getElement().style.display = "block";
+      marker.getElement().title = `${selectedPackage.name} · aeronave ${index + 1} de ${quantity}`;
       const label = marker.getElement().querySelector("[data-aircraft-label]");
-      if (label) label.textContent = aircraftGlyph(selectedPackage.aircraft);
-    } else if (marker) marker.getElement().style.display = "none";
+      if (label)
+        label.textContent = `${aircraftGlyph(selectedPackage.aircraft)} ${index + 1}`;
+    });
   }, [selectedPackage, simulationProgress]);
 
   useEffect(() => {
@@ -1711,9 +2219,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       if (continuousStartRef.current === null) continuousStartRef.current = now;
       const elapsedSeconds = (now - continuousStartRef.current) / 1000;
 
-      h24Platforms.forEach((platform, index) => {
-        const marker = h24MarkersRef.current[platform.id];
-        if (!marker) return;
+      h24Platforms.forEach((platform, platformIndex) => {
         const route =
           platform.route.length >= 2
             ? platform.closed
@@ -1723,10 +2229,31 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
         const distanceNm = routeDistanceNm(route);
         if (route.length < 2 || distanceNm <= 0 || platform.speedKt <= 0)
           return;
-        const cycleSeconds = Math.max(3, Number(platform.loopSeconds) || 20);
-        const progress = (elapsedSeconds / cycleSeconds + index * 0.17) % 1;
-        const position = interpolateRoute(route, progress);
-        if (position) marker.setLngLat(position);
+        const quantity = Math.max(1, Math.min(6, platform.quantity || 1));
+        const markers = h24MarkersRef.current[platform.id] ?? [];
+        while (markers.length < quantity && mapRef.current) {
+          const index = markers.length;
+          const element = document.createElement("div");
+          element.innerHTML = `<div style="width:48px;height:22px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:${platform.id === "h24-awacs" ? "linear-gradient(135deg,#cffafe,#0891b2)" : "linear-gradient(135deg,#ede9fe,#7c3aed)"};filter:drop-shadow(0 3px 4px #000);transform:perspective(80px) rotateX(50deg)"></div><div style="font-size:9px;font-weight:900;text-align:center;color:#fff;text-shadow:0 1px 3px #000">${aircraftGlyph(platform.aircraft)} ${index + 1}</div>`;
+          markers.push(
+            new maplibregl.Marker({ element, anchor: "center" })
+              .setLngLat([-65.7, -29.8])
+              .addTo(mapRef.current),
+          );
+        }
+        h24MarkersRef.current[platform.id] = markers;
+        const cycleSeconds = Math.max(10, Number(platform.loopSeconds) || 120);
+        markers.forEach((marker, index) => {
+          const progress =
+            (elapsedSeconds / cycleSeconds +
+              index / quantity +
+              platformIndex * 0.03) %
+            1;
+          const position = interpolateRoute(route, progress);
+          if (position) marker.setLngLat(position);
+          marker.getElement().style.display =
+            showH24 && platform.visible && index < quantity ? "block" : "none";
+        });
       });
 
       const satelliteProgressNow =
@@ -1745,6 +2272,34 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       continuousStartRef.current = null;
     };
   }, [h24Platforms, satelliteLoopSeconds]);
+
+  useEffect(() => {
+    if (
+      !selectedPackage?.targetAssetId ||
+      impactIndex < 1 ||
+      selectedHours <= 0
+    )
+      return;
+    const impactProgress = Math.max(
+      0,
+      Math.min(1, impactHours / selectedHours),
+    );
+    if (simulationProgress + 0.0001 < impactProgress) return;
+    setDestroyedAssetIds((current) =>
+      current.includes(selectedPackage.targetAssetId!)
+        ? current
+        : [...current, selectedPackage.targetAssetId!],
+    );
+    setStatus(
+      `Impacto confirmado sobre ${enemyAssets.find((asset) => asset.id === selectedPackage.targetAssetId)?.name ?? "el blanco"}. Cobertura retirada y blanco marcado como destruido.`,
+    );
+  }, [
+    simulationProgress,
+    selectedPackage,
+    impactIndex,
+    impactHours,
+    selectedHours,
+  ]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -1875,8 +2430,26 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   );
 
   const applyScenario = useCallback((parsed: any) => {
-    if (parsed.packages?.length) setPackages(parsed.packages);
-    if (parsed.h24Platforms?.length) setH24Platforms(parsed.h24Platforms);
+    if (parsed.packages?.length) {
+      const savedById = new Map(
+        parsed.packages.map((item: MissionPackage) => [item.id, item]),
+      );
+      const merged = initialPackages.map(
+        (item) => savedById.get(item.id) ?? item,
+      );
+      const custom = parsed.packages.filter(
+        (item: MissionPackage) =>
+          !initialPackages.some((base) => base.id === item.id),
+      );
+      setPackages([...merged, ...custom]);
+    }
+    if (parsed.h24Platforms?.length)
+      setH24Platforms(
+        parsed.h24Platforms.map((item: H24Platform) => ({
+          ...item,
+          quantity: Math.max(1, item.quantity || 1),
+        })),
+      );
     if (parsed.selectedPhase) setSelectedPhase(parsed.selectedPhase);
     if (parsed.selectedPackageId)
       setSelectedPackageId(parsed.selectedPackageId);
@@ -2004,8 +2577,8 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
             Simulador de paquetes aéreos sobre relieve 3D
           </h1>
           <p className="text-sm text-slate-300">
-            Trazado libre 2D, órbitas H24 continuas, satélite en loop y guardado
-            automático.
+            Paquetes precargados, rutas sugeridas de menor exposición, impactos
+            funcionales y formaciones múltiples automático.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
