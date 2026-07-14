@@ -1,0 +1,13 @@
+ACTUALIZACIÓN SIMULADOR MOA 1 V12
+
+- Reorganiza Fase II y Fase III según la secuencia indicada por Enzo.
+- Día D: Catamarca y Belén simultáneos; SEAD inicial y ataque a pistas 30 minutos después.
+- Día D tarde: Tucumán y Cafayate con escolta y reabastecimiento.
+- D+1: Salta y S-300 Catamarca en simultáneo.
+- D+2: Planta de tritio con 8 F-16/GBU-10, 2 F-16/GBU-12 y 4 KC-135.
+- Sustituye el resultado DESTRUIDO por NEUTRALIZADO.
+- Al neutralizar radar/S-300, retira su máscara y muestra explosión persistente.
+- Permite seleccionar un punto de ruta y reubicarlo con un clic en el mapa.
+- Agrega iconos móviles para F-16, AMX, C-130 y Hermes.
+- Renombra plataformas H24 como E-99 y EC-130.
+- Migra automáticamente escenarios anteriores al nuevo esquema operacional V12.

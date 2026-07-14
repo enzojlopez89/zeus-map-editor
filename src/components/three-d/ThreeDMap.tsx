@@ -93,13 +93,22 @@ type H24Platform = {
 type EnemyAsset = {
   id: string;
   name: string;
-  kind: "s300" | "radar" | "runway";
+  kind: "s300" | "radar" | "runway" | "tritio";
   longitude: number;
   latitude: number;
   altitudeMeters: number;
   headingDeg?: number;
   lengthMeters?: number;
   widthMeters?: number;
+};
+
+type FloatingAircraft = {
+  id: string;
+  name: string;
+  aircraft: string;
+  longitude: number;
+  latitude: number;
+  visible: boolean;
 };
 
 type Coverage = {
@@ -386,7 +395,7 @@ const enemyAssets: EnemyAsset[] = [
   {
     id: "tritio-plant-site",
     name: "Planta de procesamiento de tritio",
-    kind: "radar",
+    kind: "tritio",
     longitude: -66.80665833333333,
     latitude: -25.0827,
     altitudeMeters: 3950,
@@ -400,7 +409,7 @@ const initialH24Platforms: H24Platform[] = [
   {
     id: "h24-awacs",
     quantity: 2,
-    name: "AWACS H24",
+    name: "E-99",
     aircraft: "E-99M ERIEYE",
     speedKt: 400,
     loopSeconds: 120,
@@ -413,7 +422,7 @@ const initialH24Platforms: H24Platform[] = [
   {
     id: "h24-ew",
     quantity: 2,
-    name: "Guerra electrónica H24",
+    name: "EC-130",
     aircraft: "EC-130H COMPASS CALL",
     speedKt: 300,
     loopSeconds: 150,
@@ -423,6 +432,13 @@ const initialH24Platforms: H24Platform[] = [
     closed: true,
     route: [],
   },
+];
+
+const initialFloatingAircraft: FloatingAircraft[] = [
+  { id: "floating-f16", name: "F-16 móvil", aircraft: "F-16C Block 40", longitude: -64.207857, latitude: -31.319799, visible: true },
+  { id: "floating-amx", name: "AMX móvil", aircraft: "AMX A-1M", longitude: -64.247857, latitude: -31.319799, visible: true },
+  { id: "floating-c130", name: "C-130 móvil", aircraft: "C-130J", longitude: -64.287857, latitude: -31.319799, visible: true },
+  { id: "floating-hermes", name: "Hermes móvil", aircraft: "HERMES 450", longitude: -66.793409, latitude: -29.376201, visible: true },
 ];
 
 const pointSites: PointSite[] = [
@@ -780,401 +796,233 @@ function suggestedOrbitRoute(
 }
 
 const initialPackages: MissionPackage[] = [
+  // DÍA D · PRIMERA VENTANA — CATAMARCA
   {
-    id: "pkg-sead-f16-cat",
-    name: "SEAD F-16CJ · Catamarca",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "F-16CJ Block 50",
-    quantity: 2,
-    speedKt: 480,
-    cruiseAltitudeFt: 24000,
-    weapon: "AGM-88C HARM",
-    weaponsPerAircraft: 2,
-    departureTime: "21:20",
-    visible: true,
-    targetAssetId: "s300-catamarca-site",
-    route: suggestedAttackRoute(
-      "base-cordoba",
-      "s300-catamarca-site",
-      24000,
-      480,
-    ),
+    id: "pkg-sead-f16-cat", name: "SEAD F-16CJ · S-300 Catamarca", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
+    departureTime: "21:00", visible: true, targetAssetId: "s300-catamarca-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 24000, 480),
   },
   {
-    id: "pkg-sead-amx-cat",
-    name: "SEAD AMX · Catamarca",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "AMX A-1M",
-    quantity: 2,
-    speedKt: 420,
-    cruiseAltitudeFt: 18000,
-    weapon: "MAR-1",
-    weaponsPerAircraft: 4,
-    departureTime: "21:15",
-    visible: true,
-    targetAssetId: "s300-catamarca-site",
-    route: suggestedAttackRoute(
-      "base-cordoba",
-      "s300-catamarca-site",
-      18000,
-      420,
-    ),
+    id: "pkg-sead-amx-cat", name: "SEAD AMX · S-300 Catamarca", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
+    cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 4,
+    departureTime: "21:00", visible: true, targetAssetId: "s300-catamarca-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 18000, 420),
   },
   {
-    id: "pkg-oca-cat",
-    name: "OCA · Catamarca",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "AMX A-1M",
-    quantity: 4,
-    speedKt: 420,
-    cruiseAltitudeFt: 18000,
-    weapon: "GBU-10",
-    weaponsPerAircraft: 2,
-    departureTime: "21:25",
-    visible: true,
-    targetAssetId: "runway-catamarca",
+    id: "pkg-oca-cat", name: "Ataque pista y aviones · Catamarca", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
+    cruiseAltitudeFt: 18000, weapon: "GBU-10", weaponsPerAircraft: 2,
+    departureTime: "21:30", visible: true, targetAssetId: "runway-catamarca",
     route: suggestedAttackRoute("base-cordoba", "runway-catamarca", 18000, 420),
   },
   {
-    id: "pkg-sead-f16-belen",
-    name: "SEAD F-16CJ · Belén",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "F-16CJ Block 50",
-    quantity: 2,
-    speedKt: 480,
-    cruiseAltitudeFt: 24000,
-    weapon: "AGM-88C HARM",
-    weaponsPerAircraft: 2,
-    departureTime: "21:10",
-    visible: true,
-    targetAssetId: "s300-belen-site",
+    id: "pkg-escort-cat", name: "Escolta F-16 · Catamarca", phase: "fase-2",
+    baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4,
+    departureTime: "20:50", visible: true,
+    route: suggestedOrbitRoute("base-villa-mercedes", -65.9, -29.1, 26000, 480),
+  },
+  // DÍA D · PRIMERA VENTANA — BELÉN, SIMULTÁNEA CON CATAMARCA
+  {
+    id: "pkg-sead-f16-belen", name: "SEAD F-16CJ · S-300 Belén", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
+    departureTime: "21:00", visible: true, targetAssetId: "s300-belen-site",
     route: suggestedAttackRoute("base-cordoba", "s300-belen-site", 24000, 480),
   },
   {
-    id: "pkg-sead-amx-belen",
-    name: "SEAD AMX · Belén",
-    phase: "fase-2",
-    baseId: "base-villa-mercedes",
-    aircraft: "AMX A-1M",
-    quantity: 2,
-    speedKt: 420,
-    cruiseAltitudeFt: 18000,
-    weapon: "MAR-1",
-    weaponsPerAircraft: 4,
-    departureTime: "21:00",
-    visible: true,
-    targetAssetId: "s300-belen-site",
-    route: suggestedAttackRoute(
-      "base-villa-mercedes",
-      "s300-belen-site",
-      18000,
-      420,
-    ),
+    id: "pkg-sead-amx-belen", name: "SEAD AMX · S-300 Belén", phase: "fase-2",
+    baseId: "base-villa-mercedes", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
+    cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 4,
+    departureTime: "21:00", visible: true, targetAssetId: "s300-belen-site",
+    route: suggestedAttackRoute("base-villa-mercedes", "s300-belen-site", 18000, 420),
   },
   {
-    id: "pkg-oca-belen",
-    name: "OCA · Belén",
-    phase: "fase-2",
-    baseId: "base-villa-mercedes",
-    aircraft: "AMX A-1M",
-    quantity: 4,
-    speedKt: 420,
-    cruiseAltitudeFt: 18000,
-    weapon: "GBU-10",
-    weaponsPerAircraft: 2,
-    departureTime: "21:05",
-    visible: true,
-    targetAssetId: "runway-belen",
-    route: suggestedAttackRoute(
-      "base-villa-mercedes",
-      "runway-belen",
-      18000,
-      420,
-    ),
+    id: "pkg-oca-belen", name: "Ataque pista y aviones · Ala Aérea n.º 7 / Belén", phase: "fase-2",
+    baseId: "base-villa-mercedes", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
+    cruiseAltitudeFt: 18000, weapon: "GBU-10", weaponsPerAircraft: 2,
+    departureTime: "21:30", visible: true, targetAssetId: "runway-belen",
+    route: suggestedAttackRoute("base-villa-mercedes", "runway-belen", 18000, 420),
   },
   {
-    id: "pkg-oca-tuc",
-    name: "OCA · Tucumán",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "AMX A-1M",
-    quantity: 4,
-    speedKt: 420,
-    cruiseAltitudeFt: 18000,
-    weapon: "GBU-10",
-    weaponsPerAircraft: 2,
-    departureTime: "14:10",
-    visible: true,
-    targetAssetId: "runway-tucuman",
+    id: "pkg-escort-belen", name: "Escolta F-16 · Belén", phase: "fase-2",
+    baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4,
+    departureTime: "20:50", visible: true,
+    route: suggestedOrbitRoute("base-villa-mercedes", -66.7, -28.2, 26000, 480),
+  },
+  {
+    id: "pkg-rev-kc130-d", name: "Reabastecimiento KC-130 · Día D", phase: "fase-2",
+    baseId: "base-villa-mercedes", aircraft: "KC-130J", quantity: 2, speedKt: 300,
+    cruiseAltitudeFt: 20000, weapon: "Sin armamento", weaponsPerAircraft: 0,
+    departureTime: "20:10", visible: true,
+    route: suggestedOrbitRoute("base-villa-mercedes", -66.3, -30.6, 20000, 300),
+  },
+  {
+    id: "pkg-rev-kc135-d", name: "Reabastecimiento KC-135 · Día D", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "KC-135", quantity: 2, speedKt: 430,
+    cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0,
+    departureTime: "20:10", visible: true,
+    route: suggestedOrbitRoute("base-cordoba", -66.0, -30.2, 26000, 430),
+  },
+  // DÍA D · TARDE — TUCUMÁN Y CAFAYATE
+  {
+    id: "pkg-oca-tuc", name: "Ataque AMX · Pista y aviones Tucumán", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
+    cruiseAltitudeFt: 18000, weapon: "GBU-10", weaponsPerAircraft: 2,
+    departureTime: "14:00", visible: true, targetAssetId: "runway-tucuman",
     route: suggestedAttackRoute("base-cordoba", "runway-tucuman", 18000, 420),
   },
   {
-    id: "pkg-strike-tuc",
-    name: "Strike F-16C · Tucumán",
-    phase: "fase-2",
-    baseId: "base-villa-mercedes",
-    aircraft: "F-16C Block 40",
-    quantity: 4,
-    speedKt: 480,
-    cruiseAltitudeFt: 24000,
-    weapon: "GBU-38 JDAM",
-    weaponsPerAircraft: 4,
-    departureTime: "13:55",
-    visible: true,
-    targetAssetId: "runway-tucuman",
-    route: suggestedAttackRoute(
-      "base-villa-mercedes",
-      "runway-tucuman",
-      24000,
-      480,
-    ),
+    id: "pkg-strike-tuc", name: "Ataque F-16 · Pista y aviones Tucumán", phase: "fase-2",
+    baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480,
+    cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 4,
+    departureTime: "14:00", visible: true, targetAssetId: "runway-tucuman",
+    route: suggestedAttackRoute("base-villa-mercedes", "runway-tucuman", 24000, 480),
   },
   {
-    id: "pkg-sead-amx-caf",
-    name: "SEAD AMX · Cafayate",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "AMX A-1M",
-    quantity: 2,
-    speedKt: 420,
-    cruiseAltitudeFt: 18000,
-    weapon: "MAR-1",
-    weaponsPerAircraft: 2,
-    departureTime: "13:45",
-    visible: true,
-    targetAssetId: "radar-cafayate-site",
-    route: suggestedAttackRoute(
-      "base-cordoba",
-      "radar-cafayate-site",
-      18000,
-      420,
-    ),
+    id: "pkg-escort-tuc", name: "Escolta F-16 · Tucumán", phase: "fase-2",
+    baseId: "base-mendoza", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4,
+    departureTime: "13:45", visible: true,
+    route: suggestedOrbitRoute("base-mendoza", -65.5, -27.4, 26000, 480),
   },
   {
-    id: "pkg-sead-f16-caf",
-    name: "SEAD F-16CJ · Cafayate",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "F-16CJ Block 50",
-    quantity: 2,
-    speedKt: 480,
-    cruiseAltitudeFt: 24000,
-    weapon: "AGM-88C HARM",
-    weaponsPerAircraft: 2,
-    departureTime: "13:50",
-    visible: true,
-    targetAssetId: "radar-cafayate-site",
-    route: suggestedAttackRoute(
-      "base-cordoba",
-      "radar-cafayate-site",
-      24000,
-      480,
-    ),
+    id: "pkg-sead-f16-caf", name: "SEAD F-16CJ · Radar TPS-70 Cafayate", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
+    departureTime: "13:30", visible: true, targetAssetId: "radar-cafayate-site",
+    route: suggestedAttackRoute("base-cordoba", "radar-cafayate-site", 24000, 480),
   },
   {
-    id: "pkg-oca-salta",
-    name: "OCA · Salta",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "AMX A-1M",
-    quantity: 4,
-    speedKt: 420,
-    cruiseAltitudeFt: 18000,
-    weapon: "GBU-10",
-    weaponsPerAircraft: 2,
-    departureTime: "06:30",
-    visible: true,
-    targetAssetId: "runway-salta",
+    id: "pkg-sead-amx-caf", name: "SEAD AMX · Radar TPS-70 Cafayate", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
+    cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 2,
+    departureTime: "13:30", visible: true, targetAssetId: "radar-cafayate-site",
+    route: suggestedAttackRoute("base-cordoba", "radar-cafayate-site", 18000, 420),
+  },
+  {
+    id: "pkg-rev-kc130-tarde", name: "Reabastecimiento KC-130 · Día D tarde", phase: "fase-2",
+    baseId: "base-villa-mercedes", aircraft: "KC-130J", quantity: 2, speedKt: 300,
+    cruiseAltitudeFt: 20000, weapon: "Sin armamento", weaponsPerAircraft: 0,
+    departureTime: "12:50", visible: true,
+    route: suggestedOrbitRoute("base-villa-mercedes", -66.0, -29.8, 20000, 300),
+  },
+  {
+    id: "pkg-rev-kc135-tarde", name: "Reabastecimiento KC-135 · Día D tarde", phase: "fase-2",
+    baseId: "base-mendoza", aircraft: "KC-135", quantity: 2, speedKt: 430,
+    cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0,
+    departureTime: "12:50", visible: true,
+    route: suggestedOrbitRoute("base-mendoza", -66.5, -29.2, 26000, 430),
+  },
+  // D+1 — SALTA Y S-300 CATAMARCA EN SIMULTÁNEO
+  {
+    id: "pkg-oca-salta", name: "Ataque AMX · Ala Aérea n.º 3 / Salta", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
+    cruiseAltitudeFt: 18000, weapon: "GBU-10", weaponsPerAircraft: 2,
+    departureTime: "06:00", visible: true, targetAssetId: "runway-salta",
     route: suggestedAttackRoute("base-cordoba", "runway-salta", 18000, 420),
   },
   {
-    id: "pkg-strike-salta",
-    name: "Strike F-16C · Salta",
-    phase: "fase-2",
-    baseId: "base-mendoza",
-    aircraft: "F-16C Block 40",
-    quantity: 4,
-    speedKt: 480,
-    cruiseAltitudeFt: 24000,
-    weapon: "GBU-38 JDAM",
-    weaponsPerAircraft: 4,
-    departureTime: "06:15",
-    visible: true,
-    targetAssetId: "runway-salta",
+    id: "pkg-strike-salta", name: "Ataque F-16 · Ala Aérea n.º 3 / Salta", phase: "fase-2",
+    baseId: "base-mendoza", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480,
+    cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 4,
+    departureTime: "06:00", visible: true, targetAssetId: "runway-salta",
     route: suggestedAttackRoute("base-mendoza", "runway-salta", 24000, 480),
   },
   {
-    id: "pkg-sead-f16-salta",
-    name: "SEAD F-16CJ · Salta",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "F-16CJ Block 50",
-    quantity: 2,
-    speedKt: 480,
-    cruiseAltitudeFt: 24000,
-    weapon: "AGM-88C HARM",
-    weaponsPerAircraft: 4,
-    departureTime: "06:10",
-    visible: true,
-    targetAssetId: "s300-salta-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-salta-site", 24000, 480),
+    id: "pkg-sead-f16-d1-cat", name: "SEAD F-16CJ · S-300 Catamarca (D+1)", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
+    departureTime: "06:00", visible: true, targetAssetId: "s300-catamarca-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 24000, 480),
   },
   {
-    id: "pkg-sead-amx-salta",
-    name: "SEAD AMX · Salta",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "AMX A-1M",
-    quantity: 2,
-    speedKt: 420,
-    cruiseAltitudeFt: 18000,
-    weapon: "MAR-1",
-    weaponsPerAircraft: 6,
-    departureTime: "06:00",
-    visible: true,
-    targetAssetId: "s300-salta-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-salta-site", 18000, 420),
+    id: "pkg-sead-amx-d1-cat", name: "SEAD AMX · S-300 Catamarca (D+1)", phase: "fase-2",
+    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
+    cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 4,
+    departureTime: "06:00", visible: true, targetAssetId: "s300-catamarca-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 18000, 420),
   },
   {
-    id: "pkg-strike-tritio",
-    name: "Strike principal · Planta de tritio",
-    phase: "fase-3",
-    baseId: "base-mendoza",
-    aircraft: "F-16C Block 40",
-    quantity: 8,
-    speedKt: 480,
-    cruiseAltitudeFt: 24000,
-    weapon: "GBU-10 Paveway II",
-    weaponsPerAircraft: 2,
-    departureTime: "04:30",
-    visible: true,
-    targetAssetId: "tritio-plant-site",
+    id: "pkg-escort-d1", name: "Escolta F-16 · D+1", phase: "fase-2",
+    baseId: "base-mendoza", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4,
+    departureTime: "05:45", visible: true,
+    route: suggestedOrbitRoute("base-mendoza", -66.0, -27.0, 26000, 480),
+  },
+  {
+    id: "pkg-rev-kc130-d1", name: "Reabastecimiento KC-130 · D+1", phase: "fase-2",
+    baseId: "base-villa-mercedes", aircraft: "KC-130J", quantity: 2, speedKt: 300,
+    cruiseAltitudeFt: 20000, weapon: "Sin armamento", weaponsPerAircraft: 0,
+    departureTime: "05:10", visible: true,
+    route: suggestedOrbitRoute("base-villa-mercedes", -66.4, -29.7, 20000, 300),
+  },
+  {
+    id: "pkg-rev-kc135-d1", name: "Reabastecimiento KC-135 · D+1", phase: "fase-2",
+    baseId: "base-mendoza", aircraft: "KC-135", quantity: 2, speedKt: 430,
+    cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0,
+    departureTime: "05:10", visible: true,
+    route: suggestedOrbitRoute("base-mendoza", -66.5, -28.8, 26000, 430),
+  },
+  // D+2 — OBJETIVO ESTRATÉGICO TRITIO
+  {
+    id: "pkg-strike-tritio-gbu10", name: "Ataque principal · Planta de tritio (GBU-10)", phase: "fase-3",
+    baseId: "base-mendoza", aircraft: "F-16C Block 40", quantity: 8, speedKt: 480,
+    cruiseAltitudeFt: 24000, weapon: "GBU-10 Paveway II", weaponsPerAircraft: 2,
+    departureTime: "04:30", visible: true, targetAssetId: "tritio-plant-site",
     route: suggestedAttackRoute("base-mendoza", "tritio-plant-site", 24000, 480),
   },
   {
-    id: "pkg-dca-vm",
-    name: "Defensa contraaérea · Villa Mercedes",
-    phase: "fase-2",
-    baseId: "base-villa-mercedes",
-    aircraft: "F-16C Block 40",
-    quantity: 2,
-    speedKt: 480,
-    cruiseAltitudeFt: 26000,
-    weapon: "AIM-120",
-    weaponsPerAircraft: 4,
-    departureTime: "20:55",
-    visible: true,
-    route: suggestedOrbitRoute("base-villa-mercedes", -65.9, -29.9, 26000, 480),
+    id: "pkg-strike-tritio-gbu12", name: "Ataque complementario · Planta de tritio (GBU-12)", phase: "fase-3",
+    baseId: "base-mendoza", aircraft: "F-16D Block 42", quantity: 2, speedKt: 480,
+    cruiseAltitudeFt: 24000, weapon: "GBU-12 Paveway II", weaponsPerAircraft: 2,
+    departureTime: "04:30", visible: true, targetAssetId: "tritio-plant-site",
+    route: suggestedAttackRoute("base-mendoza", "tritio-plant-site", 24000, 480),
   },
   {
-    id: "pkg-rev-cba",
-    name: "REV KC-135 · Córdoba",
-    phase: "fase-2",
-    baseId: "base-cordoba",
-    aircraft: "KC-135",
-    quantity: 2,
-    speedKt: 430,
-    cruiseAltitudeFt: 26000,
-    weapon: "Sin armamento",
-    weaponsPerAircraft: 0,
-    departureTime: "20:35",
-    visible: true,
-    route: suggestedOrbitRoute("base-cordoba", -66.1, -30.5, 26000, 430),
+    id: "pkg-rev-kc135-d2", name: "Reabastecimiento KC-135 · D+2", phase: "fase-3",
+    baseId: "base-mendoza", aircraft: "KC-135", quantity: 4, speedKt: 430,
+    cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0,
+    departureTime: "03:40", visible: true,
+    route: suggestedOrbitRoute("base-mendoza", -67.2, -29.0, 26000, 430),
   },
   {
-    id: "pkg-rev-vm",
-    name: "REV KC-130J · Villa Mercedes",
-    phase: "fase-2",
-    baseId: "base-villa-mercedes",
-    aircraft: "KC-130J",
-    quantity: 4,
-    speedKt: 300,
-    cruiseAltitudeFt: 20000,
-    weapon: "Sin armamento",
-    weaponsPerAircraft: 0,
-    departureTime: "20:00",
-    visible: true,
-    route: suggestedOrbitRoute("base-villa-mercedes", -66.4, -30.8, 20000, 300),
-  },
-  {
-    id: "pkg-bda",
-    name: "BDA · Hermes 450",
-    phase: "fase-3",
-    baseId: "base-la-rioja",
-    aircraft: "HERMES 450",
-    quantity: 2,
-    speedKt: 80,
-    cruiseAltitudeFt: 15000,
-    weapon: "Sin armamento",
-    weaponsPerAircraft: 0,
-    departureTime: "08:00",
-    visible: true,
+    id: "pkg-bda", name: "BDA · Hermes 450", phase: "fase-3",
+    baseId: "base-la-rioja", aircraft: "HERMES 450", quantity: 2, speedKt: 80,
+    cruiseAltitudeFt: 15000, weapon: "Sin armamento", weaponsPerAircraft: 0,
+    departureTime: "08:00", visible: true,
     route: suggestedOrbitRoute("base-la-rioja", -66.2, -27.2, 15000, 80),
   },
 ];
 
 const temporalGroups: TemporalGroup[] = [
   {
-    id: "grupo-apertura-d",
-    name: "Apertura simultánea · Catamarca y Belén",
-    day: "D · Primera ventana",
-    description:
-      "SEAD y OCA sobre Catamarca y Belén, con DCA y reabastecimiento en apoyo.",
-    packageIds: [
-      "pkg-sead-f16-cat",
-      "pkg-sead-amx-cat",
-      "pkg-oca-cat",
-      "pkg-sead-f16-belen",
-      "pkg-sead-amx-belen",
-      "pkg-oca-belen",
-      "pkg-dca-vm",
-      "pkg-rev-cba",
-      "pkg-rev-vm",
-    ],
+    id: "grupo-apertura-d", name: "Día D · Catamarca y Belén", day: "D · Primera ventana",
+    description: "SEAD simultáneo sobre ambos S-300; 30 minutos después, ataques a pistas y aeronaves con escoltas. KC-130 y KC-135 en espera en territorio propio.",
+    packageIds: ["pkg-sead-f16-cat", "pkg-sead-amx-cat", "pkg-sead-f16-belen", "pkg-sead-amx-belen", "pkg-oca-cat", "pkg-escort-cat", "pkg-oca-belen", "pkg-escort-belen", "pkg-rev-kc130-d", "pkg-rev-kc135-d"],
   },
   {
-    id: "grupo-tucuman-cafayate",
-    name: "Segunda ventana · Tucumán y Cafayate",
-    day: "D · Tarde",
-    description: "SEAD sobre Cafayate y acciones OCA/Strike sobre Tucumán.",
-    packageIds: [
-      "pkg-sead-amx-caf",
-      "pkg-sead-f16-caf",
-      "pkg-oca-tuc",
-      "pkg-strike-tuc",
-    ],
+    id: "grupo-tucuman-cafayate", name: "Día D tarde · Tucumán y Cafayate", day: "D · Tarde",
+    description: "Ocho aeronaves de ataque sobre Tucumán en simultáneo, escolta, SEAD sobre TPS-70 Cafayate y reabastecedores en espera.",
+    packageIds: ["pkg-sead-f16-caf", "pkg-sead-amx-caf", "pkg-oca-tuc", "pkg-strike-tuc", "pkg-escort-tuc", "pkg-rev-kc130-tarde", "pkg-rev-kc135-tarde"],
   },
   {
-    id: "grupo-salta",
-    name: "Neutralización de Salta",
-    day: "D+1",
-    description:
-      "SEAD, OCA y Strike sobre Salta en una misma ventana coordinada.",
-    packageIds: [
-      "pkg-sead-f16-salta",
-      "pkg-sead-amx-salta",
-      "pkg-oca-salta",
-      "pkg-strike-salta",
-    ],
+    id: "grupo-salta", name: "D+1 · Salta y S-300 Catamarca", day: "D+1",
+    description: "Ataque simultáneo a pista y aeronaves de Salta y al S-300 de Catamarca, con escolta y reabastecedores.",
+    packageIds: ["pkg-oca-salta", "pkg-strike-salta", "pkg-sead-f16-d1-cat", "pkg-sead-amx-d1-cat", "pkg-escort-d1", "pkg-rev-kc130-d1", "pkg-rev-kc135-d1"],
   },
   {
-    id: "grupo-tritio",
-    name: "Ataque estratégico · Tritio",
-    day: "D+2",
-    description:
-      "Ataque principal contra la infraestructura crítica de producción de tritio.",
-    packageIds: ["pkg-strike-tritio"],
+    id: "grupo-tritio", name: "D+2 · Ataque estratégico Tritio", day: "D+2",
+    description: "Ataque simultáneo sobre la planta de procesamiento de tritio con 8 F-16/GBU-10 y 2 F-16/GBU-12, sostenido por 4 KC-135.",
+    packageIds: ["pkg-strike-tritio-gbu10", "pkg-strike-tritio-gbu12", "pkg-rev-kc135-d2"],
   },
   {
-    id: "grupo-bda",
-    name: "BDA, reataque y sostenimiento",
-    day: "D+3 a D+9",
-    description: "Evaluación de daños y acciones posteriores de sostenimiento.",
-    packageIds: ["pkg-bda"],
+    id: "grupo-bda", name: "BDA, reataque y sostenimiento", day: "D+3 a D+9",
+    description: "Evaluación de daños y acciones posteriores de sostenimiento.", packageIds: ["pkg-bda"],
   },
 ];
 
@@ -1321,10 +1169,10 @@ function metersToDegrees(
 function orientedRectangle(asset: EnemyAsset) {
   const length =
     asset.lengthMeters ??
-    (asset.kind === "runway" ? 2600 : asset.kind === "s300" ? 90 : 45);
+    (asset.kind === "runway" ? 2600 : asset.kind === "s300" ? 90 : asset.kind === "tritio" ? 120 : 45);
   const width =
     asset.widthMeters ??
-    (asset.kind === "runway" ? 45 : asset.kind === "s300" ? 55 : 25);
+    (asset.kind === "runway" ? 45 : asset.kind === "s300" ? 55 : asset.kind === "tritio" ? 80 : 25);
   const angle = ((asset.headingDeg ?? 0) * Math.PI) / 180;
   const corners = [
     [-width / 2, -length / 2],
@@ -1377,6 +1225,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const orbitMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
   const h24MarkersRef = useRef<Record<string, maplibregl.Marker[]>>({});
   const satelliteMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const floatingAircraftMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
   const animationRef = useRef<number | null>(null);
   const animationStartRef = useRef<number | null>(null);
   const continuousAnimationRef = useRef<number | null>(null);
@@ -1390,6 +1239,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const selectedPackageIdRef = useRef(initialPackages[0].id);
   const selectedH24IdRef = useRef(initialH24Platforms[0].id);
   const nextPointKindRef = useRef<PointKind>("navegacion");
+  const moveRoutePointIdRef = useRef<string | null>(null);
 
   const [visible, setVisible] = useState<Record<string, boolean>>(
     Object.fromEntries(coverages.map((c) => [c.id, true])),
@@ -1440,6 +1290,8 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const [groupProgress, setGroupProgress] = useState(0);
   const [groupPlaying, setGroupPlaying] = useState(false);
   const [groupSimulationSpeed, setGroupSimulationSpeed] = useState(10);
+  const [moveRoutePointId, setMoveRoutePointId] = useState<string | null>(null);
+  const [floatingAircraft, setFloatingAircraft] = useState<FloatingAircraft[]>(initialFloatingAircraft);
 
   const phasePackages = useMemo(
     () =>
@@ -1561,6 +1413,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
         cursor: "pointer",
         boxShadow: "0 2px 8px rgba(0,0,0,.6)",
       });
+      element.addEventListener("click", (event) => { event.stopPropagation(); setMoveRoutePointId(point.id); setStatus(`Seleccione en el mapa la nueva posición para ${point.name}.`); });
       const marker = new maplibregl.Marker({ element, anchor: "center" })
         .setLngLat([point.longitude, point.latitude])
         .setPopup(
@@ -1582,6 +1435,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   useEffect(() => {
     selectedPackageIdRef.current = selectedPackageId;
   }, [selectedPackageId]);
+  useEffect(() => {
+    moveRoutePointIdRef.current = moveRoutePointId;
+  }, [moveRoutePointId]);
   useEffect(() => {
     selectedH24IdRef.current = selectedH24Id;
   }, [selectedH24Id]);
@@ -1781,7 +1637,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
               name: asset.name,
               kind: asset.kind,
               height:
-                asset.kind === "runway" ? 1.2 : asset.kind === "s300" ? 16 : 22,
+                asset.kind === "runway" ? 1.2 : asset.kind === "s300" ? 16 : asset.kind === "tritio" ? 28 : 22,
               color:
                 asset.kind === "runway"
                   ? "#64748b"
@@ -1865,7 +1721,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       enemyAssets.forEach((asset) => {
         const element = document.createElement("div");
         element.title = asset.name;
-        element.innerHTML = `<div style="height:72px;width:2px;background:linear-gradient(to top,rgba(248,250,252,.1),rgba(248,250,252,.9));margin:0 auto"></div><div style="transform:translateX(-50%);white-space:nowrap;border:2px solid #fff;background:${asset.kind === "runway" ? "#475569" : asset.kind === "s300" ? "#991b1b" : "#c2410c"};color:#fff;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900">${asset.kind === "runway" ? "PISTA" : asset.kind === "s300" ? "S-300" : "RADAR"}</div>`;
+        element.innerHTML = `<div style="height:72px;width:2px;background:linear-gradient(to top,rgba(248,250,252,.1),rgba(248,250,252,.9));margin:0 auto"></div><div style="transform:translateX(-50%);white-space:nowrap;border:2px solid #fff;background:${asset.kind === "runway" ? "#475569" : asset.kind === "s300" ? "#991b1b" : asset.kind === "tritio" ? "#7f1d1d" : "#c2410c"};color:#fff;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900">${asset.kind === "runway" ? "PISTA" : asset.kind === "s300" ? "S-300" : asset.kind === "tritio" ? "TRITIO ☢" : "RADAR"}</div>`;
         Object.assign(element.style, {
           display: "block",
           cursor: "pointer",
@@ -1947,6 +1803,17 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     });
 
     map.on("click", (event) => {
+      if (moveRoutePointIdRef.current) {
+        const pointId = moveRoutePointIdRef.current;
+        setPackages((current) => current.map((pkg) =>
+          pkg.id === selectedPackageIdRef.current
+            ? { ...pkg, route: pkg.route.map((point) => point.id === pointId ? { ...point, longitude: event.lngLat.lng, latitude: event.lngLat.lat } : point) }
+            : pkg,
+        ));
+        setMoveRoutePointId(null);
+        setStatus("Punto de ruta reubicado. La nueva posición quedó guardada.");
+        return;
+      }
       if (drawingH24RouteRef.current) {
         setH24Platforms((current) =>
           current.map((platform) =>
@@ -2154,13 +2021,15 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
             name: asset.name,
             kind: asset.kind,
             height:
-              asset.kind === "runway" ? 1.2 : asset.kind === "s300" ? 16 : 22,
+              asset.kind === "runway" ? 1.2 : asset.kind === "s300" ? 16 : asset.kind === "tritio" ? 28 : 22,
             color:
               asset.kind === "runway"
                 ? "#64748b"
                 : asset.kind === "s300"
                   ? "#991b1b"
-                  : "#f97316",
+                  : asset.kind === "tritio"
+                    ? "#7f1d1d"
+                    : "#f97316",
           },
           geometry: {
             type: "Polygon",
@@ -2172,12 +2041,12 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       const marker = assetMarkersRef.current[asset.id];
       if (!marker) return;
       if (destroyedAssetIds.includes(asset.id)) {
-        marker.getElement().innerHTML = `<div style="font-size:40px;filter:drop-shadow(0 3px 4px #000)">💥</div><div style="white-space:nowrap;background:#7f1d1d;color:#fff;border:2px solid #fecaca;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:900">DESTRUIDO</div>`;
+        marker.getElement().innerHTML = `<div style="font-size:40px;filter:drop-shadow(0 3px 4px #000)">💥</div><div style="white-space:nowrap;background:#7f1d1d;color:#fff;border:2px solid #fecaca;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:900">NEUTRALIZADO</div>`;
         marker.getElement().style.display = showReferenceMarkers
           ? "block"
           : "none";
       } else {
-        marker.getElement().innerHTML = `<div style="height:72px;width:2px;background:linear-gradient(to top,rgba(248,250,252,.1),rgba(248,250,252,.9));margin:0 auto"></div><div style="transform:translateX(-50%);white-space:nowrap;border:2px solid #fff;background:${asset.kind === "runway" ? "#475569" : asset.kind === "s300" ? "#991b1b" : "#c2410c"};color:#fff;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900">${asset.kind === "runway" ? "PISTA" : asset.kind === "s300" ? "S-300" : "RADAR"}</div>`;
+        marker.getElement().innerHTML = `<div style="height:72px;width:2px;background:linear-gradient(to top,rgba(248,250,252,.1),rgba(248,250,252,.9));margin:0 auto"></div><div style="transform:translateX(-50%);white-space:nowrap;border:2px solid #fff;background:${asset.kind === "runway" ? "#475569" : asset.kind === "s300" ? "#991b1b" : asset.kind === "tritio" ? "#7f1d1d" : "#c2410c"};color:#fff;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900">${asset.kind === "runway" ? "PISTA" : asset.kind === "s300" ? "S-300" : asset.kind === "tritio" ? "TRITIO ☢" : "RADAR"}</div>`;
         marker.getElement().style.display = showReferenceMarkers
           ? "block"
           : "none";
@@ -2506,7 +2375,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
         : [...current, selectedPackage.targetAssetId!],
     );
     setStatus(
-      `Impacto confirmado sobre ${enemyAssets.find((asset) => asset.id === selectedPackage.targetAssetId)?.name ?? "el blanco"}. Cobertura retirada y blanco marcado como destruido.`,
+      `Impacto confirmado sobre ${enemyAssets.find((asset) => asset.id === selectedPackage.targetAssetId)?.name ?? "el blanco"}. Cobertura retirada y blanco marcado como NEUTRALIZADO.`,
     );
   }, [
     simulationProgress,
@@ -2564,8 +2433,10 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const scenarioStorageKey = `zeus-simulator-moa1-${workspaceCode}`;
   const buildScenarioState = useCallback(
     () => ({
+      scenarioSchemaVersion: 12,
       packages,
       h24Platforms,
+      floatingAircraft,
       selectedPhase,
       selectedPackageId,
       selectedH24Id,
@@ -2609,6 +2480,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     [
       packages,
       h24Platforms,
+      floatingAircraft,
       selectedPhase,
       selectedPackageId,
       selectedH24Id,
@@ -2653,12 +2525,13 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
 
   const applyScenario = useCallback((parsed: any) => {
     if (parsed.packages?.length) {
+      const useOperationalV12 = Number(parsed.scenarioSchemaVersion ?? 0) < 12;
       const savedById = new Map<string, MissionPackage>(
         parsed.packages.map((item: MissionPackage) => [item.id, item]),
       );
       const merged = initialPackages.map((item) => {
-        const saved: MissionPackage = savedById.get(item.id) ?? item;
-        if (item.id !== "pkg-strike-tritio") return saved;
+        const saved: MissionPackage = useOperationalV12 ? item : (savedById.get(item.id) ?? item);
+        if (!item.id.startsWith("pkg-strike-tritio")) return saved;
 
         const tritiumTarget = enemyAssets.find(
           (asset) => asset.id === "tritio-plant-site",
@@ -2687,10 +2560,10 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                   : point,
               )
             : suggestedAttackRoute(
-                "base-mendoza",
+                item.baseId,
                 "tritio-plant-site",
-                24000,
-                480,
+                item.cruiseAltitudeFt,
+                item.speedKt,
               ),
         };
       });
@@ -2707,6 +2580,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
           quantity: Math.max(1, item.quantity || 1),
         })),
       );
+    if (Array.isArray(parsed.floatingAircraft)) setFloatingAircraft(parsed.floatingAircraft);
     if (parsed.selectedPhase) setSelectedPhase(parsed.selectedPhase);
     if (parsed.selectedPackageId)
       setSelectedPackageId(parsed.selectedPackageId);
@@ -2729,7 +2603,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     if (Number.isFinite(parsed.groupProgress))
       setGroupProgress(parsed.groupProgress);
     if (Number.isFinite(parsed.groupSimulationSpeed))
-      setGroupSimulationSpeed(Math.max(0, Math.min(120, parsed.groupSimulationSpeed)));
+      setGroupSimulationSpeed(Math.max(0, Math.min(600, parsed.groupSimulationSpeed)));
     if (typeof parsed.showTonWall === "boolean")
       setShowTonWall(parsed.showTonWall);
     if (typeof parsed.showRepublicWalls === "boolean")
@@ -2796,6 +2670,28 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     const timer = window.setTimeout(() => persistScenario(false), 350);
     return () => window.clearTimeout(timer);
   }, [persistScenario]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    floatingAircraft.forEach((item) => {
+      let marker = floatingAircraftMarkersRef.current[item.id];
+      if (!marker) {
+        const element = document.createElement("div");
+        element.innerHTML = `<div style="width:54px;height:25px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:linear-gradient(135deg,#f8fafc,#64748b 48%,#0f172a);border:1px solid #fff;filter:drop-shadow(0 4px 5px #000);transform:perspective(90px) rotateX(52deg)"></div><div style="text-align:center;font-size:9px;font-weight:900;color:#fde047;text-shadow:0 1px 3px #000">${aircraftGlyph(item.aircraft)}</div>`;
+        marker = new maplibregl.Marker({ element, anchor: "center", draggable: true })
+          .setLngLat([item.longitude, item.latitude])
+          .addTo(map);
+        marker.on("dragend", () => {
+          const position = marker!.getLngLat();
+          setFloatingAircraft((current) => current.map((aircraft) => aircraft.id === item.id ? { ...aircraft, longitude: position.lng, latitude: position.lat } : aircraft));
+        });
+        floatingAircraftMarkersRef.current[item.id] = marker;
+      }
+      marker.setLngLat([item.longitude, item.latitude]);
+      marker.getElement().style.display = item.visible ? "block" : "none";
+    });
+  }, [floatingAircraft]);
 
   useEffect(() => {
     const persistBeforeLeave = () => persistScenario(false);
@@ -3326,11 +3222,17 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
             {selectedPackage.route.map((point, index) => (
               <div
                 key={point.id}
-                className={`grid grid-cols-[28px_1fr_76px_76px] items-center gap-1 rounded p-1 ${point.kind === "impacto" ? "bg-red-900/60" : "bg-slate-800"}`}
+                className={`grid grid-cols-[28px_1fr_58px_76px_76px] items-center gap-1 rounded p-1 ${point.kind === "impacto" ? "bg-red-900/60" : "bg-slate-800"}`}
               >
                 <span className="text-center font-bold">
                   {point.kind === "impacto" ? "💥" : index + 1}
                 </span>
+                <button
+                  type="button"
+                  onClick={() => { setMoveRoutePointId(point.id); setStatus(`Seleccione en el mapa la nueva posición para ${point.name}.`); }}
+                  className={`rounded p-1 text-[10px] font-bold ${moveRoutePointId === point.id ? "bg-amber-400 text-slate-950" : "bg-blue-800"}`}
+                  title="Mover este punto con un clic en el mapa"
+                >Mover</button>
                 <select
                   value={point.kind}
                   onChange={(e) => {
@@ -3559,7 +3461,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
 
           <details className="mt-4 rounded border border-red-800 bg-red-950/20 p-3">
             <summary className="cursor-pointer font-bold text-red-200">
-              Blancos destruidos
+              Blancos neutralizados
             </summary>
             {!destroyedAssetIds.length && (
               <p className="mt-2 text-xs text-slate-400">
@@ -3663,6 +3565,35 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
               <option value="fixed">Fija</option>
             </select>
           </label>
+
+          <details className="mt-4 rounded border border-cyan-800 bg-cyan-950/20 p-3">
+            <summary className="cursor-pointer font-bold text-cyan-200">
+              Aeronaves móviles sobre el mapa
+            </summary>
+            <p className="mt-2 text-xs text-slate-400">
+              Arrastre cada icono directamente sobre el mapa. Su posición se guarda automáticamente.
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {floatingAircraft.map((item) => (
+                <label key={item.id} className="flex items-center gap-2 rounded border border-slate-700 bg-slate-900 p-2 text-xs">
+                  <input
+                    type="checkbox"
+                    checked={item.visible}
+                    onChange={(event) =>
+                      setFloatingAircraft((current) =>
+                        current.map((aircraft) =>
+                          aircraft.id === item.id
+                            ? { ...aircraft, visible: event.target.checked }
+                            : aircraft,
+                        ),
+                      )
+                    }
+                  />
+                  <span>{aircraftGlyph(item.aircraft)} · {item.name}</span>
+                </label>
+              ))}
+            </div>
+          </details>
 
           <details
             open
