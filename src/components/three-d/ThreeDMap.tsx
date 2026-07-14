@@ -382,7 +382,7 @@ const initialH24Platforms: H24Platform[] = [
     name: "AWACS H24",
     aircraft: "E-99M ERIEYE",
     speedKt: 400,
-    loopSeconds: 20,
+    loopSeconds: 120,
     altitudeFt: 28000,
     visible: true,
     showRoute: true,
@@ -394,7 +394,7 @@ const initialH24Platforms: H24Platform[] = [
     name: "Guerra electrónica H24",
     aircraft: "EC-130H COMPASS CALL",
     speedKt: 300,
-    loopSeconds: 24,
+    loopSeconds: 150,
     altitudeFt: 25000,
     visible: true,
     showRoute: true,
@@ -2740,6 +2740,73 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                   className="mt-1 w-full rounded bg-slate-800 p-2 text-center"
                 />
               </label>
+            </div>
+            <div className="mt-3 rounded border border-violet-700/70 bg-slate-950/50 p-3">
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <span className="font-semibold text-violet-100">
+                  Velocidad visual del loop
+                </span>
+                <span className="rounded bg-violet-900 px-2 py-1 font-bold text-violet-100">
+                  {selectedH24.loopSeconds} s/vuelta
+                </span>
+              </div>
+              <input
+                type="range"
+                min={10}
+                max={600}
+                step={5}
+                value={selectedH24.loopSeconds}
+                onChange={(e) =>
+                  setH24Platforms((current) =>
+                    current.map((platform) =>
+                      platform.id === selectedH24Id
+                        ? {
+                            ...platform,
+                            loopSeconds: Math.max(10, Number(e.target.value)),
+                          }
+                        : platform,
+                    ),
+                  )
+                }
+                className="mt-3 w-full accent-violet-500"
+              />
+              <div className="mt-1 flex justify-between text-[10px] text-slate-400">
+                <span>Más rápido · 10 s</span>
+                <span>Más lento · 600 s</span>
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-[11px]">
+                {[
+                  { label: "Rápido", seconds: 45 },
+                  { label: "Normal", seconds: 120 },
+                  { label: "Lento", seconds: 300 },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() =>
+                      setH24Platforms((current) =>
+                        current.map((platform) =>
+                          platform.id === selectedH24Id
+                            ? { ...platform, loopSeconds: preset.seconds }
+                            : platform,
+                        ),
+                      )
+                    }
+                    className={`rounded border px-2 py-1 ${
+                      selectedH24.loopSeconds === preset.seconds
+                        ? "border-violet-300 bg-violet-700 text-white"
+                        : "border-slate-700 bg-slate-800 text-slate-200"
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-[11px] text-slate-400">
+                Este control solo modifica la velocidad de la animación. La
+                velocidad operacional en nudos permanece separada para los
+                cálculos. Un valor mayor produce una órbita más lenta.
+              </p>
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
               <button
