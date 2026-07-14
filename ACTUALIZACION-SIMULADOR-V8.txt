@@ -1,0 +1,16 @@
+ACTUALIZACIÓN SIMULADOR MOA 1 V8
+
+- Incorpora línea temporal inferior plegada sobre el mapa 3D.
+- Agrupa acciones simultáneas por ventana operacional:
+  * Día D primera ventana: Catamarca + Belén + DCA + REV.
+  * Día D tarde: Cafayate + Tucumán.
+  * Día D+1: Salta.
+  * Día D+2: ataque estratégico al tritio.
+  * Día D+3 a D+9: BDA y sostenimiento.
+- Permite seleccionar y reproducir un grupo simultáneo completo.
+- La barra temporal del grupo permite adelantar y retroceder la acción.
+- Durante la reproducción aparecen simultáneamente todas las aeronaves de todos los paquetes del grupo.
+- Cada paquete conserva su hora de salida y duración propia dentro de la ventana común.
+- Los impactos de los paquetes del grupo continúan destruyendo el blanco, retirando su cobertura y mostrando la explosión.
+- Permite volver al modo de reproducción individual o abrir un paquete del grupo para editarlo.
+- Se conserva la persistencia local de la selección y avance temporal.

@@ -28,6 +28,14 @@ type RoutePoint = {
   speedToNextKt?: number;
 };
 
+type TemporalGroup = {
+  id: string;
+  name: string;
+  day: string;
+  description: string;
+  packageIds: string[];
+};
+
 type MissionPackage = {
   id: string;
   name: string;
@@ -1109,6 +1117,78 @@ const initialPackages: MissionPackage[] = [
   },
 ];
 
+const temporalGroups: TemporalGroup[] = [
+  {
+    id: "grupo-apertura-d",
+    name: "Apertura simultánea · Catamarca y Belén",
+    day: "D · Primera ventana",
+    description:
+      "SEAD y OCA sobre Catamarca y Belén, con DCA y reabastecimiento en apoyo.",
+    packageIds: [
+      "pkg-sead-f16-cat",
+      "pkg-sead-amx-cat",
+      "pkg-oca-cat",
+      "pkg-sead-f16-belen",
+      "pkg-sead-amx-belen",
+      "pkg-oca-belen",
+      "pkg-dca-vm",
+      "pkg-rev-cba",
+      "pkg-rev-vm",
+    ],
+  },
+  {
+    id: "grupo-tucuman-cafayate",
+    name: "Segunda ventana · Tucumán y Cafayate",
+    day: "D · Tarde",
+    description: "SEAD sobre Cafayate y acciones OCA/Strike sobre Tucumán.",
+    packageIds: [
+      "pkg-sead-amx-caf",
+      "pkg-sead-f16-caf",
+      "pkg-oca-tuc",
+      "pkg-strike-tuc",
+    ],
+  },
+  {
+    id: "grupo-salta",
+    name: "Neutralización de Salta",
+    day: "D+1",
+    description:
+      "SEAD, OCA y Strike sobre Salta en una misma ventana coordinada.",
+    packageIds: [
+      "pkg-sead-f16-salta",
+      "pkg-sead-amx-salta",
+      "pkg-oca-salta",
+      "pkg-strike-salta",
+    ],
+  },
+  {
+    id: "grupo-tritio",
+    name: "Ataque estratégico · Tritio",
+    day: "D+2",
+    description:
+      "Ataque principal contra la infraestructura crítica de producción de tritio.",
+    packageIds: ["pkg-strike-tritio"],
+  },
+  {
+    id: "grupo-bda",
+    name: "BDA, reataque y sostenimiento",
+    day: "D+3 a D+9",
+    description: "Evaluación de daños y acciones posteriores de sostenimiento.",
+    packageIds: ["pkg-bda"],
+  },
+];
+
+function timeToMinutes(time: string) {
+  const [hours, minutes] = time.split(":").map(Number);
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return 0;
+  return hours * 60 + minutes;
+}
+
+function minutesToTime(total: number) {
+  const value = ((Math.round(total) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
+}
+
 function haversineNm(a: RoutePoint, b: RoutePoint) {
   const rNm = 3440.065;
   const toRad = (v: number) => (v * Math.PI) / 180;
@@ -1352,6 +1432,11 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const [mapPitch, setMapPitch] = useState(72);
   const [satelliteLoopSeconds, setSatelliteLoopSeconds] = useState(75);
   const [destroyedAssetIds, setDestroyedAssetIds] = useState<string[]>([]);
+  const [activeTemporalGroupId, setActiveTemporalGroupId] = useState<
+    string | null
+  >(null);
+  const [groupProgress, setGroupProgress] = useState(0);
+  const [groupPlaying, setGroupPlaying] = useState(false);
 
   const phasePackages = useMemo(
     () =>
@@ -1366,6 +1451,34 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     packages[0];
   const selectedH24 =
     h24Platforms.find((item) => item.id === selectedH24Id) ?? h24Platforms[0];
+  const activeTemporalGroup = temporalGroups.find(
+    (group) => group.id === activeTemporalGroupId,
+  );
+  const activeGroupPackages = useMemo(
+    () =>
+      activeTemporalGroup
+        ? activeTemporalGroup.packageIds
+            .map((id) => packages.find((pkg) => pkg.id === id))
+            .filter((pkg): pkg is MissionPackage => Boolean(pkg))
+        : [],
+    [activeTemporalGroup, packages],
+  );
+  const groupWindow = useMemo(() => {
+    if (!activeGroupPackages.length) return { start: 0, end: 1, duration: 1 };
+    const starts = activeGroupPackages.map((pkg) =>
+      timeToMinutes(pkg.departureTime),
+    );
+    const ends = activeGroupPackages.map(
+      (pkg) =>
+        timeToMinutes(pkg.departureTime) +
+        routeTimeHours(pkg.route, pkg.speedKt) * 60,
+    );
+    const start = Math.min(...starts);
+    const end = Math.max(...ends);
+    return { start, end, duration: Math.max(1, end - start) };
+  }, [activeGroupPackages]);
+  const groupCurrentMinute =
+    groupWindow.start + groupProgress * groupWindow.duration;
   const selectedDistance = useMemo(
     () => routeDistanceNm(selectedPackage?.route ?? []),
     [selectedPackage],
@@ -2177,42 +2290,79 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    const quantity = Math.max(1, Math.min(12, selectedPackage?.quantity ?? 1));
-    while (aircraftMarkersRef.current.length < quantity) {
-      const index = aircraftMarkersRef.current.length;
+    const displayPackages = activeTemporalGroupId
+      ? activeGroupPackages
+      : selectedPackage
+        ? [selectedPackage]
+        : [];
+    const instances = displayPackages.flatMap((pkg) =>
+      Array.from(
+        { length: Math.max(1, Math.min(12, pkg.quantity || 1)) },
+        (_, index) => ({ pkg, index }),
+      ),
+    );
+    while (aircraftMarkersRef.current.length < instances.length) {
       const element = document.createElement("div");
-      element.innerHTML = `<div data-aircraft-body style="width:58px;height:26px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:linear-gradient(135deg,#f8fafc,#64748b 48%,#0f172a);border:1px solid rgba(255,255,255,.8);filter:drop-shadow(0 4px 5px #000);transform:perspective(90px) rotateX(52deg)"></div><div data-aircraft-label style="margin-top:-4px;text-align:center;font-size:9px;font-weight:900;color:#fde047;text-shadow:0 1px 3px #000">${aircraftGlyph(selectedPackage?.aircraft ?? "F-16")}</div>`;
+      element.innerHTML = `<div data-aircraft-body style="width:58px;height:26px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:linear-gradient(135deg,#f8fafc,#64748b 48%,#0f172a);border:1px solid rgba(255,255,255,.8);filter:drop-shadow(0 4px 5px #000);transform:perspective(90px) rotateX(52deg)"></div><div data-aircraft-label style="margin-top:-4px;text-align:center;font-size:9px;font-weight:900;color:#fde047;text-shadow:0 1px 3px #000"></div>`;
       element.style.display = "none";
-      element.title = `Aeronave ${index + 1}`;
       aircraftMarkersRef.current.push(
         new maplibregl.Marker({ element, anchor: "center" })
           .setLngLat([-64.2, -31.3])
           .addTo(map),
       );
     }
-    aircraftMarkersRef.current.forEach((marker, index) => {
-      const route = selectedPackage?.route ?? [];
-      const position = interpolateRouteByTime(
-        route,
-        simulationProgress,
-        selectedPackage?.speedKt ?? 1,
+    aircraftMarkersRef.current.forEach((marker, markerIndex) => {
+      const instance = instances[markerIndex];
+      if (!instance) {
+        marker.getElement().style.display = "none";
+        return;
+      }
+      const { pkg, index } = instance;
+      const pkgDurationMinutes = Math.max(
+        0.01,
+        routeTimeHours(pkg.route, pkg.speedKt) * 60,
       );
-      if (!position || index >= quantity || !selectedPackage?.visible) {
+      const progress = activeTemporalGroupId
+        ? Math.max(
+            0,
+            Math.min(
+              1,
+              (groupCurrentMinute - timeToMinutes(pkg.departureTime)) /
+                pkgDurationMinutes,
+            ),
+          )
+        : simulationProgress;
+      const isActive =
+        !activeTemporalGroupId ||
+        (groupCurrentMinute >= timeToMinutes(pkg.departureTime) &&
+          groupCurrentMinute <=
+            timeToMinutes(pkg.departureTime) + pkgDurationMinutes);
+      const position = interpolateRouteByTime(pkg.route, progress, pkg.speedKt);
+      if (!position || !pkg.visible || !isActive) {
         marker.getElement().style.display = "none";
         return;
       }
       const row = Math.floor(index / 3);
       const col = index % 3;
-      const offsetLon = (col - 1) * 0.025;
-      const offsetLat = (row - Math.floor(quantity / 6)) * 0.018;
-      marker.setLngLat([position[0] + offsetLon, position[1] + offsetLat]);
+      const packageOffset =
+        displayPackages.findIndex((item) => item.id === pkg.id) * 0.012;
+      marker.setLngLat([
+        position[0] + (col - 1) * 0.025 + packageOffset,
+        position[1] + row * 0.018 - packageOffset,
+      ]);
       marker.getElement().style.display = "block";
-      marker.getElement().title = `${selectedPackage.name} · aeronave ${index + 1} de ${quantity}`;
+      marker.getElement().title = `${pkg.name} · aeronave ${index + 1} de ${pkg.quantity}`;
       const label = marker.getElement().querySelector("[data-aircraft-label]");
       if (label)
-        label.textContent = `${aircraftGlyph(selectedPackage.aircraft)} ${index + 1}`;
+        label.textContent = `${aircraftGlyph(pkg.aircraft)} ${index + 1}`;
     });
-  }, [selectedPackage, simulationProgress]);
+  }, [
+    selectedPackage,
+    simulationProgress,
+    activeTemporalGroupId,
+    activeGroupPackages,
+    groupCurrentMinute,
+  ]);
 
   useEffect(() => {
     const tick = (now: number) => {
@@ -2274,6 +2424,26 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   }, [h24Platforms, satelliteLoopSeconds]);
 
   useEffect(() => {
+    if (!activeTemporalGroupId) return;
+    activeGroupPackages.forEach((pkg) => {
+      if (!pkg.targetAssetId) return;
+      const impactIdx = pkg.route.findIndex(
+        (point) => point.kind === "impacto",
+      );
+      if (impactIdx < 1) return;
+      const impactMinute =
+        timeToMinutes(pkg.departureTime) +
+        routeTimeHoursUntil(pkg.route, impactIdx, pkg.speedKt) * 60;
+      if (groupCurrentMinute + 0.001 < impactMinute) return;
+      setDestroyedAssetIds((current) =>
+        current.includes(pkg.targetAssetId!)
+          ? current
+          : [...current, pkg.targetAssetId!],
+      );
+    });
+  }, [activeTemporalGroupId, activeGroupPackages, groupCurrentMinute]);
+
+  useEffect(() => {
     if (
       !selectedPackage?.targetAssetId ||
       impactIndex < 1 ||
@@ -2302,6 +2472,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   ]);
 
   useEffect(() => {
+    if (activeTemporalGroupId) return;
     if (!isPlaying) {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       animationStartRef.current = null;
@@ -2360,6 +2531,8 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       simulationSpeed,
       simulationProgress,
       destroyedAssetIds,
+      activeTemporalGroupId,
+      groupProgress,
       showTonWall,
       showRepublicWalls,
       wallOpacity,
@@ -2467,6 +2640,10 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       setSimulationProgress(parsed.simulationProgress);
     if (Array.isArray(parsed.destroyedAssetIds))
       setDestroyedAssetIds(parsed.destroyedAssetIds);
+    if (typeof parsed.activeTemporalGroupId === "string")
+      setActiveTemporalGroupId(parsed.activeTemporalGroupId);
+    if (Number.isFinite(parsed.groupProgress))
+      setGroupProgress(parsed.groupProgress);
     if (typeof parsed.showTonWall === "boolean")
       setShowTonWall(parsed.showTonWall);
     if (typeof parsed.showRepublicWalls === "boolean")
@@ -2577,8 +2754,8 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
             Simulador de paquetes aéreos sobre relieve 3D
           </h1>
           <p className="text-sm text-slate-300">
-            Paquetes precargados, rutas sugeridas de menor exposición, impactos
-            funcionales y formaciones múltiples automático.
+            Paquetes precargados, acciones simultáneas en línea temporal,
+            impactos funcionales y formaciones múltiples.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -2604,7 +2781,121 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       </header>
 
       <div className="grid min-h-[calc(100vh-100px)] lg:grid-cols-[1fr_390px]">
-        <div ref={mapContainerRef} className="min-h-[780px] w-full" />
+        <div className="relative min-h-[780px] w-full overflow-hidden">
+          <div ref={mapContainerRef} className="min-h-[780px] w-full" />
+          <div className="absolute bottom-3 left-3 right-3 z-20 rounded-xl border border-slate-600 bg-slate-950/95 p-3 shadow-2xl backdrop-blur">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p className="text-xs font-black uppercase tracking-wider text-amber-300">
+                  Línea temporal · acciones simultáneas
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Seleccione una ventana para verla y reproducir todos sus
+                  paquetes en forma coordinada.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setActiveTemporalGroupId(null);
+                  setGroupPlaying(false);
+                  setGroupProgress(0);
+                }}
+                className="rounded bg-slate-700 px-3 py-1.5 text-xs font-bold"
+              >
+                Modo paquete individual
+              </button>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {temporalGroups.map((group) => {
+                const selected = activeTemporalGroupId === group.id;
+                return (
+                  <button
+                    key={group.id}
+                    onClick={() => {
+                      setActiveTemporalGroupId(group.id);
+                      setGroupProgress(0);
+                      setGroupPlaying(false);
+                      setIsPlaying(false);
+                    }}
+                    className={`min-w-[210px] rounded-lg border p-2 text-left ${selected ? "border-amber-300 bg-amber-500 text-slate-950" : "border-slate-600 bg-slate-800/90 text-white"}`}
+                  >
+                    <span className="block text-[10px] font-black uppercase">
+                      {group.day}
+                    </span>
+                    <span className="block text-xs font-bold">
+                      {group.name}
+                    </span>
+                    <span
+                      className={`mt-1 block text-[10px] ${selected ? "text-slate-800" : "text-slate-400"}`}
+                    >
+                      {group.packageIds.length} paquetes
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {activeTemporalGroup && (
+              <div className="mt-1">
+                <div className="mb-1 flex items-center justify-between text-[11px]">
+                  <span>{minutesToTime(groupWindow.start)}</span>
+                  <strong>{activeTemporalGroup.name}</strong>
+                  <span>{minutesToTime(groupWindow.end)}</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.001"
+                  value={groupProgress}
+                  onChange={(e) => {
+                    setGroupPlaying(false);
+                    setGroupProgress(Number(e.target.value));
+                  }}
+                  className="w-full cursor-ew-resize"
+                />
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setGroupProgress(0);
+                      setGroupPlaying(false);
+                    }}
+                    className="rounded bg-slate-700 px-3 py-1.5 text-xs"
+                  >
+                    Reiniciar
+                  </button>
+                  <button
+                    onClick={() => setGroupPlaying((value) => !value)}
+                    className="rounded bg-emerald-700 px-4 py-1.5 text-xs font-bold"
+                  >
+                    {groupPlaying ? "Pausar grupo" : "Reproducir grupo"}
+                  </button>
+                  <span className="rounded bg-slate-800 px-3 py-1.5 text-xs">
+                    Hora: {minutesToTime(groupCurrentMinute)}
+                  </span>
+                  <span className="rounded bg-slate-800 px-3 py-1.5 text-xs">
+                    Avance: {Math.round(groupProgress * 100)} %
+                  </span>
+                  <div className="ml-auto flex max-w-full gap-1 overflow-x-auto">
+                    {activeGroupPackages.map((pkg) => (
+                      <button
+                        key={pkg.id}
+                        onClick={() => {
+                          setSelectedPackageId(pkg.id);
+                          setActiveTemporalGroupId(null);
+                          setGroupPlaying(false);
+                        }}
+                        className="whitespace-nowrap rounded border border-slate-600 bg-slate-800 px-2 py-1 text-[10px]"
+                        title="Abrir y editar este paquete"
+                      >
+                        {pkg.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
         <aside className="overflow-y-auto border-l border-slate-700 bg-slate-900 p-4 lg:max-h-[calc(100vh-100px)]">
           <p className="mb-4 rounded border border-emerald-800 bg-emerald-950/40 p-2 text-sm text-emerald-200">
             {status}
