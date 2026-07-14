@@ -1,0 +1,8 @@
+SIMULADOR MOA 1 V11
+
+Correccion definitiva del ataque D+2 a la planta de procesamiento de tritio:
+- Migra automaticamente escenarios guardados de versiones anteriores que conservaban la ruta a Oran.
+- Fuerza el blanco del paquete pkg-strike-tritio a tritio-plant-site.
+- Si el punto de impacto guardado no coincide con la planta, reconstruye la ruta desde Mendoza hacia la planta.
+- Si la ruta ya es correcta, conserva sus puntos y ajusta exactamente el punto de impacto al simbolo nuclear.
+- Al destruirse la planta, se oculta tambien el simbolo nuclear operativo y queda el marcador de explosion.

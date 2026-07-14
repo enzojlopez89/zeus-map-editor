@@ -2044,12 +2044,15 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   useEffect(() => {
     pointSites.forEach((site) => {
       const marker = siteMarkersRef.current[site.id];
-      if (marker)
-        marker.getElement().style.display = siteVisible[site.id]
-          ? "flex"
-          : "none";
+      if (!marker) return;
+      const linkedAssetId = coverageAssetId(site.id);
+      const destroyed = linkedAssetId
+        ? destroyedAssetIds.includes(linkedAssetId)
+        : false;
+      marker.getElement().style.display =
+        siteVisible[site.id] && !destroyed ? "flex" : "none";
     });
-  }, [siteVisible]);
+  }, [siteVisible, destroyedAssetIds]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2653,9 +2656,44 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       const savedById = new Map(
         parsed.packages.map((item: MissionPackage) => [item.id, item]),
       );
-      const merged = initialPackages.map(
-        (item) => savedById.get(item.id) ?? item,
-      );
+      const merged = initialPackages.map((item) => {
+        const saved = savedById.get(item.id) ?? item;
+        if (item.id !== "pkg-strike-tritio") return saved;
+
+        const tritiumTarget = enemyAssets.find(
+          (asset) => asset.id === "tritio-plant-site",
+        );
+        const savedImpact = saved.route?.find(
+          (point: RoutePoint) => point.kind === "impacto",
+        );
+        const impactIsOnTritium =
+          tritiumTarget &&
+          savedImpact &&
+          Math.abs(savedImpact.longitude - tritiumTarget.longitude) < 0.08 &&
+          Math.abs(savedImpact.latitude - tritiumTarget.latitude) < 0.08;
+
+        return {
+          ...saved,
+          targetAssetId: "tritio-plant-site",
+          route: impactIsOnTritium
+            ? saved.route.map((point: RoutePoint) =>
+                point.kind === "impacto"
+                  ? {
+                      ...point,
+                      longitude: tritiumTarget!.longitude,
+                      latitude: tritiumTarget!.latitude,
+                      name: "Impacto · Planta de procesamiento de tritio",
+                    }
+                  : point,
+              )
+            : suggestedAttackRoute(
+                "base-mendoza",
+                "tritio-plant-site",
+                24000,
+                480,
+              ),
+        };
+      });
       const custom = parsed.packages.filter(
         (item: MissionPackage) =>
           !initialPackages.some((base) => base.id === item.id),
