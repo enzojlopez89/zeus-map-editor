@@ -2653,11 +2653,11 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
 
   const applyScenario = useCallback((parsed: any) => {
     if (parsed.packages?.length) {
-      const savedById = new Map(
+      const savedById = new Map<string, MissionPackage>(
         parsed.packages.map((item: MissionPackage) => [item.id, item]),
       );
       const merged = initialPackages.map((item) => {
-        const saved = savedById.get(item.id) ?? item;
+        const saved: MissionPackage = savedById.get(item.id) ?? item;
         if (item.id !== "pkg-strike-tritio") return saved;
 
         const tritiumTarget = enemyAssets.find(
