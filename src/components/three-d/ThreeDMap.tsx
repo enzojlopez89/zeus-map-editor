@@ -918,7 +918,7 @@ const initialPackages: MissionPackage[] = [
     departureTime: "12:50", visible: true,
     route: suggestedOrbitRoute("base-mendoza", -66.5, -29.2, 26000, 430),
   },
-  // D+1 — SALTA Y S-300 CATAMARCA EN SIMULTÁNEO
+  // D+1 — SALTA Y S-300 SALTA EN SIMULTÁNEO
   {
     id: "pkg-oca-salta", name: "Ataque AMX · Ala Aérea n.º 3 / Salta", phase: "fase-2",
     baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
@@ -934,18 +934,18 @@ const initialPackages: MissionPackage[] = [
     route: suggestedAttackRoute("base-mendoza", "runway-salta", 24000, 480),
   },
   {
-    id: "pkg-sead-f16-d1-cat", name: "SEAD F-16CJ · S-300 Catamarca (D+1)", phase: "fase-2",
+    id: "pkg-sead-f16-d1-salta", name: "SEAD F-16CJ · S-300 Salta (D+1)", phase: "fase-2",
     baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
     cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
-    departureTime: "06:00", visible: true, targetAssetId: "s300-catamarca-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 24000, 480),
+    departureTime: "06:00", visible: true, targetAssetId: "s300-salta-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-salta-site", 24000, 480),
   },
   {
-    id: "pkg-sead-amx-d1-cat", name: "SEAD AMX · S-300 Catamarca (D+1)", phase: "fase-2",
+    id: "pkg-sead-amx-d1-salta", name: "SEAD AMX · S-300 Salta (D+1)", phase: "fase-2",
     baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
     cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 4,
-    departureTime: "06:00", visible: true, targetAssetId: "s300-catamarca-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 18000, 420),
+    departureTime: "06:00", visible: true, targetAssetId: "s300-salta-site",
+    route: suggestedAttackRoute("base-cordoba", "s300-salta-site", 18000, 420),
   },
   {
     id: "pkg-escort-d1", name: "Escolta F-16 · D+1", phase: "fase-2",
@@ -1011,9 +1011,9 @@ const temporalGroups: TemporalGroup[] = [
     packageIds: ["pkg-sead-f16-caf", "pkg-sead-amx-caf", "pkg-oca-tuc", "pkg-strike-tuc", "pkg-escort-tuc", "pkg-rev-kc130-tarde", "pkg-rev-kc135-tarde"],
   },
   {
-    id: "grupo-salta", name: "D+1 · Salta y S-300 Catamarca", day: "D+1",
-    description: "Ataque simultáneo a pista y aeronaves de Salta y al S-300 de Catamarca, con escolta y reabastecedores.",
-    packageIds: ["pkg-oca-salta", "pkg-strike-salta", "pkg-sead-f16-d1-cat", "pkg-sead-amx-d1-cat", "pkg-escort-d1", "pkg-rev-kc130-d1", "pkg-rev-kc135-d1"],
+    id: "grupo-salta", name: "D+1 · Salta y S-300 Salta", day: "D+1",
+    description: "Ataque simultáneo a pista y aeronaves de Salta y al S-300 de Salta, con escolta y reabastecedores.",
+    packageIds: ["pkg-oca-salta", "pkg-strike-salta", "pkg-sead-f16-d1-salta", "pkg-sead-amx-d1-salta", "pkg-escort-d1", "pkg-rev-kc130-d1", "pkg-rev-kc135-d1"],
   },
   {
     id: "grupo-tritio", name: "D+2 · Ataque estratégico Tritio", day: "D+2",
@@ -2433,7 +2433,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const scenarioStorageKey = `zeus-simulator-moa1-${workspaceCode}`;
   const buildScenarioState = useCallback(
     () => ({
-      scenarioSchemaVersion: 12,
+      scenarioSchemaVersion: 13,
       packages,
       h24Platforms,
       floatingAircraft,
@@ -2525,7 +2525,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
 
   const applyScenario = useCallback((parsed: any) => {
     if (parsed.packages?.length) {
-      const useOperationalV12 = Number(parsed.scenarioSchemaVersion ?? 0) < 12;
+      const useOperationalV12 = Number(parsed.scenarioSchemaVersion ?? 0) < 13;
       const savedById = new Map<string, MissionPackage>(
         parsed.packages.map((item: MissionPackage) => [item.id, item]),
       );
@@ -2636,6 +2636,23 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   }, []);
 
   const saveScenario = () => persistScenario(true);
+  const undoUnsavedChanges = () => {
+    const raw = localStorage.getItem(scenarioStorageKey);
+    if (!raw) {
+      setStatus("Todavía no hay una versión guardada para deshacer los cambios");
+      return;
+    }
+    try {
+      applyScenario(JSON.parse(raw));
+      setSimulationProgress(0);
+      setGroupProgress(0);
+      setIsPlaying(false);
+      setGroupPlaying(false);
+      setStatus("Cambios no guardados deshechos");
+    } catch {
+      setStatus("No se pudo recuperar la última versión guardada");
+    }
+  };
   const loadScenario = () => {
     const raw = localStorage.getItem(scenarioStorageKey);
     if (!raw) {
@@ -2665,11 +2682,6 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     hydratedRef.current = true;
   }, [scenarioStorageKey, applyScenario]);
 
-  useEffect(() => {
-    if (!hydratedRef.current) return;
-    const timer = window.setTimeout(() => persistScenario(false), 350);
-    return () => window.clearTimeout(timer);
-  }, [persistScenario]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2693,16 +2705,6 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     });
   }, [floatingAircraft]);
 
-  useEffect(() => {
-    const persistBeforeLeave = () => persistScenario(false);
-    window.addEventListener("pagehide", persistBeforeLeave);
-    window.addEventListener("beforeunload", persistBeforeLeave);
-    return () => {
-      persistBeforeLeave();
-      window.removeEventListener("pagehide", persistBeforeLeave);
-      window.removeEventListener("beforeunload", persistBeforeLeave);
-    };
-  }, [persistScenario]);
 
   const addPackage = () => {
     const id = crypto.randomUUID();
@@ -2985,7 +2987,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
               </option>
             ))}
           </select>
-          <div className="mb-4 grid grid-cols-3 gap-2 text-xs">
+          <div className="mb-4 grid grid-cols-4 gap-2 text-xs">
             <button onClick={addPackage} className="rounded bg-blue-700 p-2">
               + Paquete
             </button>
@@ -2994,6 +2996,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
               className="rounded bg-emerald-700 p-2"
             >
               Guardar
+            </button>
+            <button onClick={undoUnsavedChanges} className="rounded bg-amber-700 p-2">
+              Deshacer
             </button>
             <button onClick={loadScenario} className="rounded bg-slate-700 p-2">
               Recuperar

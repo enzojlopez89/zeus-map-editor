@@ -823,7 +823,7 @@ const initialPackages: MissionPackage[] = [
   { id: "moa2-m3-strike-salta", name: "Momento 3 · Pista y aviones Salta", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480, cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 2, departureTime: "16:20", visible: true, targetAssetId: "runway-salta", route: suggestedAttackRoute("base-villa-mercedes", "runway-salta", 24000, 480) },
   { id: "moa2-m3-escort-salta", name: "Momento 3 · Escolta F-16 Salta", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480, cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4, departureTime: "16:10", visible: true, route: suggestedOrbitRoute("base-villa-mercedes", -65.7, -25.5, 26000, 480) },
   { id: "moa2-d1-tritio", name: "D+1 · Laboratorio de procesamiento de tritio", phase: "fase-3", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 13, speedKt: 480, cruiseAltitudeFt: 24000, weapon: "GBU-10 / GBU-12", weaponsPerAircraft: 2, departureTime: "09:00", visible: true, targetAssetId: "tritio-plant-site", route: suggestedAttackRoute("base-villa-mercedes", "tritio-plant-site", 24000, 480) },
-  { id: "moa2-bda", name: "BDA y sostenimiento", phase: "fase-3", baseId: "base-villa-mercedes", aircraft: "HERMES 450", quantity: 1, speedKt: 80, cruiseAltitudeFt: 15000, weapon: "Sin armamento", weaponsPerAircraft: 0, departureTime: "12:00", visible: true, targetAssetId: "tritio-plant-site", route: suggestedAttackRoute("base-villa-mercedes", "tritio-plant-site", 15000, 80) },
+  { id: "moa2-bda", name: "BDA y sostenimiento", phase: "fase-3", baseId: "base-la-rioja", aircraft: "HERMES 450", quantity: 1, speedKt: 80, cruiseAltitudeFt: 15000, weapon: "Sin armamento", weaponsPerAircraft: 0, departureTime: "12:00", visible: true, targetAssetId: "tritio-plant-site", route: suggestedAttackRoute("base-la-rioja", "tritio-plant-site", 15000, 80) },
 ];
 const temporalGroups: TemporalGroup[] = [
   { id: "moa2-grupo-d", name: "Día D · Acción simultánea inicial", day: "D", description: "CAOC Ingeniero Juárez, S-300 Belén y Catamarca, TPS-70 Cafayate, pista de Tucumán y apoyo de reabastecimiento.", packageIds: ["moa2-cyber-caoc", "moa2-harpy-belen", "moa2-hermes-belen", "moa2-harpy-catamarca", "moa2-hermes-catamarca", "moa2-harpy-cafayate", "moa2-strike-tucuman", "moa2-escort-tucuman", "moa2-kc130-d", "moa2-kc135-d"] },
@@ -1847,7 +1847,9 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
       const marker = assetMarkersRef.current[asset.id];
       if (!marker) return;
       if (destroyedAssetIds.includes(asset.id)) {
-        marker.getElement().innerHTML = `<div style="font-size:40px;filter:drop-shadow(0 3px 4px #000)">💥</div><div style="white-space:nowrap;background:#7f1d1d;color:#fff;border:2px solid #fecaca;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:900">NEUTRALIZADO</div>`;
+        marker.getElement().innerHTML = asset.id === "caoc-ingeniero-juarez"
+          ? `<div style="white-space:nowrap;background:#7f1d1d;color:#fff;border:2px solid #fecaca;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.55)">NEUTRALIZADO</div>`
+          : `<div style="font-size:40px;filter:drop-shadow(0 3px 4px #000)">💥</div><div style="white-space:nowrap;background:#7f1d1d;color:#fff;border:2px solid #fecaca;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:900">NEUTRALIZADO</div>`;
         marker.getElement().style.display = showReferenceMarkers
           ? "block"
           : "none";
@@ -1976,7 +1978,9 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
       : selectedPackage
         ? [selectedPackage]
         : [];
-    const instances = displayPackages.flatMap((pkg) =>
+    const instances = displayPackages
+      .filter((pkg) => pkg.aircraft !== "EFECTO CIBERNÉTICO")
+      .flatMap((pkg) =>
       Array.from(
         { length: Math.max(1, Math.min(12, pkg.quantity || 1)) },
         (_, index) => ({ pkg, index }),
@@ -2239,7 +2243,7 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
   const scenarioStorageKey = `zeus-simulator-moa2-${workspaceCode}`;
   const buildScenarioState = useCallback(
     () => ({
-      scenarioSchemaVersion: 20,
+      scenarioSchemaVersion: 21,
       packages,
       h24Platforms,
       floatingAircraft,
@@ -2331,7 +2335,7 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
 
   const applyScenario = useCallback((parsed: any) => {
     if (parsed.packages?.length) {
-      const useOperationalV12 = Number(parsed.scenarioSchemaVersion ?? 0) < 20;
+      const useOperationalV12 = Number(parsed.scenarioSchemaVersion ?? 0) < 21;
       const savedById = new Map<string, MissionPackage>(
         parsed.packages.map((item: MissionPackage) => [item.id, item]),
       );
@@ -2442,6 +2446,23 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
   }, []);
 
   const saveScenario = () => persistScenario(true);
+  const undoUnsavedChanges = () => {
+    const raw = localStorage.getItem(scenarioStorageKey);
+    if (!raw) {
+      setStatus("Todavía no hay una versión guardada para deshacer los cambios");
+      return;
+    }
+    try {
+      applyScenario(JSON.parse(raw));
+      setSimulationProgress(0);
+      setGroupProgress(0);
+      setIsPlaying(false);
+      setGroupPlaying(false);
+      setStatus("Cambios no guardados deshechos");
+    } catch {
+      setStatus("No se pudo recuperar la última versión guardada");
+    }
+  };
   const loadScenario = () => {
     const raw = localStorage.getItem(scenarioStorageKey);
     if (!raw) {
@@ -2471,11 +2492,6 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
     hydratedRef.current = true;
   }, [scenarioStorageKey, applyScenario]);
 
-  useEffect(() => {
-    if (!hydratedRef.current) return;
-    const timer = window.setTimeout(() => persistScenario(false), 350);
-    return () => window.clearTimeout(timer);
-  }, [persistScenario]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2499,16 +2515,6 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
     });
   }, [floatingAircraft]);
 
-  useEffect(() => {
-    const persistBeforeLeave = () => persistScenario(false);
-    window.addEventListener("pagehide", persistBeforeLeave);
-    window.addEventListener("beforeunload", persistBeforeLeave);
-    return () => {
-      persistBeforeLeave();
-      window.removeEventListener("pagehide", persistBeforeLeave);
-      window.removeEventListener("beforeunload", persistBeforeLeave);
-    };
-  }, [persistScenario]);
 
   const addPackage = () => {
     const id = crypto.randomUUID();
@@ -2790,7 +2796,7 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
               </option>
             ))}
           </select>
-          <div className="mb-4 grid grid-cols-3 gap-2 text-xs">
+          <div className="mb-4 grid grid-cols-4 gap-2 text-xs">
             <button onClick={addPackage} className="rounded bg-blue-700 p-2">
               + Paquete
             </button>
@@ -2799,6 +2805,9 @@ export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
               className="rounded bg-emerald-700 p-2"
             >
               Guardar
+            </button>
+            <button onClick={undoUnsavedChanges} className="rounded bg-amber-700 p-2">
+              Deshacer
             </button>
             <button onClick={loadScenario} className="rounded bg-slate-700 p-2">
               Recuperar

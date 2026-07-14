@@ -1,0 +1,8 @@
+ACTUALIZACIÓN SIMULADOR V14
+
+- MOA 2: el ataque cibernético al CAOC de Ingeniero Juárez no muestra aeronave ni explosión; al ejecutarse simultáneamente con el Día D aparece únicamente NEUTRALIZADO.
+- MOA 2: la misión BDA y sostenimiento del Hermes 450 parte de la 1.ª Brigada Aérea / La Rioja.
+- MOA 1: el ataque SEAD de D+1 fue corregido del S-300 de Catamarca al S-300 de Salta para los 2 F-16CJ con AGM-88C y 2 AMX con MAR-1.
+- MOA 1 y MOA 2: se agregó el botón Deshacer, que recupera la última versión guardada y descarta los cambios realizados desde el último Guardar.
+- Se eliminó el guardado automático para que los cambios solo queden confirmados al presionar Guardar.
+- Se actualizaron las versiones internas de escenario para migrar las rutas operacionales corregidas.
