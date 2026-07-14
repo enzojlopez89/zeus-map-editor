@@ -1,0 +1,8 @@
+ACTUALIZACIÓN SIMULADOR MOA 1 V9
+
+- Agrega control de velocidad para la reproducción de grupos simultáneos.
+- Rango regulable de 0× a 120× mediante barra desplazable.
+- 0× pausa la reproducción del grupo.
+- La velocidad elegida queda guardada junto con el escenario.
+- El grupo puede reproducirse, pausarse, reiniciarse y recorrerse manualmente.
+- Se corrigió la animación automática de la línea temporal grupal.

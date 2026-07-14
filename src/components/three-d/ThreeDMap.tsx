@@ -1381,6 +1381,8 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const animationStartRef = useRef<number | null>(null);
   const continuousAnimationRef = useRef<number | null>(null);
   const continuousStartRef = useRef<number | null>(null);
+  const groupAnimationRef = useRef<number | null>(null);
+  const groupAnimationStartRef = useRef<number | null>(null);
   const hydratedRef = useRef(false);
   const latestScenarioRef = useRef<Record<string, unknown>>({});
   const drawingRouteRef = useRef(false);
@@ -1437,6 +1439,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   >(null);
   const [groupProgress, setGroupProgress] = useState(0);
   const [groupPlaying, setGroupPlaying] = useState(false);
+  const [groupSimulationSpeed, setGroupSimulationSpeed] = useState(10);
 
   const phasePackages = useMemo(
     () =>
@@ -2423,6 +2426,45 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     };
   }, [h24Platforms, satelliteLoopSeconds]);
 
+
+  useEffect(() => {
+    if (!activeTemporalGroupId || !groupPlaying || groupSimulationSpeed <= 0) {
+      if (groupAnimationRef.current)
+        cancelAnimationFrame(groupAnimationRef.current);
+      groupAnimationRef.current = null;
+      groupAnimationStartRef.current = null;
+      return;
+    }
+
+    // groupWindow.duration is expressed in simulated minutes. At 1×, one
+    // simulated second advances one real second; higher multipliers accelerate it.
+    const durationMs = Math.max(1000, (groupWindow.duration * 60 * 1000) / groupSimulationSpeed);
+    const tick = (now: number) => {
+      if (groupAnimationStartRef.current === null)
+        groupAnimationStartRef.current = now - groupProgress * durationMs;
+      const progress = Math.min(1, (now - groupAnimationStartRef.current) / durationMs);
+      setGroupProgress(progress);
+      if (progress >= 1) {
+        setGroupPlaying(false);
+        setStatus(`Grupo temporal finalizado: ${activeTemporalGroup?.name ?? "acción simultánea"}.`);
+        groupAnimationStartRef.current = null;
+        return;
+      }
+      groupAnimationRef.current = requestAnimationFrame(tick);
+    };
+    groupAnimationRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (groupAnimationRef.current) cancelAnimationFrame(groupAnimationRef.current);
+      groupAnimationRef.current = null;
+    };
+  }, [
+    activeTemporalGroupId,
+    activeTemporalGroup?.name,
+    groupPlaying,
+    groupSimulationSpeed,
+    groupWindow.duration,
+  ]);
+
   useEffect(() => {
     if (!activeTemporalGroupId) return;
     activeGroupPackages.forEach((pkg) => {
@@ -2533,6 +2575,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       destroyedAssetIds,
       activeTemporalGroupId,
       groupProgress,
+      groupSimulationSpeed,
       showTonWall,
       showRepublicWalls,
       wallOpacity,
@@ -2573,6 +2616,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       simulationSpeed,
       simulationProgress,
       destroyedAssetIds,
+      activeTemporalGroupId,
+      groupProgress,
+      groupSimulationSpeed,
       showTonWall,
       showRepublicWalls,
       wallOpacity,
@@ -2644,6 +2690,8 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       setActiveTemporalGroupId(parsed.activeTemporalGroupId);
     if (Number.isFinite(parsed.groupProgress))
       setGroupProgress(parsed.groupProgress);
+    if (Number.isFinite(parsed.groupSimulationSpeed))
+      setGroupSimulationSpeed(Math.max(0, Math.min(120, parsed.groupSimulationSpeed)));
     if (typeof parsed.showTonWall === "boolean")
       setShowTonWall(parsed.showTonWall);
     if (typeof parsed.showRepublicWalls === "boolean")
@@ -2814,6 +2862,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                     onClick={() => {
                       setActiveTemporalGroupId(group.id);
                       setGroupProgress(0);
+                      groupAnimationStartRef.current = null;
                       setGroupPlaying(false);
                       setIsPlaying(false);
                     }}
@@ -2849,6 +2898,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                   value={groupProgress}
                   onChange={(e) => {
                     setGroupPlaying(false);
+                    groupAnimationStartRef.current = null;
                     setGroupProgress(Number(e.target.value));
                   }}
                   className="w-full cursor-ew-resize"
@@ -2857,6 +2907,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                   <button
                     onClick={() => {
                       setGroupProgress(0);
+                      groupAnimationStartRef.current = null;
                       setGroupPlaying(false);
                     }}
                     className="rounded bg-slate-700 px-3 py-1.5 text-xs"
@@ -2864,7 +2915,11 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                     Reiniciar
                   </button>
                   <button
-                    onClick={() => setGroupPlaying((value) => !value)}
+                    onClick={() => {
+                      if (groupSimulationSpeed === 0) setGroupSimulationSpeed(1);
+                      groupAnimationStartRef.current = null;
+                      setGroupPlaying((value) => !value);
+                    }}
                     className="rounded bg-emerald-700 px-4 py-1.5 text-xs font-bold"
                   >
                     {groupPlaying ? "Pausar grupo" : "Reproducir grupo"}
@@ -2875,6 +2930,31 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                   <span className="rounded bg-slate-800 px-3 py-1.5 text-xs">
                     Avance: {Math.round(groupProgress * 100)} %
                   </span>
+                  <div className="min-w-[230px] flex-1 rounded border border-slate-700 bg-slate-900/80 px-2 py-1">
+                    <div className="mb-1 flex items-center justify-between text-[10px]">
+                      <span>Velocidad del grupo</span>
+                      <strong>{groupSimulationSpeed}×</strong>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="120"
+                      step="1"
+                      value={groupSimulationSpeed}
+                      onChange={(e) => {
+                        const speed = Number(e.target.value);
+                        setGroupSimulationSpeed(speed);
+                        groupAnimationStartRef.current = null;
+                        if (speed === 0) setGroupPlaying(false);
+                      }}
+                      className="w-full cursor-ew-resize"
+                    />
+                    <div className="flex justify-between text-[9px] text-slate-400">
+                      <span>0× pausa</span>
+                      <span>60×</span>
+                      <span>120×</span>
+                    </div>
+                  </div>
                   <div className="ml-auto flex max-w-full gap-1 overflow-x-auto">
                     {activeGroupPackages.map((pkg) => (
                       <button
