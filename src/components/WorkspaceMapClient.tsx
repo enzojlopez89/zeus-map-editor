@@ -347,6 +347,7 @@ export default function WorkspaceMapClient({
               <Link href={`/espacio/${workspaceCode}/${token}/ppc/pcr`} className="rounded bg-violet-700 px-3 py-1.5 font-semibold text-white hover:bg-violet-600">Cálculo PCR</Link>
               <Link href={`/espacio/${workspaceCode}/${token}/ppc/computo-aereo`} className="rounded bg-cyan-700 px-3 py-1.5 font-semibold text-white hover:bg-cyan-600">Cómputo Aéreo</Link>
               <Link href={`/espacio/${workspaceCode}/${token}/ppc/mapa-3d`} className="rounded bg-amber-700 px-3 py-1.5 font-semibold text-white hover:bg-amber-600">Mapa 3D</Link>
+              <Link href={`/espacio/${workspaceCode}/${token}/ppc/mapa-3d-moa2`} className="rounded bg-orange-700 px-3 py-1.5 font-semibold text-white hover:bg-orange-600">MOA 2</Link>
             </>
           )}
           <span className="rounded-full bg-emerald-900 px-3 py-1 font-semibold text-emerald-200">

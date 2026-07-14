@@ -393,6 +393,14 @@ const enemyAssets: EnemyAsset[] = [
     widthMeters: 35,
   },
   {
+    id: "caoc-ingeniero-juarez",
+    name: "CAOC de Ingeniero Juárez",
+    kind: "radar",
+    longitude: -61.846,
+    latitude: -23.904,
+    altitudeMeters: 165,
+  },
+  {
     id: "tritio-plant-site",
     name: "Planta de procesamiento de tritio",
     kind: "tritio",
@@ -639,6 +647,8 @@ const aircraftDefaults: Record<
   "KC-130J": { speedKt: 300, altitudeFt: 20000 },
   "EC-130H COMPASS CALL": { speedKt: 300, altitudeFt: 25000 },
   "HERMES 450": { speedKt: 80, altitudeFt: 15000 },
+  "HARPY": { speedKt: 100, altitudeFt: 12000 },
+  "EFECTO CIBERNÉTICO": { speedKt: 1, altitudeFt: 0 },
 };
 
 const routePoint = (
@@ -796,236 +806,32 @@ function suggestedOrbitRoute(
 }
 
 const initialPackages: MissionPackage[] = [
-  // DÍA D · PRIMERA VENTANA — CATAMARCA
-  {
-    id: "pkg-sead-f16-cat", name: "SEAD F-16CJ · S-300 Catamarca", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
-    departureTime: "21:00", visible: true, targetAssetId: "s300-catamarca-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 24000, 480),
-  },
-  {
-    id: "pkg-sead-amx-cat", name: "SEAD AMX · S-300 Catamarca", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
-    cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 4,
-    departureTime: "21:00", visible: true, targetAssetId: "s300-catamarca-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 18000, 420),
-  },
-  {
-    id: "pkg-oca-cat", name: "Ataque pista y aviones · Catamarca", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
-    cruiseAltitudeFt: 18000, weapon: "GBU-10", weaponsPerAircraft: 2,
-    departureTime: "21:30", visible: true, targetAssetId: "runway-catamarca",
-    route: suggestedAttackRoute("base-cordoba", "runway-catamarca", 18000, 420),
-  },
-  {
-    id: "pkg-escort-cat", name: "Escolta F-16 · Catamarca", phase: "fase-2",
-    baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4,
-    departureTime: "20:50", visible: true,
-    route: suggestedOrbitRoute("base-villa-mercedes", -65.9, -29.1, 26000, 480),
-  },
-  // DÍA D · PRIMERA VENTANA — BELÉN, SIMULTÁNEA CON CATAMARCA
-  {
-    id: "pkg-sead-f16-belen", name: "SEAD F-16CJ · S-300 Belén", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
-    departureTime: "21:00", visible: true, targetAssetId: "s300-belen-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-belen-site", 24000, 480),
-  },
-  {
-    id: "pkg-sead-amx-belen", name: "SEAD AMX · S-300 Belén", phase: "fase-2",
-    baseId: "base-villa-mercedes", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
-    cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 4,
-    departureTime: "21:00", visible: true, targetAssetId: "s300-belen-site",
-    route: suggestedAttackRoute("base-villa-mercedes", "s300-belen-site", 18000, 420),
-  },
-  {
-    id: "pkg-oca-belen", name: "Ataque pista y aviones · Ala Aérea n.º 7 / Belén", phase: "fase-2",
-    baseId: "base-villa-mercedes", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
-    cruiseAltitudeFt: 18000, weapon: "GBU-10", weaponsPerAircraft: 2,
-    departureTime: "21:30", visible: true, targetAssetId: "runway-belen",
-    route: suggestedAttackRoute("base-villa-mercedes", "runway-belen", 18000, 420),
-  },
-  {
-    id: "pkg-escort-belen", name: "Escolta F-16 · Belén", phase: "fase-2",
-    baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4,
-    departureTime: "20:50", visible: true,
-    route: suggestedOrbitRoute("base-villa-mercedes", -66.7, -28.2, 26000, 480),
-  },
-  {
-    id: "pkg-rev-kc130-d", name: "Reabastecimiento KC-130 · Día D", phase: "fase-2",
-    baseId: "base-villa-mercedes", aircraft: "KC-130J", quantity: 2, speedKt: 300,
-    cruiseAltitudeFt: 20000, weapon: "Sin armamento", weaponsPerAircraft: 0,
-    departureTime: "20:10", visible: true,
-    route: suggestedOrbitRoute("base-villa-mercedes", -66.3, -30.6, 20000, 300),
-  },
-  {
-    id: "pkg-rev-kc135-d", name: "Reabastecimiento KC-135 · Día D", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "KC-135", quantity: 2, speedKt: 430,
-    cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0,
-    departureTime: "20:10", visible: true,
-    route: suggestedOrbitRoute("base-cordoba", -66.0, -30.2, 26000, 430),
-  },
-  // DÍA D · TARDE — TUCUMÁN Y CAFAYATE
-  {
-    id: "pkg-oca-tuc", name: "Ataque AMX · Pista y aviones Tucumán", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
-    cruiseAltitudeFt: 18000, weapon: "GBU-10", weaponsPerAircraft: 2,
-    departureTime: "14:00", visible: true, targetAssetId: "runway-tucuman",
-    route: suggestedAttackRoute("base-cordoba", "runway-tucuman", 18000, 420),
-  },
-  {
-    id: "pkg-strike-tuc", name: "Ataque F-16 · Pista y aviones Tucumán", phase: "fase-2",
-    baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480,
-    cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 4,
-    departureTime: "14:00", visible: true, targetAssetId: "runway-tucuman",
-    route: suggestedAttackRoute("base-villa-mercedes", "runway-tucuman", 24000, 480),
-  },
-  {
-    id: "pkg-escort-tuc", name: "Escolta F-16 · Tucumán", phase: "fase-2",
-    baseId: "base-mendoza", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4,
-    departureTime: "13:45", visible: true,
-    route: suggestedOrbitRoute("base-mendoza", -65.5, -27.4, 26000, 480),
-  },
-  {
-    id: "pkg-sead-f16-caf", name: "SEAD F-16CJ · Radar TPS-70 Cafayate", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
-    departureTime: "13:30", visible: true, targetAssetId: "radar-cafayate-site",
-    route: suggestedAttackRoute("base-cordoba", "radar-cafayate-site", 24000, 480),
-  },
-  {
-    id: "pkg-sead-amx-caf", name: "SEAD AMX · Radar TPS-70 Cafayate", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
-    cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 2,
-    departureTime: "13:30", visible: true, targetAssetId: "radar-cafayate-site",
-    route: suggestedAttackRoute("base-cordoba", "radar-cafayate-site", 18000, 420),
-  },
-  {
-    id: "pkg-rev-kc130-tarde", name: "Reabastecimiento KC-130 · Día D tarde", phase: "fase-2",
-    baseId: "base-villa-mercedes", aircraft: "KC-130J", quantity: 2, speedKt: 300,
-    cruiseAltitudeFt: 20000, weapon: "Sin armamento", weaponsPerAircraft: 0,
-    departureTime: "12:50", visible: true,
-    route: suggestedOrbitRoute("base-villa-mercedes", -66.0, -29.8, 20000, 300),
-  },
-  {
-    id: "pkg-rev-kc135-tarde", name: "Reabastecimiento KC-135 · Día D tarde", phase: "fase-2",
-    baseId: "base-mendoza", aircraft: "KC-135", quantity: 2, speedKt: 430,
-    cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0,
-    departureTime: "12:50", visible: true,
-    route: suggestedOrbitRoute("base-mendoza", -66.5, -29.2, 26000, 430),
-  },
-  // D+1 — SALTA Y S-300 CATAMARCA EN SIMULTÁNEO
-  {
-    id: "pkg-oca-salta", name: "Ataque AMX · Ala Aérea n.º 3 / Salta", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 4, speedKt: 420,
-    cruiseAltitudeFt: 18000, weapon: "GBU-10", weaponsPerAircraft: 2,
-    departureTime: "06:00", visible: true, targetAssetId: "runway-salta",
-    route: suggestedAttackRoute("base-cordoba", "runway-salta", 18000, 420),
-  },
-  {
-    id: "pkg-strike-salta", name: "Ataque F-16 · Ala Aérea n.º 3 / Salta", phase: "fase-2",
-    baseId: "base-mendoza", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480,
-    cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 4,
-    departureTime: "06:00", visible: true, targetAssetId: "runway-salta",
-    route: suggestedAttackRoute("base-mendoza", "runway-salta", 24000, 480),
-  },
-  {
-    id: "pkg-sead-f16-d1-cat", name: "SEAD F-16CJ · S-300 Catamarca (D+1)", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2,
-    departureTime: "06:00", visible: true, targetAssetId: "s300-catamarca-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 24000, 480),
-  },
-  {
-    id: "pkg-sead-amx-d1-cat", name: "SEAD AMX · S-300 Catamarca (D+1)", phase: "fase-2",
-    baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 2, speedKt: 420,
-    cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 4,
-    departureTime: "06:00", visible: true, targetAssetId: "s300-catamarca-site",
-    route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 18000, 420),
-  },
-  {
-    id: "pkg-escort-d1", name: "Escolta F-16 · D+1", phase: "fase-2",
-    baseId: "base-mendoza", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4,
-    departureTime: "05:45", visible: true,
-    route: suggestedOrbitRoute("base-mendoza", -66.0, -27.0, 26000, 480),
-  },
-  {
-    id: "pkg-rev-kc130-d1", name: "Reabastecimiento KC-130 · D+1", phase: "fase-2",
-    baseId: "base-villa-mercedes", aircraft: "KC-130J", quantity: 2, speedKt: 300,
-    cruiseAltitudeFt: 20000, weapon: "Sin armamento", weaponsPerAircraft: 0,
-    departureTime: "05:10", visible: true,
-    route: suggestedOrbitRoute("base-villa-mercedes", -66.4, -29.7, 20000, 300),
-  },
-  {
-    id: "pkg-rev-kc135-d1", name: "Reabastecimiento KC-135 · D+1", phase: "fase-2",
-    baseId: "base-mendoza", aircraft: "KC-135", quantity: 2, speedKt: 430,
-    cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0,
-    departureTime: "05:10", visible: true,
-    route: suggestedOrbitRoute("base-mendoza", -66.5, -28.8, 26000, 430),
-  },
-  // D+2 — OBJETIVO ESTRATÉGICO TRITIO
-  {
-    id: "pkg-strike-tritio-gbu10", name: "Ataque principal · Planta de tritio (GBU-10)", phase: "fase-3",
-    baseId: "base-mendoza", aircraft: "F-16C Block 40", quantity: 8, speedKt: 480,
-    cruiseAltitudeFt: 24000, weapon: "GBU-10 Paveway II", weaponsPerAircraft: 2,
-    departureTime: "04:30", visible: true, targetAssetId: "tritio-plant-site",
-    route: suggestedAttackRoute("base-mendoza", "tritio-plant-site", 24000, 480),
-  },
-  {
-    id: "pkg-strike-tritio-gbu12", name: "Ataque complementario · Planta de tritio (GBU-12)", phase: "fase-3",
-    baseId: "base-mendoza", aircraft: "F-16D Block 42", quantity: 2, speedKt: 480,
-    cruiseAltitudeFt: 24000, weapon: "GBU-12 Paveway II", weaponsPerAircraft: 2,
-    departureTime: "04:30", visible: true, targetAssetId: "tritio-plant-site",
-    route: suggestedAttackRoute("base-mendoza", "tritio-plant-site", 24000, 480),
-  },
-  {
-    id: "pkg-rev-kc135-d2", name: "Reabastecimiento KC-135 · D+2", phase: "fase-3",
-    baseId: "base-mendoza", aircraft: "KC-135", quantity: 4, speedKt: 430,
-    cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0,
-    departureTime: "03:40", visible: true,
-    route: suggestedOrbitRoute("base-mendoza", -67.2, -29.0, 26000, 430),
-  },
-  {
-    id: "pkg-bda", name: "BDA · Hermes 450", phase: "fase-3",
-    baseId: "base-la-rioja", aircraft: "HERMES 450", quantity: 2, speedKt: 80,
-    cruiseAltitudeFt: 15000, weapon: "Sin armamento", weaponsPerAircraft: 0,
-    departureTime: "08:00", visible: true,
-    route: suggestedOrbitRoute("base-la-rioja", -66.2, -27.2, 15000, 80),
-  },
+  { id: "moa2-cyber-caoc", name: "Ataque cibernético · CAOC Ingeniero Juárez", phase: "fase-2", baseId: "base-cordoba", aircraft: "EFECTO CIBERNÉTICO", quantity: 1, speedKt: 1, cruiseAltitudeFt: 0, weapon: "Efecto cibernético", weaponsPerAircraft: 1, departureTime: "08:00", visible: true, targetAssetId: "caoc-ingeniero-juarez", route: suggestedAttackRoute("base-cordoba", "caoc-ingeniero-juarez", 0, 600) },
+  { id: "moa2-harpy-belen", name: "Harpy + Hermes · S-300 Belén", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "HARPY", quantity: 5, speedKt: 100, cruiseAltitudeFt: 12000, weapon: "Munición merodeadora antirradiación", weaponsPerAircraft: 1, departureTime: "08:00", visible: true, targetAssetId: "s300-belen-site", route: suggestedAttackRoute("base-villa-mercedes", "s300-belen-site", 12000, 100) },
+  { id: "moa2-hermes-belen", name: "Hermes 450 · Apoyo S-300 Belén", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "HERMES 450", quantity: 1, speedKt: 80, cruiseAltitudeFt: 15000, weapon: "ISR / designación", weaponsPerAircraft: 0, departureTime: "07:45", visible: true, targetAssetId: "s300-belen-site", route: suggestedAttackRoute("base-villa-mercedes", "s300-belen-site", 15000, 80) },
+  { id: "moa2-harpy-catamarca", name: "Harpy + Hermes · S-300 Catamarca", phase: "fase-2", baseId: "base-cordoba", aircraft: "HARPY", quantity: 5, speedKt: 100, cruiseAltitudeFt: 12000, weapon: "Munición merodeadora antirradiación", weaponsPerAircraft: 1, departureTime: "08:00", visible: true, targetAssetId: "s300-catamarca-site", route: suggestedAttackRoute("base-cordoba", "s300-catamarca-site", 12000, 100) },
+  { id: "moa2-hermes-catamarca", name: "Hermes 450 · Apoyo S-300 Catamarca", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "HERMES 450", quantity: 1, speedKt: 80, cruiseAltitudeFt: 15000, weapon: "ISR / designación", weaponsPerAircraft: 0, departureTime: "07:45", visible: true, targetAssetId: "s300-catamarca-site", route: suggestedAttackRoute("base-villa-mercedes", "s300-catamarca-site", 15000, 80) },
+  { id: "moa2-harpy-cafayate", name: "Harpy · Radar AN/TPS-70 Cafayate", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "HARPY", quantity: 5, speedKt: 100, cruiseAltitudeFt: 12000, weapon: "Munición merodeadora antirradiación", weaponsPerAircraft: 1, departureTime: "08:00", visible: true, targetAssetId: "radar-cafayate-site", route: suggestedAttackRoute("base-villa-mercedes", "radar-cafayate-site", 12000, 100) },
+  { id: "moa2-strike-tucuman", name: "Ataque F-16 · Pista y aviones Tucumán", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 5, speedKt: 480, cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 2, departureTime: "08:00", visible: true, targetAssetId: "runway-tucuman", route: suggestedAttackRoute("base-villa-mercedes", "runway-tucuman", 24000, 480) },
+  { id: "moa2-escort-tucuman", name: "Escolta F-16 · Tucumán", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 2, speedKt: 480, cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4, departureTime: "07:50", visible: true, route: suggestedOrbitRoute("base-villa-mercedes", -65.4, -27.6, 26000, 480) },
+  { id: "moa2-kc130-d", name: "Reabastecimiento KC-130 · Día D", phase: "fase-2", baseId: "base-la-rioja", aircraft: "KC-130J", quantity: 2, speedKt: 300, cruiseAltitudeFt: 20000, weapon: "Sin armamento", weaponsPerAircraft: 0, departureTime: "07:00", visible: true, route: suggestedOrbitRoute("base-la-rioja", -66.3, -30.2, 20000, 300) },
+  { id: "moa2-kc135-d", name: "Reabastecimiento KC-135 · Día D", phase: "fase-2", baseId: "base-cordoba", aircraft: "KC-135", quantity: 2, speedKt: 430, cruiseAltitudeFt: 26000, weapon: "Sin armamento", weaponsPerAircraft: 0, departureTime: "07:00", visible: true, route: suggestedOrbitRoute("base-cordoba", -65.8, -30.0, 26000, 430) },
+  { id: "moa2-m2-catamarca", name: "Momento 2 · Pista y aviones Catamarca", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480, cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 2, departureTime: "12:00", visible: true, targetAssetId: "runway-catamarca", route: suggestedAttackRoute("base-villa-mercedes", "runway-catamarca", 24000, 480) },
+  { id: "moa2-m2-belen", name: "Momento 2 · Pista y aviones Belén", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480, cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 2, departureTime: "12:00", visible: true, targetAssetId: "runway-belen", route: suggestedAttackRoute("base-villa-mercedes", "runway-belen", 24000, 480) },
+  { id: "moa2-m3-sead-salta-f16", name: "Momento 3 · F-16 contra S-300 Salta", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16CJ Block 50", quantity: 2, speedKt: 480, cruiseAltitudeFt: 24000, weapon: "AGM-88C HARM", weaponsPerAircraft: 2, departureTime: "16:00", visible: true, targetAssetId: "s300-salta-site", route: suggestedAttackRoute("base-villa-mercedes", "s300-salta-site", 24000, 480) },
+  { id: "moa2-m3-sead-salta-amx", name: "Momento 3 · AMX contra S-300 Salta", phase: "fase-2", baseId: "base-cordoba", aircraft: "AMX A-1M", quantity: 2, speedKt: 420, cruiseAltitudeFt: 18000, weapon: "MAR-1 antirradiación", weaponsPerAircraft: 2, departureTime: "16:00", visible: true, targetAssetId: "s300-salta-site", route: suggestedAttackRoute("base-cordoba", "s300-salta-site", 18000, 420) },
+  { id: "moa2-m3-strike-salta", name: "Momento 3 · Pista y aviones Salta", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480, cruiseAltitudeFt: 24000, weapon: "GBU-38 JDAM", weaponsPerAircraft: 2, departureTime: "16:20", visible: true, targetAssetId: "runway-salta", route: suggestedAttackRoute("base-villa-mercedes", "runway-salta", 24000, 480) },
+  { id: "moa2-m3-escort-salta", name: "Momento 3 · Escolta F-16 Salta", phase: "fase-2", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 4, speedKt: 480, cruiseAltitudeFt: 26000, weapon: "AIM-120", weaponsPerAircraft: 4, departureTime: "16:10", visible: true, route: suggestedOrbitRoute("base-villa-mercedes", -65.7, -25.5, 26000, 480) },
+  { id: "moa2-d1-tritio", name: "D+1 · Laboratorio de procesamiento de tritio", phase: "fase-3", baseId: "base-villa-mercedes", aircraft: "F-16C Block 40", quantity: 13, speedKt: 480, cruiseAltitudeFt: 24000, weapon: "GBU-10 / GBU-12", weaponsPerAircraft: 2, departureTime: "09:00", visible: true, targetAssetId: "tritio-plant-site", route: suggestedAttackRoute("base-villa-mercedes", "tritio-plant-site", 24000, 480) },
+  { id: "moa2-bda", name: "BDA y sostenimiento", phase: "fase-3", baseId: "base-villa-mercedes", aircraft: "HERMES 450", quantity: 1, speedKt: 80, cruiseAltitudeFt: 15000, weapon: "Sin armamento", weaponsPerAircraft: 0, departureTime: "12:00", visible: true, targetAssetId: "tritio-plant-site", route: suggestedAttackRoute("base-villa-mercedes", "tritio-plant-site", 15000, 80) },
 ];
-
 const temporalGroups: TemporalGroup[] = [
-  {
-    id: "grupo-apertura-d", name: "Día D · Catamarca y Belén", day: "D · Primera ventana",
-    description: "SEAD simultáneo sobre ambos S-300; 30 minutos después, ataques a pistas y aeronaves con escoltas. KC-130 y KC-135 en espera en territorio propio.",
-    packageIds: ["pkg-sead-f16-cat", "pkg-sead-amx-cat", "pkg-sead-f16-belen", "pkg-sead-amx-belen", "pkg-oca-cat", "pkg-escort-cat", "pkg-oca-belen", "pkg-escort-belen", "pkg-rev-kc130-d", "pkg-rev-kc135-d"],
-  },
-  {
-    id: "grupo-tucuman-cafayate", name: "Día D tarde · Tucumán y Cafayate", day: "D · Tarde",
-    description: "Ocho aeronaves de ataque sobre Tucumán en simultáneo, escolta, SEAD sobre TPS-70 Cafayate y reabastecedores en espera.",
-    packageIds: ["pkg-sead-f16-caf", "pkg-sead-amx-caf", "pkg-oca-tuc", "pkg-strike-tuc", "pkg-escort-tuc", "pkg-rev-kc130-tarde", "pkg-rev-kc135-tarde"],
-  },
-  {
-    id: "grupo-salta", name: "D+1 · Salta y S-300 Catamarca", day: "D+1",
-    description: "Ataque simultáneo a pista y aeronaves de Salta y al S-300 de Catamarca, con escolta y reabastecedores.",
-    packageIds: ["pkg-oca-salta", "pkg-strike-salta", "pkg-sead-f16-d1-cat", "pkg-sead-amx-d1-cat", "pkg-escort-d1", "pkg-rev-kc130-d1", "pkg-rev-kc135-d1"],
-  },
-  {
-    id: "grupo-tritio", name: "D+2 · Ataque estratégico Tritio", day: "D+2",
-    description: "Ataque simultáneo sobre la planta de procesamiento de tritio con 8 F-16/GBU-10 y 2 F-16/GBU-12, sostenido por 4 KC-135.",
-    packageIds: ["pkg-strike-tritio-gbu10", "pkg-strike-tritio-gbu12", "pkg-rev-kc135-d2"],
-  },
-  {
-    id: "grupo-bda", name: "BDA, reataque y sostenimiento", day: "D+3 a D+9",
-    description: "Evaluación de daños y acciones posteriores de sostenimiento.", packageIds: ["pkg-bda"],
-  },
+  { id: "moa2-grupo-d", name: "Día D · Acción simultánea inicial", day: "D", description: "CAOC Ingeniero Juárez, S-300 Belén y Catamarca, TPS-70 Cafayate, pista de Tucumán y apoyo de reabastecimiento.", packageIds: ["moa2-cyber-caoc", "moa2-harpy-belen", "moa2-hermes-belen", "moa2-harpy-catamarca", "moa2-hermes-catamarca", "moa2-harpy-cafayate", "moa2-strike-tucuman", "moa2-escort-tucuman", "moa2-kc130-d", "moa2-kc135-d"] },
+  { id: "moa2-grupo-m2", name: "Día D · Momento 2", day: "D · M2", description: "Ataque simultáneo sobre pistas y aeronaves de Catamarca y Belén.", packageIds: ["moa2-m2-catamarca", "moa2-m2-belen"] },
+  { id: "moa2-grupo-m3", name: "Día D · Momento 3", day: "D · M3", description: "Neutralización del S-300 y ataque sobre pista y aeronaves de Salta, con escolta.", packageIds: ["moa2-m3-sead-salta-f16", "moa2-m3-sead-salta-amx", "moa2-m3-strike-salta", "moa2-m3-escort-salta"] },
+  { id: "moa2-grupo-d1", name: "D+1 · Tritio", day: "D+1", description: "Ataque principal sobre el laboratorio de procesamiento de tritio con 13 F-16.", packageIds: ["moa2-d1-tritio"] },
+  { id: "moa2-grupo-bda", name: "BDA y sostenimiento", day: "D+2 a D+9", description: "Evaluación de daños y sostenimiento, equivalente al resto de la Fase III del MOA 1.", packageIds: ["moa2-bda"] },
 ];
-
 function timeToMinutes(time: string) {
   const [hours, minutes] = time.split(":").map(Number);
   if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return 0;
@@ -1214,7 +1020,7 @@ function addMinutes(time: string, minutes: number) {
   return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
 }
 
-export default function ThreeDMap({ workspaceCode, token }: Props) {
+export default function ThreeDMapMoa2({ workspaceCode, token }: Props) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const siteMarkersRef = useRef<Record<string, maplibregl.Marker>>({});
@@ -2430,10 +2236,10 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     destroyedAssetIds,
   ]);
 
-  const scenarioStorageKey = `zeus-simulator-moa1-${workspaceCode}`;
+  const scenarioStorageKey = `zeus-simulator-moa2-${workspaceCode}`;
   const buildScenarioState = useCallback(
     () => ({
-      scenarioSchemaVersion: 12,
+      scenarioSchemaVersion: 20,
       packages,
       h24Platforms,
       floatingAircraft,
@@ -2518,14 +2324,14 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       latestScenarioRef.current = state;
       localStorage.setItem(scenarioStorageKey, JSON.stringify(state));
       if (showMessage)
-        setStatus("Modo de Acción N.º 1 guardado en este equipo");
+        setStatus("Modo de Acción N.º 2 guardado en este equipo");
     },
     [buildScenarioState, scenarioStorageKey],
   );
 
   const applyScenario = useCallback((parsed: any) => {
     if (parsed.packages?.length) {
-      const useOperationalV12 = Number(parsed.scenarioSchemaVersion ?? 0) < 12;
+      const useOperationalV12 = Number(parsed.scenarioSchemaVersion ?? 0) < 20;
       const savedById = new Map<string, MissionPackage>(
         parsed.packages.map((item: MissionPackage) => [item.id, item]),
       );
@@ -2730,14 +2536,13 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700 bg-slate-900 p-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-amber-300">
-            A3 · MODO DE ACCIÓN N.º 1
+            A3 · MODO DE ACCIÓN N.º 2
           </p>
           <h1 className="text-2xl font-bold">
             Simulador de paquetes aéreos sobre relieve 3D
           </h1>
           <p className="text-sm text-slate-300">
-            Paquetes precargados, acciones simultáneas en línea temporal,
-            impactos funcionales y formaciones múltiples.
+            Planeamiento del Modo de Acción N.º 2, paquetes editables, acciones simultáneas y efectos de neutralización.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -2760,10 +2565,10 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
             Cómputo Aéreo
           </Link>
           <Link
-            href={`/espacio/${workspaceCode}/${token}/ppc/mapa-3d-moa2`}
-            className="rounded bg-orange-700 px-3 py-2"
+            href={`/espacio/${workspaceCode}/${token}/ppc/mapa-3d`}
+            className="rounded bg-amber-700 px-3 py-2"
           >
-            MOA 2
+            MOA 1
           </Link>
         </div>
       </header>

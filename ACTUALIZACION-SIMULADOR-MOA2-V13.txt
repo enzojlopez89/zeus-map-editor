@@ -1,0 +1,21 @@
+ACTUALIZACIÓN V13 — MODO DE ACCIÓN N.º 2
+
+Se agregó una pestaña independiente para el MOA 2 en:
+/espacio/[workspace]/[token]/ppc/mapa-3d-moa2
+
+Incluye:
+- mismo mapa 3D, límites verticales, TO, bases, radares, S-300, planta de tritio, satélite y plataformas H24;
+- almacenamiento independiente del MOA 1;
+- creador y editor de paquetes, fases, base de salida, aeronaves, cantidad, altitud, armamento, blanco y ruta editable;
+- reproducción individual y por acciones simultáneas, con velocidades de 0x a 600x;
+- neutralización de blancos, explosión, rótulo NEUTRALIZADO y desactivación de coberturas asociadas;
+- restitución individual o total de blancos;
+- satélite con icono ampliado;
+- E-99 y EC-130 en el panel H24;
+- paquetes precargados del Día D, momentos 2 y 3, y D+1 contra el laboratorio de tritio;
+- CAOC de Ingeniero Juárez como objetivo de efecto cibernético;
+- Harpy y Hermes 450 incorporados como plataformas seleccionables.
+
+Validación realizada:
+- TypeScript: npx tsc --noEmit, sin errores.
+- No se completó un build integral en el entorno de preparación porque la instalación local de dependencias quedó incompleta. Ejecutar npm.cmd install y npm.cmd run build en el proyecto antes de subir.
