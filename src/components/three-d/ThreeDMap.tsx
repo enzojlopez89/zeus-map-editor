@@ -306,6 +306,10 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const satelliteMarkerRef = useRef<maplibregl.Marker | null>(null);
   const animationRef = useRef<number | null>(null);
   const animationStartRef = useRef<number | null>(null);
+  const continuousAnimationRef = useRef<number | null>(null);
+  const continuousStartRef = useRef<number | null>(null);
+  const hydratedRef = useRef(false);
+  const latestScenarioRef = useRef<Record<string, unknown>>({});
   const drawingRouteRef = useRef(false);
   const drawingH24RouteRef = useRef(false);
   const selectedPackageIdRef = useRef(initialPackages[0].id);
@@ -326,7 +330,6 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showH24, setShowH24] = useState(true);
   const [showSatellite, setShowSatellite] = useState(true);
-  const [satelliteProgress, setSatelliteProgress] = useState(0);
   const [showTonWall, setShowTonWall] = useState(true);
   const [showRepublicWalls, setShowRepublicWalls] = useState(true);
   const [wallOpacity, setWallOpacity] = useState(0.3);
@@ -342,6 +345,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   const [drawingH24Route, setDrawingH24Route] = useState(false);
   const [showPhaseOnly, setShowPhaseOnly] = useState(true);
   const [aircraftScaleMode, setAircraftScaleMode] = useState<"dynamic" | "fixed">("dynamic");
+  const [mapBearing, setMapBearing] = useState(-24);
+  const [mapPitch, setMapPitch] = useState(72);
+  const [satelliteLoopSeconds, setSatelliteLoopSeconds] = useState(75);
 
   const phasePackages = useMemo(() => showPhaseOnly ? packages.filter((item) => item.phase === selectedPhase) : packages, [packages, selectedPhase, showPhaseOnly]);
   const selectedPackage = packages.find((item) => item.id === selectedPackageId) ?? phasePackages[0] ?? packages[0];
@@ -422,6 +428,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       pitch: 72,
       bearing: -24,
       maxPitch: 85,
+      dragRotate: true,
+      touchPitch: true,
+      keyboard: true,
       style: {
         version: 8,
         sources: {
@@ -435,6 +444,10 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       },
     });
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-left");
+    map.addControl(new maplibregl.FullscreenControl(), "top-left");
+    map.addControl(new maplibregl.ScaleControl({ unit: "nautical" }), "bottom-left");
+    map.on("rotate", () => setMapBearing(Math.round(map.getBearing() * 10) / 10));
+    map.on("pitch", () => setMapPitch(Math.round(map.getPitch() * 10) / 10));
     map.on("load", () => {
       coverages.forEach((coverage) => {
         map.addSource(coverage.id, { type: "geojson", data: coverage.url });
@@ -706,19 +719,33 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
   }, [selectedPackage, simulationProgress]);
 
   useEffect(() => {
-    h24Platforms.forEach((platform, index) => {
-      const marker = h24MarkersRef.current[platform.id];
-      if (!marker) return;
-      const route = platform.route.length >= 2 ? (platform.closed ? [...platform.route, platform.route[0]] : platform.route) : [];
-      const position = route.length ? interpolateRoute(route, (simulationProgress + index * 0.22) % 1) : null;
-      if (position) marker.setLngLat(position);
-    });
-    setSatelliteProgress((simulationProgress * 1.7) % 1);
-  }, [simulationProgress, h24Platforms]);
+    const tick = (now: number) => {
+      if (continuousStartRef.current === null) continuousStartRef.current = now;
+      const elapsedSeconds = (now - continuousStartRef.current) / 1000;
 
-  useEffect(() => {
-    satelliteMarkerRef.current?.setLngLat([-70.2 + satelliteProgress * 7.7, -31 + satelliteProgress * 7.5]);
-  }, [satelliteProgress]);
+      h24Platforms.forEach((platform, index) => {
+        const marker = h24MarkersRef.current[platform.id];
+        if (!marker) return;
+        const route = platform.route.length >= 2 ? (platform.closed ? [...platform.route, platform.route[0]] : platform.route) : [];
+        const distanceNm = routeDistanceNm(route);
+        if (route.length < 2 || distanceNm <= 0 || platform.speedKt <= 0) return;
+        const cycleSeconds = Math.max(8, (distanceNm / platform.speedKt) * 3600);
+        const progress = ((elapsedSeconds / cycleSeconds) + index * 0.17) % 1;
+        const position = interpolateRoute(route, progress);
+        if (position) marker.setLngLat(position);
+      });
+
+      const satelliteProgressNow = (elapsedSeconds / Math.max(10, satelliteLoopSeconds)) % 1;
+      satelliteMarkerRef.current?.setLngLat([-70.2 + satelliteProgressNow * 7.7, -31 + satelliteProgressNow * 7.5]);
+      continuousAnimationRef.current = requestAnimationFrame(tick);
+    };
+    continuousAnimationRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (continuousAnimationRef.current) cancelAnimationFrame(continuousAnimationRef.current);
+      continuousAnimationRef.current = null;
+      continuousStartRef.current = null;
+    };
+  }, [h24Platforms, satelliteLoopSeconds]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -742,24 +769,115 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
     return () => { if (animationRef.current) cancelAnimationFrame(animationRef.current); };
   }, [isPlaying, selectedHours, simulationSpeed, impactPoint, impactArrival]);
 
-  const saveScenario = () => {
-    localStorage.setItem("zeus-simulator-moa1", JSON.stringify({ packages, h24Platforms, selectedPhase, savedAt: new Date().toISOString() }));
-    setStatus("Modo de Acción N.º 1 guardado en este equipo");
-  };
+  const scenarioStorageKey = `zeus-simulator-moa1-${workspaceCode}`;
+  const buildScenarioState = useCallback(() => ({
+    packages,
+    h24Platforms,
+    selectedPhase,
+    selectedPackageId,
+    selectedH24Id,
+    showPhaseOnly,
+    showH24,
+    showSatellite,
+    satelliteLoopSeconds,
+    showTonWall,
+    showRepublicWalls,
+    wallOpacity,
+    tonWallHeightMeters,
+    republicWallHeightMeters,
+    showOwnBases,
+    showEnemyBases,
+    showEnemyAssets,
+    showReferenceMarkers,
+    aircraftScaleMode,
+    exaggeration,
+    opacity,
+    visible,
+    siteVisible,
+    mapCamera: mapRef.current ? {
+      center: [mapRef.current.getCenter().lng, mapRef.current.getCenter().lat],
+      zoom: mapRef.current.getZoom(),
+      pitch: mapRef.current.getPitch(),
+      bearing: mapRef.current.getBearing(),
+    } : null,
+    savedAt: new Date().toISOString(),
+  }), [packages, h24Platforms, selectedPhase, selectedPackageId, selectedH24Id, showPhaseOnly, showH24, showSatellite, satelliteLoopSeconds, showTonWall, showRepublicWalls, wallOpacity, tonWallHeightMeters, republicWallHeightMeters, showOwnBases, showEnemyBases, showEnemyAssets, showReferenceMarkers, aircraftScaleMode, exaggeration, opacity, visible, siteVisible]);
+
+  const persistScenario = useCallback((showMessage = false) => {
+    if (typeof window === "undefined") return;
+    const state = buildScenarioState();
+    latestScenarioRef.current = state;
+    localStorage.setItem(scenarioStorageKey, JSON.stringify(state));
+    if (showMessage) setStatus("Modo de Acción N.º 1 guardado en este equipo");
+  }, [buildScenarioState, scenarioStorageKey]);
+
+  const applyScenario = useCallback((parsed: any) => {
+    if (parsed.packages?.length) setPackages(parsed.packages);
+    if (parsed.h24Platforms?.length) setH24Platforms(parsed.h24Platforms);
+    if (parsed.selectedPhase) setSelectedPhase(parsed.selectedPhase);
+    if (parsed.selectedPackageId) setSelectedPackageId(parsed.selectedPackageId);
+    if (parsed.selectedH24Id) setSelectedH24Id(parsed.selectedH24Id);
+    if (typeof parsed.showPhaseOnly === "boolean") setShowPhaseOnly(parsed.showPhaseOnly);
+    if (typeof parsed.showH24 === "boolean") setShowH24(parsed.showH24);
+    if (typeof parsed.showSatellite === "boolean") setShowSatellite(parsed.showSatellite);
+    if (Number.isFinite(parsed.satelliteLoopSeconds)) setSatelliteLoopSeconds(parsed.satelliteLoopSeconds);
+    if (typeof parsed.showTonWall === "boolean") setShowTonWall(parsed.showTonWall);
+    if (typeof parsed.showRepublicWalls === "boolean") setShowRepublicWalls(parsed.showRepublicWalls);
+    if (Number.isFinite(parsed.wallOpacity)) setWallOpacity(parsed.wallOpacity);
+    if (Number.isFinite(parsed.tonWallHeightMeters)) setTonWallHeightMeters(parsed.tonWallHeightMeters);
+    if (Number.isFinite(parsed.republicWallHeightMeters)) setRepublicWallHeightMeters(parsed.republicWallHeightMeters);
+    if (typeof parsed.showOwnBases === "boolean") setShowOwnBases(parsed.showOwnBases);
+    if (typeof parsed.showEnemyBases === "boolean") setShowEnemyBases(parsed.showEnemyBases);
+    if (typeof parsed.showEnemyAssets === "boolean") setShowEnemyAssets(parsed.showEnemyAssets);
+    if (typeof parsed.showReferenceMarkers === "boolean") setShowReferenceMarkers(parsed.showReferenceMarkers);
+    if (parsed.aircraftScaleMode) setAircraftScaleMode(parsed.aircraftScaleMode);
+    if (Number.isFinite(parsed.exaggeration)) setExaggeration(parsed.exaggeration);
+    if (Number.isFinite(parsed.opacity)) setOpacity(parsed.opacity);
+    if (parsed.visible) setVisible(parsed.visible);
+    if (parsed.siteVisible) setSiteVisible(parsed.siteVisible);
+    if (parsed.mapCamera && mapRef.current) {
+      mapRef.current.jumpTo(parsed.mapCamera);
+      setMapBearing(parsed.mapCamera.bearing ?? -24);
+      setMapPitch(parsed.mapCamera.pitch ?? 72);
+    }
+  }, []);
+
+  const saveScenario = () => persistScenario(true);
   const loadScenario = () => {
-    const raw = localStorage.getItem("zeus-simulator-moa1");
+    const raw = localStorage.getItem(scenarioStorageKey);
     if (!raw) { setStatus("No hay una simulación guardada en este equipo"); return; }
     try {
-      const parsed = JSON.parse(raw) as { packages?: MissionPackage[]; h24Platforms?: H24Platform[]; selectedPhase?: CampaignPhase };
-      if (parsed.packages?.length) {
-        setPackages(parsed.packages);
-        setSelectedPackageId(parsed.packages[0].id);
-        if (parsed.h24Platforms?.length) setH24Platforms(parsed.h24Platforms);
-        if (parsed.selectedPhase) setSelectedPhase(parsed.selectedPhase);
-        setStatus("Simulación guardada recuperada");
-      }
+      const parsed = JSON.parse(raw);
+      applyScenario(parsed);
+      setStatus("Simulación guardada recuperada");
     } catch { setStatus("El archivo de simulación guardado no es válido"); }
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem(scenarioStorageKey);
+    if (raw) {
+      try { applyScenario(JSON.parse(raw)); setStatus("Cambios anteriores recuperados automáticamente"); } catch { /* conserva valores iniciales */ }
+    }
+    hydratedRef.current = true;
+  }, [scenarioStorageKey, applyScenario]);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    const timer = window.setTimeout(() => persistScenario(false), 350);
+    return () => window.clearTimeout(timer);
+  }, [persistScenario]);
+
+  useEffect(() => {
+    const persistBeforeLeave = () => persistScenario(false);
+    window.addEventListener("pagehide", persistBeforeLeave);
+    window.addEventListener("beforeunload", persistBeforeLeave);
+    return () => {
+      persistBeforeLeave();
+      window.removeEventListener("pagehide", persistBeforeLeave);
+      window.removeEventListener("beforeunload", persistBeforeLeave);
+    };
+  }, [persistScenario]);
 
   const addPackage = () => {
     const id = crypto.randomUUID();
@@ -777,7 +895,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-amber-300">A3 · MODO DE ACCIÓN N.º 1</p>
           <h1 className="text-2xl font-bold">Simulador de paquetes aéreos sobre relieve 3D</h1>
-          <p className="text-sm text-slate-300">Fase II · Momento I Ofensiva · trazado libre 2D y ejecución temporal.</p>
+          <p className="text-sm text-slate-300">Trazado libre 2D, órbitas H24 continuas, satélite en loop y guardado automático.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href={`/espacio/${workspaceCode}/${token}`} className="rounded bg-slate-700 px-3 py-2">Mapa 2D</Link>
@@ -872,8 +990,25 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
             <select value={simulationSpeed} onChange={(e) => setSimulationSpeed(Number(e.target.value))} className="rounded bg-slate-700 p-2 text-center"><option value="1">1×</option><option value="5">5×</option><option value="10">10×</option><option value="30">30×</option><option value="60">60×</option></select>
           </div>
 
+          <details open className="mt-4 rounded border border-sky-800 bg-sky-950/20 p-3">
+            <summary className="cursor-pointer font-bold text-sky-200">Orientación libre del mapa 3D</summary>
+            <p className="mt-2 text-xs text-slate-300">Arrastre con el botón derecho para girar e inclinar. También puede usar estos controles precisos.</p>
+            <label className="mt-3 block text-xs font-bold">Rotación horizontal: {mapBearing.toFixed(0)}°
+              <input type="range" min="-180" max="180" step="1" value={mapBearing} onChange={(e) => { const value = Number(e.target.value); setMapBearing(value); mapRef.current?.setBearing(value); }} className="mt-2 w-full" />
+            </label>
+            <label className="mt-3 block text-xs font-bold">Inclinación: {mapPitch.toFixed(0)}°
+              <input type="range" min="0" max="85" step="1" value={mapPitch} onChange={(e) => { const value = Number(e.target.value); setMapPitch(value); mapRef.current?.setPitch(value); }} className="mt-2 w-full" />
+            </label>
+            <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+              <button onClick={() => { setMapBearing(0); setMapPitch(72); mapRef.current?.easeTo({ bearing: 0, pitch: 72, duration: 500 }); }} className="rounded bg-sky-800 p-2">Vista operativa</button>
+              <button onClick={() => { setMapBearing(0); setMapPitch(0); mapRef.current?.easeTo({ bearing: 0, pitch: 0, duration: 500 }); }} className="rounded bg-slate-700 p-2">Vista cenital</button>
+            </div>
+            <p className="mt-2 text-[11px] text-slate-400">MapLibre permite rotación horizontal e inclinación libre. No aplica giro lateral de cámara porque deformaría la referencia geográfica.</p>
+          </details>
+
           <h2 className="mb-2 mt-5 font-bold">Capas de simulación</h2>
-          <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showSatellite} onChange={(e) => setShowSatellite(e.target.checked)} />Satélite y trayectoria orbital</label>
+          <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showSatellite} onChange={(e) => setShowSatellite(e.target.checked)} />Satélite y trayectoria orbital en loop continuo</label>
+          <label className="mb-2 block rounded border border-slate-700 p-2 text-xs">Duración visual de cada pasada satelital: {satelliteLoopSeconds} s<input type="range" min="20" max="180" step="5" value={satelliteLoopSeconds} onChange={(e) => setSatelliteLoopSeconds(Number(e.target.value))} className="mt-2 w-full" /></label>
           <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={selectedPackage.visible} onChange={(e) => updatePackage({ visible: e.target.checked })} />Mostrar paquete seleccionado</label>
           <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showOwnBases} onChange={(e) => setShowOwnBases(e.target.checked)} />Bases propias</label>
           <label className="mb-2 flex items-center gap-2 rounded border border-slate-700 p-2 text-sm"><input type="checkbox" checked={showEnemyBases} onChange={(e) => setShowEnemyBases(e.target.checked)} />Bases enemigas</label>
@@ -896,7 +1031,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
             <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={selectedH24.closed} onChange={(e) => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, closed: e.target.checked } : platform))} />Cerrar circuito automáticamente</label>
             <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={selectedH24.visible} onChange={(e) => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, visible: e.target.checked } : platform))} />Mostrar aeronave</label>
             <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={selectedH24.showRoute} onChange={(e) => setH24Platforms((current) => current.map((platform) => platform.id === selectedH24Id ? { ...platform, showRoute: e.target.checked } : platform))} />Mostrar trayectoria</label>
-            <p className="mt-2 text-xs text-slate-400">Puntos cargados: {selectedH24.route.length}. La trayectoria puede ser libre y cerrada para mantener la órbita durante toda la simulación.</p>
+            <p className="mt-2 text-xs text-slate-400">Puntos cargados: {selectedH24.route.length}. La trayectoria se reproduce permanentemente en un loop independiente del reloj del paquete. Puede ocultar la aeronave o la línea sin detener su movimiento.</p>
           </details>
 
           <details open className="mt-4 rounded border border-cyan-800 bg-cyan-950/20 p-3">
