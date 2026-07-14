@@ -1052,8 +1052,8 @@ const initialPackages: MissionPackage[] = [
     weaponsPerAircraft: 2,
     departureTime: "04:30",
     visible: true,
-    targetAssetId: "radar-oran-site",
-    route: suggestedAttackRoute("base-mendoza", "radar-oran-site", 24000, 480),
+    targetAssetId: "tritio-plant-site",
+    route: suggestedAttackRoute("base-mendoza", "tritio-plant-site", 24000, 480),
   },
   {
     id: "pkg-dca-vm",
@@ -2938,7 +2938,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                     <input
                       type="range"
                       min="0"
-                      max="120"
+                      max="600"
                       step="1"
                       value={groupSimulationSpeed}
                       onChange={(e) => {
@@ -2951,8 +2951,8 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
                     />
                     <div className="flex justify-between text-[9px] text-slate-400">
                       <span>0× pausa</span>
-                      <span>60×</span>
-                      <span>120×</span>
+                      <span>300×</span>
+                      <span>600×</span>
                     </div>
                   </div>
                   <div className="ml-auto flex max-w-full gap-1 overflow-x-auto">
@@ -3433,6 +3433,9 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
               <option value="30">30×</option>
               <option value="60">60×</option>
               <option value="120">120×</option>
+              <option value="240">240×</option>
+              <option value="360">360×</option>
+              <option value="600">600×</option>
             </select>
           </div>
 

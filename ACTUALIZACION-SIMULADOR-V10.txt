@@ -1,0 +1,8 @@
+SIMULADOR MOA 1 - V10
+
+Correcciones:
+- El paquete D+2 "Strike principal · Planta de tritio" ahora tiene como blanco real el activo tritio-plant-site, correspondiente al símbolo nuclear del mapa.
+- La ruta precargada del paquete termina en la Planta de procesamiento de tritio.
+- Al alcanzarse el punto de impacto, la instalación queda marcada como destruida y aparece el símbolo persistente de explosión.
+- La velocidad del grupo simultáneo puede regularse entre 0x y 600x.
+- La reproducción individual de paquetes incorpora 240x, 360x y 600x.
