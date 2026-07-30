@@ -190,7 +190,7 @@ export default function TriviaApp() {
             <div>
               <Link href="/" className="text-xs font-bold uppercase tracking-widest text-cyan-300">← Inicio ZEUS</Link>
               <h1 className="mt-3 text-4xl font-black uppercase">Trivia PPC</h1>
-              <p className="mt-2 text-slate-300">{QUESTIONS.length} preguntas objetivas verificadas · sesión independiente por navegador</p>
+              <p className="mt-2 text-slate-300">Banco doctrinario actualizado · sesión independiente por navegador</p>
             </div>
             <button onClick={() => setScreen("stats")} className="rounded-xl border border-cyan-400/50 bg-cyan-500/10 px-5 py-3 text-sm font-black uppercase tracking-widest">Estadísticas</button>
           </div>
@@ -325,10 +325,10 @@ export default function TriviaApp() {
             <div className={`mt-7 rounded-2xl border p-5 ${correct ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-rose-500/40 bg-rose-500/10'}`}>
               <p className="font-black uppercase tracking-widest">{correct ? 'Respuesta correcta' : 'Respuesta incorrecta'}</p>
               <p className="mt-3 text-slate-200">Correcta: {current.respuestaCorrecta}) {current.opciones.find((o) => o.id === current.respuestaCorrecta)?.texto}</p>
-              <details className="mt-5 rounded-xl bg-slate-950/70 p-4 text-sm">
-                <summary className="cursor-pointer font-bold text-cyan-300">Ver fuente y verificación</summary>
-                <p className="mt-3 whitespace-pre-wrap leading-6 text-slate-300">{current.fuenteRaw}</p>
-              </details>
+              <div className="mt-5 rounded-xl border border-cyan-400/20 bg-slate-950/70 p-4 text-sm">
+                <p className="font-black uppercase tracking-widest text-cyan-300">Justificación doctrinaria</p>
+                <p className="mt-3 whitespace-pre-wrap leading-6 text-slate-300">{current.justificacionDoctrinaria || current.fuenteRaw}</p>
+              </div>
               <div className="mt-5 flex flex-wrap gap-3">
                 <button onClick={toggleMarked} className="rounded-lg border border-amber-400/50 px-4 py-2 text-xs font-bold uppercase tracking-widest text-amber-200">{marked ? 'Quitar de repaso' : 'Marcar para repasar'}</button>
                 <button onClick={() => next()} className="ml-auto rounded-lg bg-cyan-600 px-5 py-2 text-xs font-black uppercase tracking-widest">{index === queue.length-1 ? 'Ver resultado' : 'Siguiente pregunta'}</button>
