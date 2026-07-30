@@ -1,0 +1,8 @@
+TRIVIA PPC V16
+
+- La respuesta correcta se muestra inmediatamente después de presionar Verificar respuesta, tanto en Modo Estudio como en Modo Examen.
+- Se eliminaron del módulo las preguntas de desarrollo para mantener una dinámica fluida.
+- Las categorías "Otras preguntas verificadas" y "Preguntas complementarias del examen 2020" se integraron en "PPC general e integrador".
+- Se agregó la división "PPC completo", seleccionada de manera predeterminada, para mezclar aleatoriamente todas las preguntas objetivas del banco.
+- La selección aleatoria continúa activada de forma predeterminada al ingresar.
+- El banco operativo queda compuesto por 344 preguntas: 296 de opción múltiple y 48 de verdadero/falso.
