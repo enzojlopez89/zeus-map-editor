@@ -70,6 +70,7 @@ export default function TriviaApp() {
   const [questionSeconds, setQuestionSeconds] = useState(0);
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [correctionMessage, setCorrectionMessage] = useState("");
+  const [showExplanation, setShowExplanation] = useState(false);
   const [correctionStatus, setCorrectionStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -116,6 +117,7 @@ export default function TriviaApp() {
     setTotalSeconds(0);
     setCorrectionMessage("");
     setCorrectionStatus("idle");
+    setShowExplanation(false);
     setScreen("run");
   }
 
@@ -144,6 +146,7 @@ export default function TriviaApp() {
     setQuestionSeconds(0);
     setCorrectionMessage("");
     setCorrectionStatus("idle");
+    setShowExplanation(false);
   }
 
   async function submitCorrection() {
@@ -355,46 +358,60 @@ export default function TriviaApp() {
             <div className={`mt-7 rounded-2xl border p-5 ${correct ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-rose-500/40 bg-rose-500/10'}`}>
               <p className="font-black uppercase tracking-widest">{correct ? 'Respuesta correcta' : 'Respuesta incorrecta'}</p>
               <p className="mt-3 text-slate-200">Correcta: {current.respuestaCorrecta}) {current.opciones.find((o) => o.id === current.respuestaCorrecta)?.texto}</p>
-              <div className="mt-5 space-y-4 rounded-xl border border-cyan-400/20 bg-slate-950/70 p-4 text-sm">
-                {current.fragmentosPpc?.length ? current.fragmentosPpc.map((fragment, fragmentIndex) => (
-                  <p key={`${current.id}-fragment-${fragmentIndex}`} className="leading-7 text-slate-300">
-                    {fragment.texto} <span className="font-semibold text-cyan-200">(PPC, pág. {fragment.pagina}{fragment.parrafo ? `, párr. ${fragment.parrafo}` : ""})</span>
-                  </p>
-                )) : (
-                  <p className="leading-7 text-amber-200">Esta respuesta todavía no tiene un fragmento directo validado del PPC. Podés informar una corrección mediante el formulario inferior.</p>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowExplanation((value) => !value)}
+                aria-expanded={showExplanation}
+                className="mt-5 flex w-full items-center justify-between rounded-xl border border-cyan-400/30 bg-slate-950/50 px-4 py-3 text-left text-sm font-black uppercase tracking-widest text-cyan-200 transition hover:border-cyan-300/60"
+              >
+                <span>Justificación</span>
+                <span aria-hidden="true" className="text-lg">{showExplanation ? "−" : "+"}</span>
+              </button>
 
-              <div className="mt-5 rounded-xl border border-white/10 bg-slate-950/60 p-4">
-                <label htmlFor={`correction-${current.id}`} className="text-xs font-black uppercase tracking-widest text-slate-300">
-                  Informar una corrección
-                </label>
-                <p className="mt-2 text-xs leading-5 text-slate-500">Indicá qué respuesta, fragmento o referencia debería revisarse. El número y el texto de la pregunta se adjuntan automáticamente.</p>
-                <textarea
-                  id={`correction-${current.id}`}
-                  value={correctionMessage}
-                  onChange={(event) => {
-                    setCorrectionMessage(event.target.value);
-                    if (correctionStatus !== "idle") setCorrectionStatus("idle");
-                  }}
-                  rows={4}
-                  maxLength={2000}
-                  placeholder="Escribí aquí la corrección propuesta y, si la conocés, la página y el párrafo del PPC..."
-                  className="mt-3 w-full resize-y rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400"
-                />
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={submitCorrection}
-                    disabled={!correctionMessage.trim() || correctionStatus === "sending"}
-                    className="rounded-lg border border-cyan-400/50 px-4 py-2 text-xs font-black uppercase tracking-widest text-cyan-200 disabled:opacity-40"
-                  >
-                    {correctionStatus === "sending" ? "Enviando..." : "Enviar corrección"}
-                  </button>
-                  {correctionStatus === "sent" && <span className="text-xs font-bold text-emerald-300">Corrección enviada. Gracias.</span>}
-                  {correctionStatus === "error" && <span className="text-xs font-bold text-rose-300">No pudo enviarse. Verificá que la tabla de reportes esté creada en Supabase.</span>}
+              {showExplanation && (
+                <div className="mt-3 space-y-4 rounded-xl border border-cyan-400/20 bg-slate-950/70 p-4 text-sm">
+                  <div className="space-y-4">
+                    {current.fragmentosPpc?.length ? current.fragmentosPpc.map((fragment, fragmentIndex) => (
+                      <p key={`${current.id}-fragment-${fragmentIndex}`} className="leading-7 text-slate-300">
+                        {fragment.texto} <span className="font-semibold text-cyan-200">(PPC, pág. {fragment.pagina}{fragment.parrafo ? `, párr. ${fragment.parrafo}` : ""})</span>
+                      </p>
+                    )) : (
+                      <p className="leading-7 text-amber-200">Esta respuesta todavía no tiene un fragmento directo validado del PPC.</p>
+                    )}
+                  </div>
+
+                  <div className="border-t border-white/10 pt-4">
+                    <label htmlFor={`correction-${current.id}`} className="text-xs font-black uppercase tracking-widest text-slate-300">
+                      Informar una corrección
+                    </label>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">Indicá qué respuesta, fragmento o referencia debería revisarse. El número y el texto de la pregunta se adjuntan automáticamente.</p>
+                    <textarea
+                      id={`correction-${current.id}`}
+                      value={correctionMessage}
+                      onChange={(event) => {
+                        setCorrectionMessage(event.target.value);
+                        if (correctionStatus !== "idle") setCorrectionStatus("idle");
+                      }}
+                      rows={4}
+                      maxLength={2000}
+                      placeholder="Escribí aquí la corrección propuesta y, si la conocés, la página y el párrafo del PPC..."
+                      className="mt-3 w-full resize-y rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400"
+                    />
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={submitCorrection}
+                        disabled={!correctionMessage.trim() || correctionStatus === "sending"}
+                        className="rounded-lg border border-cyan-400/50 px-4 py-2 text-xs font-black uppercase tracking-widest text-cyan-200 disabled:opacity-40"
+                      >
+                        {correctionStatus === "sending" ? "Enviando..." : "Enviar corrección"}
+                      </button>
+                      {correctionStatus === "sent" && <span className="text-xs font-bold text-emerald-300">Corrección enviada. Gracias.</span>}
+                      {correctionStatus === "error" && <span className="text-xs font-bold text-rose-300">No pudo enviarse. Verificá que la tabla de reportes esté creada en Supabase.</span>}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="mt-5 flex flex-wrap gap-3">
                 <button onClick={toggleMarked} className="rounded-lg border border-amber-400/50 px-4 py-2 text-xs font-bold uppercase tracking-widest text-amber-200">{marked ? 'Quitar de repaso' : 'Marcar para repasar'}</button>
