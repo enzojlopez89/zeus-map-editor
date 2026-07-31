@@ -6,6 +6,12 @@ export type TriviaOption = {
   textoOriginal: string;
 };
 
+export type TriviaEvidenceFragment = {
+  texto: string;
+  pagina: string;
+  parrafo?: string;
+};
+
 export type TriviaQuestion = {
   id: string;
   numero: number;
@@ -18,6 +24,7 @@ export type TriviaQuestion = {
   respuestaCorrecta: string | null;
   respuestaDesarrollo: string | null;
   justificacionDoctrinaria: string;
+  fragmentosPpc?: TriviaEvidenceFragment[];
   fuenteRaw: string;
   nivelSeguridad: "alto" | "medio" | "dudoso";
   tipoVerificacion: string;
