@@ -18,6 +18,7 @@ const QUESTIONS = (rawQuestions as TriviaQuestion[])
   }));
 const SESSION_KEY = "zeus-trivia-ppc-session-v2";
 const COMPLETE_PPC = "ppc-completo";
+const TRIVIA_ONLY = process.env.NEXT_PUBLIC_TRIVIA_ONLY === "true";
 
 type StoredSession = {
   answers: SessionAnswer[];
@@ -221,7 +222,9 @@ export default function TriviaApp() {
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <Link href="/" className="text-xs font-bold uppercase tracking-widest text-cyan-300">← Inicio ZEUS</Link>
+              {!TRIVIA_ONLY && (
+                <Link href="/" className="text-xs font-bold uppercase tracking-widest text-cyan-300">← Inicio ZEUS</Link>
+              )}
               <h1 className="mt-3 text-4xl font-black uppercase">Trivia PPC</h1>
               <p className="mt-2 text-slate-300">Banco doctrinario actualizado · sesión independiente por navegador</p>
             </div>
