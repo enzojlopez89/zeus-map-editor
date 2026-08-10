@@ -4711,8 +4711,8 @@
       },
       {
         "id": "B",
-        "texto": "Falso. ORIENTACIÓN DEL COMANDANTE A SU EM Y DIRECTIVA DEL JEM",
-        "textoOriginal": "B) Falso. ORIENTACIÓN DEL COMANDANTE A SU EM Y DIRECTIVA DEL JEM  [CORRECTA]"
+        "texto": "Falso.",
+        "textoOriginal": "B) Falso. [CORRECTA]"
       }
     ],
     "respuestaCorrecta": "B",
@@ -5028,8 +5028,8 @@
       },
       {
         "id": "B",
-        "texto": "Falso. APRECIACIÓN INICIAL Capacidades del Enemigo",
-        "textoOriginal": "B) Falso. APRECIACIÓN INICIAL Capacidades del Enemigo"
+        "texto": "Falso.",
+        "textoOriginal": "B) Falso."
       }
     ],
     "respuestaCorrecta": "A",
@@ -5181,8 +5181,8 @@
       },
       {
         "id": "D",
-        "texto": "Sin ningún orden específico. Es un listado que tiene todas las capacidades sin aplicarle ningún criterio ordenador. Cálculo del Esfuerzo",
-        "textoOriginal": "D) Sin ningún orden específico. Es un listado que tiene todas las capacidades sin aplicarle ningún criterio ordenador. Cálculo del Esfuerzo"
+        "texto": "Sin ningún orden específico. Es un listado que tiene todas las capacidades sin aplicarle ningún criterio ordenador.",
+        "textoOriginal": "D) Sin ningún orden específico. Es un listado que tiene todas las capacidades sin aplicarle ningún criterio ordenador."
       }
     ],
     "respuestaCorrecta": "A",

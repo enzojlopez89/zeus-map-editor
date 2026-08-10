@@ -231,6 +231,22 @@ export default function TriviaApp() {
             <button onClick={() => setScreen("stats")} className="rounded-xl border border-cyan-400/50 bg-cyan-500/10 px-5 py-3 text-sm font-black uppercase tracking-widest">Estadísticas</button>
           </div>
 
+          {!TRIVIA_ONLY && (
+            <Link
+              href="/trivia-ppc/orientacion-as"
+              className="mt-8 block rounded-3xl border border-amber-300/45 bg-gradient-to-r from-amber-500/20 via-slate-900 to-cyan-500/10 p-6 shadow-2xl transition hover:-translate-y-0.5 hover:border-amber-200"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.28em] text-amber-300">Nuevo apartado</p>
+                  <h2 className="mt-2 text-2xl font-black">Modo examen orientación del AS.</h2>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">125 preguntas verificadas y relacionadas directamente con la orientación recibida para el examen PPC.</p>
+                </div>
+                <span className="rounded-xl bg-amber-400 px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-950">Ingresar →</span>
+              </div>
+            </Link>
+          )}
+
           <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
             <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
               <h2 className="text-xl font-black">Configurar sesión</h2>
