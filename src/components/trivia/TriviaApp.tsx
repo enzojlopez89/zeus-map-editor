@@ -72,6 +72,7 @@ export default function TriviaApp() {
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [correctionMessage, setCorrectionMessage] = useState("");
   const [showExplanation, setShowExplanation] = useState(false);
+  const [isErrorReview, setIsErrorReview] = useState(false);
   const [correctionStatus, setCorrectionStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -119,6 +120,27 @@ export default function TriviaApp() {
     setCorrectionMessage("");
     setCorrectionStatus("idle");
     setShowExplanation(false);
+    setIsErrorReview(false);
+    setScreen("run");
+  }
+
+  function startErrorReview() {
+    const wrongIds = new Set(runAnswers.filter((answer) => answer.correct === false).map((answer) => answer.questionId));
+    const wrongQueue = queue.filter((question) => wrongIds.has(question.id));
+    if (!wrongQueue.length) return;
+
+    // Conserva exactamente el orden de preguntas de la sesión y el orden original de las opciones.
+    setQueue(wrongQueue);
+    setIndex(0);
+    setSelected(null);
+    setVerified(false);
+    setRunAnswers([]);
+    setQuestionSeconds(0);
+    setTotalSeconds(0);
+    setCorrectionMessage("");
+    setCorrectionStatus("idle");
+    setShowExplanation(false);
+    setIsErrorReview(true);
     setScreen("run");
   }
 
@@ -182,7 +204,7 @@ export default function TriviaApp() {
     setSession((prev) => ({
       ...prev,
       answers: [...prev.answers, ...finalAnswers],
-      exams: setup.mode === "examen" ? [...prev.exams, { date: new Date().toISOString(), score, correct: correctCount, total: objective.length, seconds: totalSeconds }] : prev.exams,
+      exams: setup.mode === "examen" && !isErrorReview ? [...prev.exams, { date: new Date().toISOString(), score, correct: correctCount, total: objective.length, seconds: totalSeconds }] : prev.exams,
     }));
     setScreen("results");
   }
@@ -332,11 +354,27 @@ export default function TriviaApp() {
     return (
       <main className="min-h-screen bg-slate-950 px-4 py-8 text-white">
         <div className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-slate-900 p-7 text-center shadow-2xl">
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-300">Sesión finalizada</p>
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-300">{isErrorReview ? "Repaso de errores finalizado" : "Sesión finalizada"}</p>
           <p className="mt-5 text-7xl font-black">{pct}%</p>
           <p className="mt-3 text-slate-300">{right} correctas · {objective.length-right} incorrectas · {formatTime(totalSeconds)}</p>
+
+          {TRIVIA_ONLY && objective.length - right > 0 && (
+            <div className="mt-7 rounded-2xl border border-amber-400/35 bg-amber-500/10 p-5 text-left">
+              <p className="text-xs font-black uppercase tracking-widest text-amber-300">Repaso personalizado</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">Volvé a resolver únicamente las {objective.length-right} preguntas incorrectas. Se conserva el mismo orden en que aparecieron y las opciones permanecen exactamente en su orden original.</p>
+              <button onClick={startErrorReview} className="mt-4 w-full rounded-xl bg-amber-500 px-5 py-3 font-black uppercase tracking-widest text-slate-950">Repasar solo las incorrectas</button>
+            </div>
+          )}
+
+          {TRIVIA_ONLY && isErrorReview && objective.length > 0 && objective.length - right === 0 && (
+            <div className="mt-7 rounded-2xl border border-emerald-400/35 bg-emerald-500/10 p-5">
+              <p className="font-black uppercase tracking-widest text-emerald-300">Repaso completado</p>
+              <p className="mt-2 text-sm text-slate-300">No quedan preguntas incorrectas de este repaso.</p>
+            </div>
+          )}
+
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <button onClick={() => setScreen("home")} className="rounded-xl bg-cyan-600 px-6 py-3 font-black uppercase tracking-widest">Nueva sesión</button>
+            <button onClick={() => setScreen("home")} className="rounded-xl bg-cyan-600 px-6 py-3 font-black uppercase tracking-widest">Nueva sesión completa</button>
             <button onClick={() => setScreen("stats")} className="rounded-xl border border-slate-500 px-6 py-3 font-black uppercase tracking-widest">Ver estadísticas</button>
           </div>
         </div>
@@ -350,7 +388,7 @@ export default function TriviaApp() {
     <main className="min-h-screen bg-slate-950 px-4 py-5 text-white sm:px-8">
       <div className="mx-auto max-w-5xl">
         <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900 px-5 py-4">
-          <div><p className="text-xs font-black uppercase tracking-widest text-cyan-300">{setup.mode === 'examen' ? 'Modo Examen' : 'Modo Estudio'}</p><p className="mt-1 text-sm text-slate-400">Pregunta {index+1} de {queue.length}</p></div>
+          <div><p className="text-xs font-black uppercase tracking-widest text-cyan-300">{isErrorReview ? 'Repaso de errores' : setup.mode === 'examen' ? 'Modo Examen' : 'Modo Estudio'}</p><p className="mt-1 text-sm text-slate-400">Pregunta {index+1} de {queue.length}</p></div>
           <div className="flex items-center gap-5"><div className="text-right"><p className="text-xs uppercase text-slate-500">Tiempo pregunta</p><p className="font-mono text-xl font-black">{formatTime(questionSeconds)}</p></div><button onClick={() => finish()} className="rounded-lg border border-rose-500/50 px-3 py-2 text-xs font-bold uppercase text-rose-200">Finalizar</button></div>
         </header>
 
