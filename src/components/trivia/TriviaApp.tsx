@@ -358,15 +358,15 @@ export default function TriviaApp() {
           <p className="mt-5 text-7xl font-black">{pct}%</p>
           <p className="mt-3 text-slate-300">{right} correctas · {objective.length-right} incorrectas · {formatTime(totalSeconds)}</p>
 
-          {TRIVIA_ONLY && objective.length - right > 0 && (
+          {objective.length - right > 0 && (
             <div className="mt-7 rounded-2xl border border-amber-400/35 bg-amber-500/10 p-5 text-left">
               <p className="text-xs font-black uppercase tracking-widest text-amber-300">Repaso personalizado</p>
               <p className="mt-2 text-sm leading-6 text-slate-300">Volvé a resolver únicamente las {objective.length-right} preguntas incorrectas. Se conserva el mismo orden en que aparecieron y las opciones permanecen exactamente en su orden original.</p>
-              <button onClick={startErrorReview} className="mt-4 w-full rounded-xl bg-amber-500 px-5 py-3 font-black uppercase tracking-widest text-slate-950">Repasar solo las incorrectas</button>
+              <button onClick={startErrorReview} className="mt-4 w-full rounded-xl bg-amber-500 px-5 py-3 font-black uppercase tracking-widest text-slate-950">Repasar las incorrectas</button>
             </div>
           )}
 
-          {TRIVIA_ONLY && isErrorReview && objective.length > 0 && objective.length - right === 0 && (
+          {isErrorReview && objective.length > 0 && objective.length - right === 0 && (
             <div className="mt-7 rounded-2xl border border-emerald-400/35 bg-emerald-500/10 p-5">
               <p className="font-black uppercase tracking-widest text-emerald-300">Repaso completado</p>
               <p className="mt-2 text-sm text-slate-300">No quedan preguntas incorrectas de este repaso.</p>

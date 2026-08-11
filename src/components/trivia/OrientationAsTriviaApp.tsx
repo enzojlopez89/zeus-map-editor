@@ -53,6 +53,7 @@ export default function OrientationAsTriviaApp() {
   const [correctionMessage, setCorrectionMessage] = useState("");
   const [correctionStatus, setCorrectionStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [history, setHistory] = useState<ExamHistory[]>([]);
+  const [isErrorReview, setIsErrorReview] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -90,6 +91,27 @@ export default function OrientationAsTriviaApp() {
     setShowExplanation(false);
     setCorrectionMessage("");
     setCorrectionStatus("idle");
+    setIsErrorReview(false);
+    setScreen("run");
+  }
+
+  function startErrorReview() {
+    const wrongIds = new Set(answers.filter((answer) => answer.correct === false).map((answer) => answer.questionId));
+    const wrongQueue = queue.filter((question) => wrongIds.has(question.id));
+    if (!wrongQueue.length) return;
+
+    // Conserva exactamente el orden de las preguntas de la ronda anterior y el orden original de las opciones.
+    setQueue(wrongQueue);
+    setIndex(0);
+    setSelected(null);
+    setVerified(false);
+    setAnswers([]);
+    setQuestionSeconds(0);
+    setTotalSeconds(0);
+    setShowExplanation(false);
+    setCorrectionMessage("");
+    setCorrectionStatus("idle");
+    setIsErrorReview(true);
     setScreen("run");
   }
 
@@ -110,7 +132,9 @@ export default function OrientationAsTriviaApp() {
     const correctCount = objective.filter((a) => a.correct).length;
     const score = objective.length ? Math.round((correctCount / objective.length) * 100) : 0;
     setAnswers(finalAnswers);
-    setHistory((prev) => [...prev, { date: new Date().toISOString(), score, correct: correctCount, total: objective.length, seconds: totalSeconds }]);
+    if (!isErrorReview) {
+      setHistory((prev) => [...prev, { date: new Date().toISOString(), score, correct: correctCount, total: objective.length, seconds: totalSeconds }]);
+    }
     setScreen("results");
   }
 
@@ -204,9 +228,25 @@ export default function OrientationAsTriviaApp() {
     return (
       <main className="min-h-screen bg-slate-950 px-4 py-8 text-white">
         <div className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-slate-900 p-7 text-center shadow-2xl">
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-300">Orientación del AS. · examen finalizado</p>
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-300">{isErrorReview ? "Orientación del AS. · repaso finalizado" : "Orientación del AS. · examen finalizado"}</p>
           <p className="mt-5 text-7xl font-black">{pct}%</p>
           <p className="mt-3 text-slate-300">{right} correctas · {objective.length - right} incorrectas · {formatTime(totalSeconds)}</p>
+
+          {objective.length - right > 0 && (
+            <div className="mt-7 rounded-2xl border border-amber-400/35 bg-amber-500/10 p-5 text-left">
+              <p className="text-xs font-black uppercase tracking-widest text-amber-300">Repaso de errores</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">Volvé a resolver únicamente las {objective.length - right} preguntas que respondiste mal en esta ronda. Se mantiene el mismo orden de preguntas y el mismo orden de opciones.</p>
+              <button onClick={startErrorReview} className="mt-4 w-full rounded-xl bg-amber-500 px-5 py-3 font-black uppercase tracking-widest text-slate-950">Repasar las incorrectas</button>
+            </div>
+          )}
+
+          {isErrorReview && objective.length > 0 && objective.length - right === 0 && (
+            <div className="mt-7 rounded-2xl border border-emerald-400/35 bg-emerald-500/10 p-5">
+              <p className="font-black uppercase tracking-widest text-emerald-300">Repaso completado</p>
+              <p className="mt-2 text-sm text-slate-300">No quedan preguntas incorrectas de la ronda anterior.</p>
+            </div>
+          )}
+
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <button onClick={() => setScreen("home")} className="rounded-xl bg-cyan-600 px-6 py-3 font-black uppercase tracking-widest">Nuevo examen</button>
             <Link href="/trivia-ppc" className="rounded-xl border border-slate-500 px-6 py-3 font-black uppercase tracking-widest">Trivia PPC</Link>
@@ -224,7 +264,7 @@ export default function OrientationAsTriviaApp() {
       <div className="mx-auto max-w-5xl">
         <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900 px-5 py-4">
           <div>
-            <p className="text-xs font-black uppercase tracking-widest text-amber-300">Modo examen orientación del AS.</p>
+            <p className="text-xs font-black uppercase tracking-widest text-amber-300">{isErrorReview ? "Repaso de errores · orientación del AS." : "Modo examen orientación del AS."}</p>
             <p className="mt-1 text-sm text-slate-400">Pregunta {index + 1} de {queue.length}</p>
           </div>
           <div className="flex items-center gap-5">
