@@ -103,6 +103,8 @@ export type Compatibilidad = {
   block42: "si" | "condicionado" | "por-verificar";
   block50: "si" | "condicionado" | "por-verificar";
   requisito?: string;
+  imagen2d?: string;
+  nivelModelo?: NivelModelo;
 };
 
 export const f16Compatibilidad: Compatibilidad[] = [
