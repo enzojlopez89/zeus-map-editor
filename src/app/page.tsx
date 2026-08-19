@@ -11,12 +11,12 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-5 py-8 sm:px-8 lg:px-12">
         <header className="max-w-4xl rounded-3xl border border-white/15 bg-slate-950/65 p-6 shadow-2xl backdrop-blur-md sm:p-8">
           <p className="text-xs font-black uppercase tracking-[0.35em] text-amber-300">Ejercicio académico</p>
-          <h1 className="mt-3 text-4xl font-black uppercase tracking-tight sm:text-6xl">EJERCICIO ZEUS</h1>
+          <h1 className="mt-3 text-5xl font-black uppercase tracking-tight sm:text-7xl">ZEUS</h1>
           <p className="mt-2 text-lg font-semibold uppercase tracking-[0.16em] text-slate-200 sm:text-2xl">
             Proceso de Planificación de Comando
           </p>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            Acceso centralizado a las células de trabajo, herramientas de planeamiento y plataforma de estudio PPC.
+            Acceso centralizado a las células de trabajo, herramientas de planeamiento, biblioteca técnica de medios y plataforma de estudio PPC.
           </p>
         </header>
 
@@ -33,6 +33,15 @@ export default function Home() {
                 <p className="mt-5 text-xs font-bold uppercase tracking-widest text-white/70 group-hover:text-cyan-200">Ingresar a la célula →</p>
               </Link>
             ))}
+
+            <Link
+              href="/medios-3d"
+              className="group rounded-2xl border border-cyan-300/45 bg-gradient-to-br from-cyan-500/20 via-slate-950/80 to-slate-950 p-5 shadow-xl backdrop-blur-md transition hover:-translate-y-1 hover:border-cyan-200"
+            >
+              <p className="text-sm font-black uppercase tracking-widest text-cyan-200">Medios 3D</p>
+              <p className="mt-2 text-sm leading-5 text-slate-200">Hangar técnico-operacional con fichas, análisis tridimensional y configuraciones de empleo.</p>
+              <p className="mt-5 text-xs font-bold uppercase tracking-widest text-cyan-100">Abrir hangar →</p>
+            </Link>
 
             <Link
               href="/trivia-ppc"

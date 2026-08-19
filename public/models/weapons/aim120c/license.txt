@@ -1,0 +1,11 @@
+Model Information:
+* title:	AIM-120C AMRAAM
+* source:	https://sketchfab.com/3d-models/aim-120c-amraam-62b79b0f76e44684ad43adcc2ae3cdb9
+* author:	Peter Primini (https://sketchfab.com/Planetrix23)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "AIM-120C AMRAAM" (https://sketchfab.com/3d-models/aim-120c-amraam-62b79b0f76e44684ad43adcc2ae3cdb9) by Peter Primini (https://sketchfab.com/Planetrix23) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

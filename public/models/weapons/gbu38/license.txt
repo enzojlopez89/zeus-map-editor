@@ -1,0 +1,11 @@
+Model Information:
+* title:	US USAF GBU-38 JDAM guided bomb (War Thunder)
+* source:	https://sketchfab.com/3d-models/us-usaf-gbu-38-jdam-guided-bomb-war-thunder-2a5da36672f743f2bb33aaee5eb4088f
+* author:	KojfDiscord (https://sketchfab.com/KojfDiscord)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "US USAF GBU-38 JDAM guided bomb (War Thunder)" (https://sketchfab.com/3d-models/us-usaf-gbu-38-jdam-guided-bomb-war-thunder-2a5da36672f743f2bb33aaee5eb4088f) by KojfDiscord (https://sketchfab.com/KojfDiscord) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	ARA Sarandí (D-13) Realistic 3D Naval Ship
+* source:	https://sketchfab.com/3d-models/ara-sarandi-d-13-realistic-3d-naval-ship-a70653ec7b06457e94252f5df9d8cb9c
+* author:	soysascha (https://sketchfab.com/soysascha)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "ARA Sarandí (D-13) Realistic 3D Naval Ship" (https://sketchfab.com/3d-models/ara-sarandi-d-13-realistic-3d-naval-ship-a70653ec7b06457e94252f5df9d8cb9c) by soysascha (https://sketchfab.com/soysascha) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	US 1000 lb LDGP Mk 83 bomb (War Thunder)
+* source:	https://sketchfab.com/3d-models/us-1000-lb-ldgp-mk-83-bomb-war-thunder-a5638a2670b0449487ac80dfb3b94851
+* author:	KojfDiscord (https://sketchfab.com/KojfDiscord)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "US 1000 lb LDGP Mk 83 bomb (War Thunder)" (https://sketchfab.com/3d-models/us-1000-lb-ldgp-mk-83-bomb-war-thunder-a5638a2670b0449487ac80dfb3b94851) by KojfDiscord (https://sketchfab.com/KojfDiscord) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

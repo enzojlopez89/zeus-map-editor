@@ -1,0 +1,11 @@
+Model Information:
+* title:	Missiles AGM 88 Harm (WARNO)
+* source:	https://sketchfab.com/3d-models/missiles-agm-88-harm-warno-d2dbeed05dd443a6a11714e91c640283
+* author:	KojfDiscord (https://sketchfab.com/KojfDiscord)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Missiles AGM 88 Harm (WARNO)" (https://sketchfab.com/3d-models/missiles-agm-88-harm-warno-d2dbeed05dd443a6a11714e91c640283) by KojfDiscord (https://sketchfab.com/KojfDiscord) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

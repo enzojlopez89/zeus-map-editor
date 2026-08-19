@@ -1,0 +1,11 @@
+Model Information:
+* title:	US 2000 lb LDGP Mk 84 Air Bomb (War Thunder)
+* source:	https://sketchfab.com/3d-models/us-2000-lb-ldgp-mk-84-air-bomb-war-thunder-a4e11e4000c448f5af2285ae6847d59e
+* author:	KojfDiscord (https://sketchfab.com/KojfDiscord)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "US 2000 lb LDGP Mk 84 Air Bomb (War Thunder)" (https://sketchfab.com/3d-models/us-2000-lb-ldgp-mk-84-air-bomb-war-thunder-a4e11e4000c448f5af2285ae6847d59e) by KojfDiscord (https://sketchfab.com/KojfDiscord) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

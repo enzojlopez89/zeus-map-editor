@@ -1,0 +1,11 @@
+Model Information:
+* title:	Mark 82 General Purpose Bomb
+* source:	https://sketchfab.com/3d-models/mark-82-general-purpose-bomb-a5696711e97d48dfa6038919ca9c7a0d
+* author:	mrminimal (https://sketchfab.com/mrminimal)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Mark 82 General Purpose Bomb" (https://sketchfab.com/3d-models/mark-82-general-purpose-bomb-a5696711e97d48dfa6038919ca9c7a0d) by mrminimal (https://sketchfab.com/mrminimal) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

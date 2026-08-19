@@ -1,0 +1,11 @@
+Model Information:
+* title:	AIM-7 Sparrow Missile
+* source:	https://sketchfab.com/3d-models/aim-7-sparrow-missile-c906aa59c0df493296129f02049a90c7
+* author:	Snicks Game Development (https://sketchfab.com/SnicksGameDevelopment)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "AIM-7 Sparrow Missile" (https://sketchfab.com/3d-models/aim-7-sparrow-missile-c906aa59c0df493296129f02049a90c7) by Snicks Game Development (https://sketchfab.com/SnicksGameDevelopment) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

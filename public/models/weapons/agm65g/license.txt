@@ -1,0 +1,11 @@
+Model Information:
+* title:	AGM-65 Maverick
+* source:	https://sketchfab.com/3d-models/agm-65-maverick-40970bb2ecde4310b7e09bbc540ced17
+* author:	mrminimal (https://sketchfab.com/mrminimal)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "AGM-65 Maverick" (https://sketchfab.com/3d-models/agm-65-maverick-40970bb2ecde4310b7e09bbc540ced17) by mrminimal (https://sketchfab.com/mrminimal) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
