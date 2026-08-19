@@ -1414,7 +1414,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
         boxShadow: "0 2px 8px rgba(0,0,0,.6)",
       });
       element.addEventListener("click", (event) => { event.stopPropagation(); setMoveRoutePointId(point.id); setStatus(`Seleccione en el mapa la nueva posición para ${point.name}.`); });
-      const marker = new maplibregl.Marker({ element, anchor: "center" })
+      const marker = new maplibregl.Marker({ element, anchor: "center", pitchAlignment: "viewport", rotationAlignment: "viewport", opacityWhenCovered: 1 })
         .setLngLat([point.longitude, point.latitude])
         .setPopup(
           new maplibregl.Popup({ offset: 18 }).setHTML(
@@ -2181,7 +2181,7 @@ export default function ThreeDMap({ workspaceCode, token }: Props) {
       element.innerHTML = `<div data-aircraft-body style="width:58px;height:26px;clip-path:polygon(50% 0,59% 34%,100% 58%,64% 64%,58% 100%,50% 78%,42% 100%,36% 64%,0 58%,41% 34%);background:linear-gradient(135deg,#f8fafc,#64748b 48%,#0f172a);border:1px solid rgba(255,255,255,.8);filter:drop-shadow(0 4px 5px #000);transform:perspective(90px) rotateX(52deg)"></div><div data-aircraft-label style="margin-top:-4px;text-align:center;font-size:9px;font-weight:900;color:#fde047;text-shadow:0 1px 3px #000"></div>`;
       element.style.display = "none";
       aircraftMarkersRef.current.push(
-        new maplibregl.Marker({ element, anchor: "center" })
+        new maplibregl.Marker({ element, anchor: "center", pitchAlignment: "viewport", rotationAlignment: "viewport", opacityWhenCovered: 1 })
           .setLngLat([-64.2, -31.3])
           .addTo(map),
       );

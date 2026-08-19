@@ -15,6 +15,8 @@ export type Medio3D = {
   imagen2d: string;
   nivelModelo: NivelModelo;
   especificaciones?: { etiqueta: string; valor: string }[];
+  datosPlan?: { etiqueta: string; valor: string }[];
+  fuenteTecnica?: string;
   notaTecnica?: string;
   armamentoPlan?: string[];
 };
@@ -77,6 +79,272 @@ export const medios: Medio3D[] = [
   { id: "s2t", nombre: "S-2T Turbo Tracker", dominio: "Naval", categoria: "Aviación naval", funcion: "Guerra antisubmarina", cantidad: "4", ubicacion: "Las Cuevas", estado: "3d" , imagen2d: "https://commons.wikimedia.org/wiki/Special:Redirect/file/ROCAF%20S-2T%20Turbo%20Tracker%20Display%20at%20Tainan%20Air%20Force%20Base%20Apron%2020130810a.jpg", nivelModelo: "3d-zeus" },
 ];
 
+
+type FichaParcial = Pick<Medio3D, "especificaciones" | "datosPlan" | "fuenteTecnica" | "notaTecnica" | "armamentoPlan">;
+
+const fichasTecnicasZEUS: Record<string, FichaParcial> = {
+  f16c40: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "34 F-16C Block 40" },
+      { etiqueta: "Ubicación", valor: "2ª BA (20) · 4ª BA (14)" },
+      { etiqueta: "Rol ZEUS", valor: "Caza / ataque / defensa contra-aérea" },
+      { etiqueta: "Armamento A/A", valor: "AIM-9M 18 km · AIM-120C-5 105 km (NEZ 65 km) · AIM-7P 70 km" },
+      { etiqueta: "Armamento A/S", valor: "Mk 82/83/84 · GBU-10/12/38 · AGM-65G 34 km · AGM-119 55 km" }
+    ],
+    fuenteTecnica: "USAF · F-16 Fighting Falcon Fact Sheet",
+    notaTecnica: "Performance de referencia de la familia F-16C/D; varía por Block, motor, carga y perfil."
+  },
+  f16d42: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "6 F-16D Block 42" },
+      { etiqueta: "Ubicación", valor: "4ª BA · Mendoza" },
+      { etiqueta: "Rol ZEUS", valor: "Multirrol biplaza" },
+      { etiqueta: "Armamento A/A", valor: "AIM-9M 18 km · AIM-120C-5 105 km (NEZ 65 km) · AIM-7P 70 km" }
+    ],
+    fuenteTecnica: "USAF · F-16 Fighting Falcon Fact Sheet"
+  },
+  f16cj50: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "10 F-16CJ Block 50" },
+      { etiqueta: "Ubicación", valor: "5ª BA · Gral. Acha" },
+      { etiqueta: "Rol ZEUS", valor: "SEAD / DEAD" },
+      { etiqueta: "AGM-88C HARM", valor: "140 unidades · alcance Plan: 148 km" },
+      { etiqueta: "HTS", valor: "10 AN/ASQ-213" }
+    ],
+    fuenteTecnica: "USAF · F-16 Fighting Falcon Fact Sheet"
+  },
+  amx: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "36 AMX A-1M" },
+      { etiqueta: "Rol ZEUS", valor: "Ataque aire-superficie / autodefensa AA" }
+    ],
+    notaTecnica: "Performance específica pendiente de incorporar desde fuente técnica primaria."
+  },
+  t6: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "24 T-6 Texan II" },
+      { etiqueta: "Ubicación", valor: "2ª BA (12) · 3ª BA (12)" },
+      { etiqueta: "Rol ZEUS", valor: "Ataque aire-superficie" }
+    ],
+    fuenteTecnica: "Textron Aviation Defense · T-6C Texan II"
+  },
+  harpy: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "36 IAI Harpy" },
+      { etiqueta: "Ubicación", valor: "5ª BA · Gral. Acha" },
+      { etiqueta: "Rol ZEUS", valor: "SEAD / munición merodeadora antirradiación" }
+    ],
+    notaTecnica: "Alcance y autonomía pendientes de cotejo técnico primario; ZEUS no los estima."
+  },
+  e99m: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "3 E-99M Erieye" },
+      { etiqueta: "Ubicación", valor: "3ª BA · Córdoba" },
+      { etiqueta: "Rol ZEUS", valor: "AEW&C / vigilancia / C2" }
+    ],
+    notaTecnica: "Performance de la variante E-99M pendiente de consolidar desde fuente técnica primaria."
+  },
+  ec130h: {
+    especificaciones: [
+      { etiqueta: "Velocidad", valor: "300 mph (Mach 0,52) a 20.000 ft" },
+      { etiqueta: "Alcance", valor: "2.295 mi / 3.694 km" },
+      { etiqueta: "Techo", valor: "25.000 ft / 7,6 km" },
+      { etiqueta: "MTOW", valor: "155.000 lb / 69.750 kg" },
+      { etiqueta: "Combustible", valor: "41.000 lb / 18.597 kg" },
+      { etiqueta: "Armamento", valor: "No cinético · ataque electromagnético" }
+    ],
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "2 EC-130H Compass Call" },
+      { etiqueta: "Ubicación", valor: "5ª BA · Gral. Acha" },
+      { etiqueta: "Rol ZEUS", valor: "Guerra electrónica / AE / ERA / C2" }
+    ],
+    fuenteTecnica: "USAF / Air Combat Command · EC-130H Compass Call"
+  },
+  hermes450: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "6 Hermes 450" },
+      { etiqueta: "Ubicación", valor: "2ª BA y 5ª BA" },
+      { etiqueta: "Rol ZEUS", valor: "ISR / ELINT / COMINT" }
+    ],
+    notaTecnica: "Performance pendiente de cotejo con documentación técnica primaria."
+  },
+  c130j: {
+    especificaciones: [
+      { etiqueta: "Velocidad máx. crucero", valor: "365 KTAS / 675 km/h" },
+      { etiqueta: "Alcance con 40.000 lb", valor: "≈ 2.160 NM / 4.000 km" },
+      { etiqueta: "MTOW", valor: "164.000 lb / 74.389 kg" },
+      { etiqueta: "Carga útil máx.", valor: "≈ 44.000 lb / 19.958 kg (según variante)" }
+    ],
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "10 C-130J" },
+      { etiqueta: "Ubicación", valor: "1ª BA · La Rioja" },
+      { etiqueta: "Rol ZEUS", valor: "Transporte táctico · carga · tropas · asalto aéreo" }
+    ],
+    fuenteTecnica: "Lockheed Martin · C-130J Super Hercules",
+    notaTecnica: "Alcance y carga dependen de variante y perfil; se muestran como referencia de familia."
+  },
+  kc130j: {
+    especificaciones: [
+      { etiqueta: "Velocidad máx. crucero", valor: "≈ 365 KTAS / 675 km/h" },
+      { etiqueta: "Alcance con 40.000 lb", valor: "≈ 1.980 NM (familia KC/HC/MC-130J)" },
+      { etiqueta: "MTOW", valor: "164.000 lb / 74.389 kg" }
+    ],
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "4 KC-130J" },
+      { etiqueta: "Ubicación", valor: "1ª BA · La Rioja" },
+      { etiqueta: "Rol ZEUS", valor: "Reabastecimiento en vuelo / transporte" }
+    ],
+    fuenteTecnica: "Lockheed Martin · C-130J family data"
+  },
+  kc135: {
+    especificaciones: [
+      { etiqueta: "Velocidad", valor: "530 mph a 30.000 ft" },
+      { etiqueta: "Techo", valor: "50.000 ft / 15.240 m" },
+      { etiqueta: "Alcance con 150.000 lb transferibles", valor: "1.500 mi / 2.419 km" },
+      { etiqueta: "Alcance ferry", valor: "Hasta 11.015 mi / 17.766 km" },
+      { etiqueta: "MTOW", valor: "322.500 lb / 146.285 kg" },
+      { etiqueta: "Combustible transferible máx.", valor: "200.000 lb / 90.719 kg" }
+    ],
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "6 KC-135" },
+      { etiqueta: "Ubicación", valor: "3ª BA (3) · 4ª BA (3)" },
+      { etiqueta: "Rol ZEUS", valor: "Reabastecimiento en vuelo" }
+    ],
+    fuenteTecnica: "USAF · KC-135 Stratotanker Fact Sheet"
+  },
+  lj60: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "6 Learjet 60" },
+      { etiqueta: "Rol ZEUS", valor: "VIP / MEDEVAC" }
+    ],
+    notaTecnica: "Performance de la variante operativa pendiente de cotejo técnico primario."
+  },
+  dhc6: {
+    especificaciones: [
+      { etiqueta: "Alcance máx. (cero carga)", valor: "763 NM / 1.413 km · tanques estándar" },
+      { etiqueta: "Alcance máx. LR", valor: "833 NM / 1.542 km · tanques largo alcance" },
+      { etiqueta: "Velocidad máx. autonomía", valor: "100 KIAS (referencia de familia)" }
+    ],
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "12 DHC-6-400" },
+      { etiqueta: "Rol ZEUS", valor: "Transporte ligero · carga · tropas · asalto aéreo" }
+    ],
+    fuenteTecnica: "De Havilland Canada · Twin Otter Series 400"
+  },
+  ch47: {
+    especificaciones: [
+      { etiqueta: "Velocidad máxima", valor: "170 KTAS / 302 km/h" },
+      { etiqueta: "Radio de misión", valor: "165 NM / 306 km" },
+      { etiqueta: "Peso bruto máx.", valor: "54.000 lb / 24.494 kg" },
+      { etiqueta: "Combustible", valor: "1.080 US gal / 4.088 L" }
+    ],
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "12 CH-47F" },
+      { etiqueta: "Rol ZEUS", valor: "Transporte · asalto aéreo · búsqueda/recuperación" }
+    ],
+    fuenteTecnica: "Boeing · CH-47F Chinook"
+  },
+  uh1y: {
+    especificaciones: [
+      { etiqueta: "Velocidad máxima", valor: "170 KIAS" },
+      { etiqueta: "Crucero", valor: "147 KTAS" },
+      { etiqueta: "Radio de combate", valor: "119 NM" },
+      { etiqueta: "Alcance máximo", valor: "325 NM" },
+      { etiqueta: "Capacidad", valor: "4 + 8 personas" }
+    ],
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "16 UH-1Y" },
+      { etiqueta: "Rol ZEUS", valor: "Transporte · asalto aéreo · búsqueda/recuperación" }
+    ],
+    fuenteTecnica: "Bell · UH-1Y Venom"
+  },
+  b412: {
+    especificaciones: [
+      { etiqueta: "Peso bruto máx. interno", valor: "12.200 lb / 5.534 kg" },
+      { etiqueta: "Peso bruto máx. externo", valor: "13.000 lb / 5.897 kg" },
+      { etiqueta: "Carga de gancho", valor: "5.000 lb / 2.268 kg" }
+    ],
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "14 B-412" },
+      { etiqueta: "Rol ZEUS", valor: "CASEVAC · SAR · transporte" }
+    ],
+    fuenteTecnica: "Bell · Bell 412"
+  },
+  tps77: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "3 TPS-77 MRR" },
+      { etiqueta: "Alcance máximo", valor: "250–300 NM" },
+      { etiqueta: "Cobertura", valor: "Vigilancia 360°" }
+    ],
+    notaTecnica: "Valores del Plan ZEUS."
+  },
+  gm400: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "1 GM400 Alpha" },
+      { etiqueta: "Alcance máximo", valor: "270–320 NM" },
+      { etiqueta: "Cobertura", valor: "Vigilancia 360°" }
+    ],
+    notaTecnica: "Valores del Plan ZEUS."
+  },
+  patriot: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "2 baterías" },
+      { etiqueta: "Alcance", valor: "160 km" },
+      { etiqueta: "Altura máxima", valor: "24.240 m" }
+    ],
+    notaTecnica: "Valores del Plan ZEUS."
+  },
+  nasams: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "6 baterías" },
+      { etiqueta: "MR", valor: "35 km · 16.000 m" },
+      { etiqueta: "SR", valor: "15 km · 9.000 m" }
+    ],
+    notaTecnica: "Valores del Plan ZEUS."
+  },
+  skyguard: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "8 baterías" },
+      { etiqueta: "Alcance", valor: "4.000 m" },
+      { etiqueta: "Altura máxima", valor: "4.000 m" }
+    ],
+    notaTecnica: "Valores del Plan ZEUS."
+  },
+  rbs70: {
+    datosPlan: [
+      { etiqueta: "Cantidad", valor: "80 lanzadores" },
+      { etiqueta: "Alcance", valor: "9 km" },
+      { etiqueta: "Altura máxima", valor: "5.000 m" }
+    ],
+    notaTecnica: "Valores del Plan ZEUS."
+  },
+  landcruiser: { datosPlan: [{ etiqueta: "Cantidad", valor: "35" }, { etiqueta: "Rol", valor: "Movilidad terrestre" }] },
+  sprinter: { datosPlan: [{ etiqueta: "Cantidad", valor: "12" }, { etiqueta: "Rol", valor: "Transporte" }] },
+  amarok: { datosPlan: [{ etiqueta: "Cantidad", valor: "22" }, { etiqueta: "Rol", valor: "Movilidad terrestre" }] },
+  unimog: { datosPlan: [{ etiqueta: "Cantidad", valor: "30" }, { etiqueta: "Rol", valor: "Transporte táctico/logístico" }] },
+  camion20: { datosPlan: [{ etiqueta: "Cantidad", valor: "7" }, { etiqueta: "Capacidad nominal ZEUS", valor: "20 Tn" }] },
+  camion5: { datosPlan: [{ etiqueta: "Cantidad", valor: "10" }, { etiqueta: "Capacidad nominal ZEUS", valor: "5 Tn" }] },
+  meko360: { datosPlan: [{ etiqueta: "Cantidad", valor: "4" }, { etiqueta: "Ubicación", valor: "Puerto Aguas Negras" }, { etiqueta: "Rol ZEUS", valor: "Guerra de superficie / defensa" }], notaTecnica: "Performance naval pendiente de cotejo técnico primario." },
+  meko140: { datosPlan: [{ etiqueta: "Cantidad", valor: "6" }, { etiqueta: "Ubicación", valor: "Puerto Aguas Negras" }, { etiqueta: "Rol ZEUS", valor: "Guerra de superficie" }] },
+  drummond: { datosPlan: [{ etiqueta: "Cantidad", valor: "4" }, { etiqueta: "Rol ZEUS", valor: "Guerra de superficie" }] },
+  sigma: { datosPlan: [{ etiqueta: "Cantidad", valor: "4" }, { etiqueta: "Rol ZEUS", valor: "Patrulla oceánica de largo alcance" }] },
+  bouchard: { datosPlan: [{ etiqueta: "Cantidad", valor: "8" }, { etiqueta: "Rol ZEUS", valor: "Patrulla" }] },
+  tipo209: { datosPlan: [{ etiqueta: "Cantidad", valor: "3" }, { etiqueta: "Ubicación", valor: "Las Cuevas" }, { etiqueta: "Rol ZEUS", valor: "Guerra submarina" }] },
+  tr1700: { datosPlan: [{ etiqueta: "Cantidad", valor: "4" }, { etiqueta: "Ubicación", valor: "Las Cuevas" }, { etiqueta: "Rol ZEUS", valor: "Guerra submarina" }] },
+  p3: { datosPlan: [{ etiqueta: "Cantidad", valor: "2" }, { etiqueta: "Ubicación", valor: "Las Cuevas" }, { etiqueta: "Rol ZEUS", valor: "Guerra antisubmarina" }], notaTecnica: "Performance específica pendiente de consolidación desde fuente primaria." },
+  s2t: { datosPlan: [{ etiqueta: "Cantidad", valor: "4" }, { etiqueta: "Ubicación", valor: "Las Cuevas" }, { etiqueta: "Rol ZEUS", valor: "Guerra antisubmarina" }], notaTecnica: "Performance específica pendiente de consolidación desde fuente primaria." }
+};
+
+for (const medio of medios) {
+  const ficha = fichasTecnicasZEUS[medio.id];
+  if (!ficha) continue;
+  medio.especificaciones = ficha.especificaciones ?? medio.especificaciones;
+  medio.datosPlan = ficha.datosPlan ?? medio.datosPlan;
+  medio.fuenteTecnica = ficha.fuenteTecnica ?? medio.fuenteTecnica;
+  medio.notaTecnica = ficha.notaTecnica ?? medio.notaTecnica;
+  medio.armamentoPlan = ficha.armamentoPlan ?? medio.armamentoPlan;
+}
+
 export const f16General = {
   funcion: "Caza multirrol",
   longitud: "14,8 m",
@@ -88,6 +356,7 @@ export const f16General = {
   combustibleTipicoExterno: "5.443 kg totales con 2 tanques externos",
   velocidad: "Mach 2 / 1.500 mph en altura",
   alcanceFerry: "> 1.740 NM",
+  radioCombateAS: "> 500 mi / 860 km (misión A/S de referencia)",
   techo: "> 50.000 ft / 15 km",
   limiteG: "Hasta 9 G con combustible interno completo",
   armamentoFijo: "M61A1 20 mm",
