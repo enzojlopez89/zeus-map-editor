@@ -1,5 +1,6 @@
 "use client";
 
+import A4LogisticsCalculator from "@/components/a4/A4LogisticsCalculator";
 import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import maplibregl from "maplibre-gl";
 import { circle, lineString, length as turfLength } from "@turf/turf";
@@ -3883,6 +3884,8 @@ export default function MapEditor({
             )}
           </div>
         </div>
+
+        {workspaceCode === "a4" && !readOnly && <A4LogisticsCalculator />}
 
         <section {...propiedadesPanel("fuerzas")} className="mb-5 cursor-move rounded bg-slate-900 p-4">
           <h2 className="mb-3 font-semibold">↕ Fuerzas visibles</h2>
