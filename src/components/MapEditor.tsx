@@ -103,6 +103,7 @@ type BaseMilitar = {
     | "Fuerza de despliegue rápido";
   icono?: string;
   detalle?: string;
+  infraestructuraHtml?: string;
   escalon?: string;
   altitudeMeters?: number;
 };
@@ -330,6 +331,72 @@ const BASES_PROPIAS: BaseMilitar[] = [
     bando: "propio",
     tipo: "Base aérea",
     altitudeMeters: 1425,
+  },
+  {
+    nombre: "BAM AIMOGASTA",
+    longitude: -66.833028,
+    latitude: -28.548500,
+    bando: "propio",
+    tipo: "Base aérea",
+    detalle: "Base Aérea Militar. Aeródromo Tipo 2.",
+    infraestructuraHtml:
+      "<strong>Aeródromo Tipo 2</strong><br />" +
+      "<strong>Pista:</strong> 45 × 3000 m<br />" +
+      "<strong>Plataforma:</strong> 400 × 600 m<br />" +
+      "<strong>Hangares:</strong> 3 × (45 × 45 × 20 m)",
+  },
+  {
+    nombre: "BAM LUCIO MANSILLA",
+    longitude: -64.693778,
+    latitude: -29.795056,
+    bando: "propio",
+    tipo: "Base aérea",
+    detalle: "Base Aérea Militar. Aeródromo Tipo 8.",
+    infraestructuraHtml:
+      "<strong>Aeródromo Tipo 8</strong><br />" +
+      "<strong>Pistas:</strong> ninguna<br />" +
+      "<strong>Plataformas:</strong> 400 × 800 / 400 × 1000 / 200 × 1000 / 600 × 1500 / 2 × (200 × 800) m",
+  },
+  {
+    nombre: "BAM CHAMICAL",
+    longitude: -66.294056,
+    latitude: -30.345139,
+    bando: "propio",
+    tipo: "Base aérea",
+    detalle: "Base Aérea Militar. Aeródromo Tipo 10.",
+    infraestructuraHtml:
+      "<strong>Aeródromo Tipo 10</strong><br />" +
+      "<strong>Pistas:</strong> 70 × 3314 m / 55 × 3350 m<br />" +
+      "<strong>Plataformas:</strong> 145 × 610 / 265 × 485 / 220 × 361 / 220 × 299 / 90 × 346 m<br />" +
+      "<strong>Hangares:</strong> 138 × 125 × 12 / 80 × 90 × 10 / 172 × 90 × 10 / 150 × 165 × 12 / 80 × 75 × 9 m",
+  },
+  {
+    nombre: "BAM SAN JUAN",
+    longitude: -68.418250,
+    latitude: -31.572028,
+    bando: "propio",
+    tipo: "Base aérea",
+    detalle: "Base Aérea Militar. Aeródromo Tipo 6.",
+    infraestructuraHtml:
+      "<strong>Aeródromo Tipo 6</strong><br />" +
+      "<strong>Pistas:</strong> 60 × 2900 m / 55 × 3172 m<br />" +
+      "<strong>Plataformas:</strong> 172 × 60 / 266 × 65 / 62 × 85 / 75 × 85 / 240 × 150 / 502 × 141 / 248 × 245 m<br />" +
+      "<strong>Hangares:</strong> 2 × (85 × 65 × 12), 70 × 100 × 12, 100 × 72 × 12, 55 × 30 × 9, 75 × 65 × 12, 65 × 30 × 9 m<br />" +
+      "<strong>Búnkeres:</strong> 3 para 2 aeronaves (30 × 40 × 6 m)",
+  },
+  {
+    nombre: "BAM CHEPES",
+    longitude: -66.585000,
+    latitude: -31.326472,
+    bando: "propio",
+    tipo: "Base aérea",
+    detalle: "Base Aérea Militar. Aeródromo Tipo 4.",
+    infraestructuraHtml:
+      "<strong>Aeródromo Tipo 4</strong><br />" +
+      "<strong>Pista:</strong> 45 × 2800 m<br />" +
+      "<strong>Plataformas:</strong> 110 × 260 / 90 × 240 / 55 × 165 / 65 × 85 m<br />" +
+      "<strong>Hangares:</strong> 2 × (40 × 80 × 12), 30 × 90 × 9, 30 × 40 × 9, 40 × 50 × 10 m<br />" +
+      "<strong>Búnkeres:</strong> 5 para 2 aeronaves (30 × 30 × 6 m)",
   },
   {
     nombre: "Área de Material Realicó (AMR)",
@@ -1244,6 +1311,11 @@ function etiquetaCortaUbicacion(nombre: string): string {
     "Base Aérea Militar Malargüe": "MALARGÜE",
     "Grupo 1 COM / San Luis": "SAN LUIS",
     "Grupo 2 COM / Malargüe": "MALARGÜE",
+    "BAM AIMOGASTA": "AIMOGASTA",
+    "BAM LUCIO MANSILLA": "LUCIO MANSILLA",
+    "BAM CHAMICAL": "CHAMICAL",
+    "BAM SAN JUAN": "SAN JUAN",
+    "BAM CHEPES": "CHEPES",
   };
 
   if (especiales[nombre]) return especiales[nombre];
@@ -2332,6 +2404,7 @@ export default function MapEditor({
         ${base.escalon ? `<br /><strong>Escalón:</strong> ${base.escalon}` : ""}
         ${coordenadasDetalladasHtml(base.latitude, base.longitude, base.altitudeMeters)}
         ${base.detalle ? `<br /><br /><span>${base.detalle}</span>` : ""}
+        ${base.infraestructuraHtml ? `<br /><br />${base.infraestructuraHtml}` : ""}
         <hr style="margin:8px 0;border:0;border-top:1px solid #475569" />
         <strong>Aeronaves:</strong><br />${listar(aeronaves)}
         <br /><br />
@@ -3012,19 +3085,30 @@ export default function MapEditor({
       agregarEtiquetaUbicacion("laboratorio-tritio", LABORATORIO_TRITIO.nombre, LABORATORIO_TRITIO.longitude, LABORATORIO_TRITIO.latitude);
 
       TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
+        const popup = new maplibregl.Popup({
+          offset: 25,
+          maxWidth: "460px",
+          className: "zeus-popup",
+          closeButton: false,
+          closeOnClick: false,
+        }).setHTML(mediosDeBase(base));
+
         const marker = new maplibregl.Marker({
           element: crearIconoBase(base),
           anchor: "center",
         })
           .setLngLat([base.longitude, base.latitude])
-          .setPopup(
-            new maplibregl.Popup({
-              offset: 25,
-              maxWidth: "430px",
-              className: "zeus-popup",
-            }).setHTML(mediosDeBase(base)),
-          )
+          .setPopup(popup)
           .addTo(map);
+
+        const elementoMarker = marker.getElement();
+        elementoMarker.addEventListener("mouseenter", () => {
+          popup.setLngLat([base.longitude, base.latitude]).addTo(map);
+        });
+        elementoMarker.addEventListener("mouseleave", () => {
+          popup.remove();
+        });
+
         habilitarMedicionSobreMarcador(marker, [base.longitude, base.latitude]);
 
         basesRef.current[base.nombre] = marker;

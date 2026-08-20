@@ -40,6 +40,7 @@ type BasePlan = {
   personalPermanente: number;
   cicloReabDias: number;
   cicloCombustibleDias: number;
+  cocinasTfpIniciales: number | null;
 };
 
 type Medio = {
@@ -188,16 +189,16 @@ const PERIODOS: Periodo[] = [
 ];
 
 const BASES_INICIALES: BasePlan[] = [
-  { id:"la-rioja", nombre:"1ª B.A. · La Rioja", capacidadAlojamiento:1500, personalPermanente:1305, cicloReabDias:3, cicloCombustibleDias:4 },
-  { id:"villa-mercedes", nombre:"2ª B.A. · Villa Mercedes", capacidadAlojamiento:1500, personalPermanente:1293, cicloReabDias:3, cicloCombustibleDias:4 },
-  { id:"cordoba", nombre:"3ª B.A. · Córdoba", capacidadAlojamiento:1500, personalPermanente:1201, cicloReabDias:3, cicloCombustibleDias:4 },
-  { id:"mendoza", nombre:"4ª B.A. · Mendoza", capacidadAlojamiento:1000, personalPermanente:652, cicloReabDias:3, cicloCombustibleDias:4 },
-  { id:"gral-acha", nombre:"5ª B.A. · Gral. Acha", capacidadAlojamiento:1000, personalPermanente:840, cicloReabDias:3, cicloCombustibleDias:4 },
-  { id:"malargue", nombre:"B.A.M. · Malargüe", capacidadAlojamiento:1000, personalPermanente:711, cicloReabDias:3, cicloCombustibleDias:3 },
-  { id:"san-luis", nombre:"Grupo 1 COM · San Luis", capacidadAlojamiento:500, personalPermanente:149, cicloReabDias:3, cicloCombustibleDias:4 },
-  { id:"realico", nombre:"A.M. Realicó", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:3 },
-  { id:"san-rafael", nombre:"A.M. San Rafael", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:3 },
-  { id:"rio-cuarto", nombre:"COAe · Río Cuarto", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:4 },
+  { id:"la-rioja", nombre:"1ª B.A. · La Rioja", capacidadAlojamiento:1500, personalPermanente:1305, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:3 },
+  { id:"villa-mercedes", nombre:"2ª B.A. · Villa Mercedes", capacidadAlojamiento:1500, personalPermanente:1293, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:3 },
+  { id:"cordoba", nombre:"3ª B.A. · Córdoba", capacidadAlojamiento:1500, personalPermanente:1201, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:3 },
+  { id:"mendoza", nombre:"4ª B.A. · Mendoza", capacidadAlojamiento:1000, personalPermanente:652, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:2 },
+  { id:"gral-acha", nombre:"5ª B.A. · Gral. Acha", capacidadAlojamiento:1000, personalPermanente:840, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:2 },
+  { id:"malargue", nombre:"B.A.M. · Malargüe", capacidadAlojamiento:1000, personalPermanente:711, cicloReabDias:3, cicloCombustibleDias:3 , cocinasTfpIniciales:2 },
+  { id:"san-luis", nombre:"Grupo 1 COM · San Luis", capacidadAlojamiento:500, personalPermanente:149, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:1 },
+  { id:"realico", nombre:"A.M. Realicó", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:3 , cocinasTfpIniciales:null },
+  { id:"san-rafael", nombre:"A.M. San Rafael", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:3 , cocinasTfpIniciales:null },
+  { id:"rio-cuarto", nombre:"COAe · Río Cuarto", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:null },
 ];
 
 const MEDIOS_INICIALES: Medio[] = [
@@ -641,7 +642,7 @@ export default function A4LogisticsCalculator() {
                     const ocup=b.personalPermanente+tec+org;
                     const libres=b.capacidadAlojamiento==null?null:b.capacidadAlojamiento-ocup;
                     return <section key={b.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-                      <div className="flex justify-between gap-3"><h2 className="font-black">{b.nombre}</h2><span className={`rounded px-2 py-1 text-[10px] ${libres!=null&&libres<0?"bg-red-950 text-red-300":"bg-slate-800"}`}>{libres==null?"Capacidad pendiente":`${fmt(libres)} plazas`}</span></div>
+                      <div className="flex justify-between gap-3"><h2 className="font-black">{b.nombre}</h2><span className={`rounded px-2 py-1 text-[10px] ${libres!=null&&libres<0?"bg-red-950 text-red-300":"bg-slate-800"}`}>{libres==null?"Capacidad pendiente":libres<0?`Déficit: ${fmt(Math.abs(libres))} plazas`:`Disponibles: ${fmt(libres)} plazas`}</span></div>
                       <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
                         <div className="rounded bg-slate-950 p-2">Permanente<b className="block text-lg">{fmt(b.personalPermanente)}</b></div>
                         <div className="rounded bg-slate-950 p-2">TFP medios<b className="block text-lg">{fmt(tec)}</b></div>
@@ -678,7 +679,7 @@ export default function A4LogisticsCalculator() {
                     return <div key={m.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
                       <div className="flex flex-wrap justify-between gap-2"><b>{m.cantidad} × {m.sistema}</b><span className="text-xs text-slate-400">{baseNombre(m.origen,plan.bases)} → {baseNombre(m.destino,plan.bases)}</span></div>
                       <div className="mt-2 grid gap-2 md:grid-cols-4 text-xs">
-                        <div className="rounded bg-slate-950 p-2">Bloques TFP de 4<b className="block text-lg">{tp?.bloques??"—"}</b></div>
+                        <div className="rounded bg-slate-950 p-2">Grupos TFP necesarios (hasta 4 aeronaves c/u)<b className="block text-lg">{tp?.bloques??"—"}</b></div>
                         <div className="rounded bg-slate-950 p-2">Personal técnico<b className="block text-lg">{tp?.total??"—"}</b></div>
                         <div className="rounded bg-slate-950 p-2">Aérea<b className="block text-lg">{distanciaAerea(m.origen,m.destino)??"—"} km</b></div>
                         <div className="rounded bg-slate-950 p-2">Terrestre<b className="block text-lg">{distanciaTerrestre(m.origen,m.destino)??"—"} km</b></div>
@@ -716,13 +717,20 @@ export default function A4LogisticsCalculator() {
                     const tec=personalTfpPorBase[b.id]||0;
                     const org=personalOrganicoPorBase[b.id]||0;
                     const ocup=b.personalPermanente+tec+org;
-                    const carpas=Math.max(0,Math.ceil(ocup/500));
+                    const carpasNecesarias=Math.max(0,Math.ceil(ocup/500));
                     const raciones=ocup*2;
-                    const cocinas=Math.max(0,Math.ceil(ocup/500));
+                    const cocinasNecesarias=Math.max(0,Math.ceil(ocup/500));
+                    const cocinasAsignadas=b.cocinasTfpIniciales;
+                    const cocinasAdicionales=cocinasAsignadas==null?null:Math.max(0,cocinasNecesarias-cocinasAsignadas);
                     return <section key={b.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
                       <div className="flex justify-between"><b>{b.nombre}</b><span className="text-xs text-slate-400">Cap. {b.capacidadAlojamiento??"pendiente"}</span></div>
-                      <div className="mt-3 grid grid-cols-3 gap-2 text-xs"><div className="rounded bg-slate-950 p-2">Ocupación<b className="block text-lg">{fmt(ocup)}</b></div><div className="rounded bg-slate-950 p-2">Carpas 500 pers<b className="block text-lg">{carpas}</b></div><div className="rounded bg-slate-950 p-2">Raciones/día<b className="block text-lg">{fmt(raciones)}</b></div></div>
-                      <p className="mt-2 text-xs text-slate-400">Cocinas de campaña estimadas por regla de la TFP: {cocinas}.</p>
+                      <div className="mt-3 grid grid-cols-3 gap-2 text-xs"><div className="rounded bg-slate-950 p-2">Personal presente estimado<b className="block text-lg">{fmt(ocup)}</b></div><div className="rounded bg-slate-950 p-2">Carpas requeridas (500 pers.)<b className="block text-lg">{carpasNecesarias}</b></div><div className="rounded bg-slate-950 p-2">Raciones por día (2/pers.)<b className="block text-lg">{fmt(raciones)}</b></div></div>
+                      <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
+                        <div className="rounded bg-slate-950 p-2">Cocinas TFP asignadas<b className="block text-lg">{cocinasAsignadas??"—"}</b></div>
+                        <div className="rounded bg-slate-950 p-2">Cocinas requeridas estimadas<b className="block text-lg">{cocinasNecesarias}</b></div>
+                        <div className="rounded bg-slate-950 p-2">Cocinas adicionales<b className="block text-lg">{cocinasAdicionales??"—"}</b></div>
+                      </div>
+                      <p className="mt-2 text-[11px] text-slate-500">Para mantener coherencia con los valores numéricos de TFP (1), la estimación dinámica usa 1 cocina por cada 500 personas. La asignación inicial indicada por TFP se conserva separada.</p>
                     </section>;
                   })}
                 </div>
@@ -777,7 +785,8 @@ export default function A4LogisticsCalculator() {
               <div className="space-y-4">
                 <div className="rounded-xl border border-emerald-900 bg-emerald-950/20 p-4 text-sm"><b className="text-emerald-300">TFP (1) cargada.</b> El personal aeronáutico se calcula por bloques de hasta 4 aeronaves y cambia automáticamente según ERC, MESC o MEIC.</div>
                 <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4">
-                  <table className="w-full min-w-[1100px] text-left text-xs"><thead className="text-slate-400"><tr><th className="p-2">Sistema</th><th>MEIC / 4</th><th>MESC / 4</th><th>ERC / 4</th><th>Combustible L/h</th><th>HH mant/HV</th></tr></thead>
+                  <p className="mb-3 text-xs text-slate-400">Cada valor indica el personal técnico requerido para un grupo de hasta 4 aeronaves. La calculadora selecciona MEIC, MESC o ERC automáticamente según la fase/momento activo.</p>
+                  <table className="w-full min-w-[1250px] text-left text-xs"><thead className="text-slate-400"><tr><th className="p-2">Sistema</th><th>MEIC · personal / hasta 4 aeronaves</th><th>MESC · personal / hasta 4 aeronaves</th><th>ERC · personal / hasta 4 aeronaves</th><th>Combustible L/h</th><th>HH mant/HV</th></tr></thead>
                     <tbody>{TFP_SISTEMAS.map((t)=>{
                       const tm=Object.values(t.meic).reduce((a,b)=>a+b,0), ts=Object.values(t.mesc).reduce((a,b)=>a+b,0), te=Object.values(t.erc).reduce((a,b)=>a+b,0);
                       return <tr key={t.sistema} className="border-t border-slate-800"><td className="p-2 font-bold">{t.sistema}</td><td>{tm}</td><td>{ts}</td><td>{te}</td><td>{t.combustibleLitrosHora??"Pendiente"}</td><td>{t.hhMantPorHoraVuelo??"Pendiente"}</td></tr>;
