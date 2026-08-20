@@ -10,19 +10,12 @@ type BaseId =
   | "gral-acha"
   | "malargue"
   | "san-luis"
+  | "rio-cuarto"
   | "realico"
-  | "san-rafael"
-  | "rio-cuarto";
+  | "san-rafael";
 
 type Esfuerzo = "ERC" | "MESC" | "MEIC";
-type Tab =
-  | "situacion"
-  | "movimientos"
-  | "personal"
-  | "misiones"
-  | "reabastecimiento"
-  | "tfp"
-  | "alertas";
+type Tab = "situacion" | "movimientos" | "armamento" | "tfp" | "deficits" | "historial";
 
 type Periodo = {
   id: string;
@@ -30,400 +23,259 @@ type Periodo = {
   momento: string;
   ventana: string;
   esfuerzo: Esfuerzo;
-  detalle: string;
 };
 
-type BasePlan = {
+type BaseInicial = {
   id: BaseId;
   nombre: string;
+  personalInicial: number | null;
   capacidadAlojamiento: number | null;
-  personalPermanente: number;
-  cicloReabDias: number;
-  cicloCombustibleDias: number;
-  cocinasTfpIniciales: number | null;
+  infraestructura?: string[];
 };
 
-type Medio = {
+type MedioInicial = {
   id: string;
   sistema: string;
-  baseInicial: BaseId;
-  cantidadInicial: number;
-};
-
-type PersonalTFP = {
-  jefe: number;
-  encargado: number;
-  estructuras: number;
-  armamento: number;
-  avionica: number;
-  hidraulica: number;
-  especiales: number;
-};
-
-type TfpSistema = {
-  sistema: string;
-  meic: PersonalTFP;
-  mesc: PersonalTFP;
-  erc: PersonalTFP;
-  combustibleLitrosHora: number | null;
-  hhMantPorHoraVuelo: number | null;
-};
-
-type EquipoApoyo = {
-  id: string;
-  nombre: string;
-  personal24h: number | null;
-  combustibleLitrosHora: number | null;
-  pesoKg: number | null;
-  capacidadTn: number | null;
-};
-
-type VehiculoTFP = {
-  id: string;
-  nombre: string;
-  cantidad: number;
-  choferesPorVehiculo: number;
-  capacidadPax: number | null;
-  capacidadTn: number;
-  consumoL100km: number;
-};
-
-type MovimientoMedio = {
-  id: string;
-  periodoId: string;
-  sistema: string;
-  origen: BaseId;
-  destino: BaseId;
-  cantidad: number;
-  equipos: Record<string, number>;
-  fecha: string;
-  predefinido?: boolean;
-};
-
-type MovimientoPersonal = {
-  id: string;
-  periodoId: string;
-  origen: BaseId;
-  destino: BaseId;
-  oficiales: number;
-  suboficiales: number;
-  sv: number;
-  civiles: number;
-  predefinido?: boolean;
-};
-
-type MovimientoMaterial = {
-  id: string;
-  periodoId: string;
-  origen: BaseId;
-  destino: BaseId;
-  material: string;
-  cantidad: number;
-  pesoKgUnidad: number;
-  predefinido?: boolean;
-};
-
-type Mision = {
-  id: string;
-  periodoId: string;
-  dia: string;
-  operacion: string;
-  aeronave: string;
-  cantidad: number;
-  armamento: string;
-  armamentoPorAvion: number | null;
   base: BaseId;
-  horasVuelo: number | null;
-};
-
-type MisionREV = {
-  id: string;
-  periodoId: string;
-  nombre: string;
-  cisterna: "KC-135" | "KC-130J";
-  cantidadCisternas: number;
-  receptores: number;
-  litrosPorReceptor: number;
-  capacidadTransferiblePorCisterna: number | null;
-  ida: boolean;
-  regreso: boolean;
-};
-
-type Reabastecimiento = {
-  id: string;
-  periodoId: string;
-  base: BaseId;
-  recurso: string;
   cantidad: number;
+  detalle?: string;
+};
+
+type ArmamentoInicial = {
+  id: string;
+  nombre: string;
+  familia: string;
+  cantidad: number;
+  ubicacion: "reserva-ton" | BaseId;
+};
+
+type MaterialInicial = {
+  id: string;
+  nombre: string;
+  cantidad: number;
+  ubicacion: BaseId | "reserva-ton";
   unidad: string;
-  diaSolicitud: number;
-  demoraDias: number;
 };
 
-type EstadoPlan = {
+type TfpPersonal = {
+  sistema: string;
+  meic4: number;
+  mesc4: number;
+  erc4: number;
+};
+
+type Movimiento = {
+  id: string;
+  periodoId: string;
+  tipo: "medio" | "armamento" | "material" | "personal";
+  itemId: string;
+  descripcion: string;
+  origen: BaseId | "reserva-ton";
+  destino: BaseId | "reserva-ton";
+  cantidad: number;
+  personalTfpMovido: number;
+  aplicado: boolean;
+  fecha?: string;
+  predefinido?: boolean;
+};
+
+type PlanGuardado = {
   nombre: string;
   periodoActivo: string;
-  bases: BasePlan[];
-  medios: Medio[];
-  movimientos: MovimientoMedio[];
-  movimientosPersonal: MovimientoPersonal[];
-  movimientosMaterial: MovimientoMaterial[];
-  misiones: Mision[];
-  misionesREV: MisionREV[];
-  reabastecimientos: Reabastecimiento[];
+  movimientos: Movimiento[];
 };
 
-const STORAGE_INDEX = "zeus-a4-v3-index";
-const STORAGE_PREFIX = "zeus-a4-v3-plan:";
+const STORAGE_INDEX = "zeus-a4-v6-index";
+const STORAGE_PREFIX = "zeus-a4-v6-plan:";
 
 const PERIODOS: Periodo[] = [
-  { id:"f1m1", fase:"FASE I · PREPARACIÓN", momento:"Momento 1 · Concepción", ventana:"Antes de M", esfuerzo:"ERC", detalle:"Planeamiento y preparación inicial." },
-  { id:"f1m2-despl", fase:"FASE I · PREPARACIÓN", momento:"Momento 2 · Despliegue", ventana:"M+1 a M+4", esfuerzo:"ERC", detalle:"Despliegue de sistemas de armas y personal hacia PPRRFF." },
-  { id:"f1m2-arm", fase:"FASE I · PREPARACIÓN", momento:"Momento 2 · Abastecimiento", ventana:"M+5 a M+7", esfuerzo:"ERC", detalle:"Abastecimiento de armamento, equipos y material de apoyo." },
-  { id:"f1m2-adies", fase:"FASE I · PREPARACIÓN", momento:"Momento 2 · Adiestramiento", ventana:"M+8 a M+40", esfuerzo:"ERC", detalle:"Adiestramiento operativo." },
-  { id:"f1m2-comp", fase:"FASE I · PREPARACIÓN", momento:"Momento 2 · Comprobación", ventana:"M+41 a M+45", esfuerzo:"ERC", detalle:"Comprobación del sistema aéreo ofensivo." },
-  { id:"f1m3", fase:"FASE I · PREPARACIÓN", momento:"Momento 3 · Alerta", ventana:"A a D", esfuerzo:"MESC", detalle:"Exploración, reconocimiento y alistamiento sostenido." },
-  { id:"f2", fase:"FASE II · TOMAR LA INICIATIVA", momento:"Operaciones", ventana:"D a D+1", esfuerzo:"MEIC", detalle:"Máximo esfuerzo intensivo de combate." },
-  { id:"f3", fase:"FASE III · DOMINAR", momento:"Operaciones", ventana:"D+2 a D+9", esfuerzo:"MESC", detalle:"Máximo esfuerzo sostenido de combate." },
-  { id:"f4", fase:"ESTABILIZACIÓN", momento:"Repliegue", ventana:"D+10 en adelante", esfuerzo:"ERC", detalle:"Repliegue y esfuerzo remanente de combate." },
+  { id:"f1m1", fase:"FASE I · PREPARACIÓN", momento:"Momento 1 · Concepción", ventana:"Antes de M", esfuerzo:"ERC" },
+  { id:"f1m2-despl", fase:"FASE I · PREPARACIÓN", momento:"Momento 2 · Despliegue", ventana:"M+1 a M+4", esfuerzo:"ERC" },
+  { id:"f1m2-arm", fase:"FASE I · PREPARACIÓN", momento:"Momento 2 · Abastecimiento", ventana:"M+5 a M+7", esfuerzo:"ERC" },
+  { id:"f1m2-adies", fase:"FASE I · PREPARACIÓN", momento:"Momento 2 · Adiestramiento", ventana:"M+8 a M+40", esfuerzo:"ERC" },
+  { id:"f1m2-comp", fase:"FASE I · PREPARACIÓN", momento:"Momento 2 · Comprobación", ventana:"M+41 a M+45", esfuerzo:"ERC" },
+  { id:"f1m3", fase:"FASE I · PREPARACIÓN", momento:"Momento 3 · Alerta", ventana:"A a D", esfuerzo:"MESC" },
+  { id:"f2", fase:"FASE II · TOMAR LA INICIATIVA", momento:"Operaciones", ventana:"D a D+1", esfuerzo:"MEIC" },
+  { id:"f3", fase:"FASE III · DOMINAR", momento:"Operaciones", ventana:"D+2 a D+9", esfuerzo:"MESC" },
+  { id:"f4", fase:"ESTABILIZACIÓN", momento:"Repliegue", ventana:"D+10 en adelante", esfuerzo:"ERC" },
 ];
 
-const BASES_INICIALES: BasePlan[] = [
-  { id:"la-rioja", nombre:"1ª B.A. · La Rioja", capacidadAlojamiento:1500, personalPermanente:1305, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:3 },
-  { id:"villa-mercedes", nombre:"2ª B.A. · Villa Mercedes", capacidadAlojamiento:1500, personalPermanente:1293, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:3 },
-  { id:"cordoba", nombre:"3ª B.A. · Córdoba", capacidadAlojamiento:1500, personalPermanente:1201, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:3 },
-  { id:"mendoza", nombre:"4ª B.A. · Mendoza", capacidadAlojamiento:1000, personalPermanente:652, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:2 },
-  { id:"gral-acha", nombre:"5ª B.A. · Gral. Acha", capacidadAlojamiento:1000, personalPermanente:840, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:2 },
-  { id:"malargue", nombre:"B.A.M. · Malargüe", capacidadAlojamiento:1000, personalPermanente:711, cicloReabDias:3, cicloCombustibleDias:3 , cocinasTfpIniciales:2 },
-  { id:"san-luis", nombre:"Grupo 1 COM · San Luis", capacidadAlojamiento:500, personalPermanente:149, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:1 },
-  { id:"realico", nombre:"A.M. Realicó", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:3 , cocinasTfpIniciales:null },
-  { id:"san-rafael", nombre:"A.M. San Rafael", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:3 , cocinasTfpIniciales:null },
-  { id:"rio-cuarto", nombre:"COAe · Río Cuarto", capacidadAlojamiento:null, personalPermanente:0, cicloReabDias:3, cicloCombustibleDias:4 , cocinasTfpIniciales:null },
+const BASES: BaseInicial[] = [
+  { id:"la-rioja", nombre:"1ª B.A. · La Rioja", personalInicial:1305, capacidadAlojamiento:1500 },
+  { id:"villa-mercedes", nombre:"2ª B.A. · Villa Mercedes", personalInicial:1293, capacidadAlojamiento:1500 },
+  { id:"cordoba", nombre:"3ª B.A. · Córdoba", personalInicial:1201, capacidadAlojamiento:1500 },
+  { id:"mendoza", nombre:"4ª B.A. · Mendoza", personalInicial:652, capacidadAlojamiento:1000 },
+  { id:"gral-acha", nombre:"5ª B.A. · Gral. Acha", personalInicial:840, capacidadAlojamiento:1000 },
+  { id:"malargue", nombre:"B.A.M. · Malargüe", personalInicial:711, capacidadAlojamiento:1000 },
+  { id:"san-luis", nombre:"Grupo 1 COM · San Luis", personalInicial:149, capacidadAlojamiento:500 },
+  { id:"rio-cuarto", nombre:"COAe · Río Cuarto", personalInicial:null, capacidadAlojamiento:null },
+  { id:"realico", nombre:"A.M. · Realicó", personalInicial:null, capacidadAlojamiento:null },
+  { id:"san-rafael", nombre:"A.M. · San Rafael", personalInicial:null, capacidadAlojamiento:null },
 ];
 
-const MEDIOS_INICIALES: Medio[] = [
-  { id:"f16cj", sistema:"F-16CJ Block 50", baseInicial:"gral-acha", cantidadInicial:10 },
-  { id:"f16c-vm", sistema:"F-16C Block 40", baseInicial:"villa-mercedes", cantidadInicial:20 },
-  { id:"f16c-men", sistema:"F-16C Block 40", baseInicial:"mendoza", cantidadInicial:14 },
-  { id:"f16d", sistema:"F-16D Block 42", baseInicial:"mendoza", cantidadInicial:6 },
-  { id:"amx-vm", sistema:"AMX A-1M", baseInicial:"villa-mercedes", cantidadInicial:12 },
-  { id:"amx-cor", sistema:"AMX A-1M", baseInicial:"cordoba", cantidadInicial:12 },
-  { id:"e99m", sistema:"E-99M", baseInicial:"cordoba", cantidadInicial:3 },
-  { id:"ec130h", sistema:"EC-130H", baseInicial:"gral-acha", cantidadInicial:2 },
-  { id:"c130j", sistema:"C-130J", baseInicial:"la-rioja", cantidadInicial:10 },
-  { id:"kc130j", sistema:"KC-130J", baseInicial:"la-rioja", cantidadInicial:4 },
-  { id:"kc135-cor", sistema:"KC-135", baseInicial:"cordoba", cantidadInicial:3 },
-  { id:"kc135-men", sistema:"KC-135", baseInicial:"mendoza", cantidadInicial:3 },
-  { id:"harpy", sistema:"IAI Harpy", baseInicial:"gral-acha", cantidadInicial:36 },
-  { id:"hermes-vm", sistema:"Hermes 450", baseInicial:"villa-mercedes", cantidadInicial:3 },
-  { id:"hermes-ga", sistema:"Hermes 450", baseInicial:"gral-acha", cantidadInicial:3 },
-  { id:"ch47-cor", sistema:"CH-47F", baseInicial:"cordoba", cantidadInicial:6 },
-  { id:"ch47-ga", sistema:"CH-47F", baseInicial:"gral-acha", cantidadInicial:6 },
-  { id:"uh1y-lr", sistema:"UH-1Y", baseInicial:"la-rioja", cantidadInicial:4 },
-  { id:"uh1y-vm", sistema:"UH-1Y", baseInicial:"villa-mercedes", cantidadInicial:4 },
-  { id:"uh1y-cor", sistema:"UH-1Y", baseInicial:"cordoba", cantidadInicial:4 },
-  { id:"uh1y-men", sistema:"UH-1Y", baseInicial:"mendoza", cantidadInicial:4 },
-  { id:"b412-lr", sistema:"B-412", baseInicial:"la-rioja", cantidadInicial:4 },
-  { id:"b412-vm", sistema:"B-412", baseInicial:"villa-mercedes", cantidadInicial:4 },
-  { id:"b412-cor", sistema:"B-412", baseInicial:"cordoba", cantidadInicial:2 },
-  { id:"b412-men", sistema:"B-412", baseInicial:"mendoza", cantidadInicial:2 },
-  { id:"b412-ga", sistema:"B-412", baseInicial:"gral-acha", cantidadInicial:2 },
-  { id:"lj60-lr", sistema:"Learjet 60", baseInicial:"la-rioja", cantidadInicial:3 },
-  { id:"lj60-ga", sistema:"Learjet 60", baseInicial:"gral-acha", cantidadInicial:3 },
-  { id:"dhc6-lr", sistema:"DHC6-400", baseInicial:"la-rioja", cantidadInicial:4 },
-  { id:"dhc6-vm", sistema:"DHC6-400", baseInicial:"villa-mercedes", cantidadInicial:4 },
-  { id:"dhc6-men", sistema:"DHC6-400", baseInicial:"mendoza", cantidadInicial:4 },
+const MEDIOS: MedioInicial[] = [
+  { id:"lr-c130j", sistema:"C-130J", base:"la-rioja", cantidad:10 },
+  { id:"lr-kc130j", sistema:"KC-130J", base:"la-rioja", cantidad:4 },
+  { id:"lr-lj60", sistema:"Learjet 60", base:"la-rioja", cantidad:3 },
+  { id:"lr-dhc6", sistema:"DHC6-400", base:"la-rioja", cantidad:4 },
+  { id:"lr-b412", sistema:"B-412", base:"la-rioja", cantidad:4 },
+  { id:"lr-uh1y", sistema:"UH-1Y", base:"la-rioja", cantidad:4 },
+  { id:"lr-nasams", sistema:"NASAMS", base:"la-rioja", cantidad:1 },
+  { id:"lr-skyguard", sistema:"Oerlikon Skyguard", base:"la-rioja", cantidad:1 },
+  { id:"lr-rbs70", sistema:"RBS-70", base:"la-rioja", cantidad:1, detalle:"Cantidad de sistema no individualizada en CHARLIE; se registra presencia." },
+  { id:"lr-tps77", sistema:"TPS-77", base:"la-rioja", cantidad:1 },
+
+  { id:"vm-f16c", sistema:"F-16C Block 40", base:"villa-mercedes", cantidad:20 },
+  { id:"vm-amx", sistema:"AMX A-1M", base:"villa-mercedes", cantidad:12 },
+  { id:"vm-t6", sistema:"T-6 Texan II", base:"villa-mercedes", cantidad:12 },
+  { id:"vm-hermes", sistema:"Hermes 450", base:"villa-mercedes", cantidad:3 },
+  { id:"vm-b412", sistema:"B-412", base:"villa-mercedes", cantidad:4 },
+  { id:"vm-uh1y", sistema:"UH-1Y", base:"villa-mercedes", cantidad:4 },
+  { id:"vm-dhc6", sistema:"DHC6-400", base:"villa-mercedes", cantidad:4 },
+  { id:"vm-nasams", sistema:"NASAMS", base:"villa-mercedes", cantidad:2 },
+  { id:"vm-skyguard", sistema:"Oerlikon Skyguard", base:"villa-mercedes", cantidad:1 },
+  { id:"vm-rbs70", sistema:"RBS-70", base:"villa-mercedes", cantidad:1, detalle:"Cantidad de sistema no individualizada en CHARLIE; se registra presencia." },
+  { id:"vm-tps77", sistema:"TPS-77", base:"villa-mercedes", cantidad:1 },
+
+  { id:"cba-amx", sistema:"AMX A-1M", base:"cordoba", cantidad:12 },
+  { id:"cba-t6", sistema:"T-6 Texan II", base:"cordoba", cantidad:12 },
+  { id:"cba-e99", sistema:"E-99M", base:"cordoba", cantidad:3 },
+  { id:"cba-b412", sistema:"B-412", base:"cordoba", cantidad:2 },
+  { id:"cba-uh1y", sistema:"UH-1Y", base:"cordoba", cantidad:4 },
+  { id:"cba-kc135", sistema:"KC-135", base:"cordoba", cantidad:3 },
+  { id:"cba-ch47", sistema:"CH-47F", base:"cordoba", cantidad:6 },
+  { id:"cba-patriot", sistema:"Patriot", base:"cordoba", cantidad:1 },
+  { id:"cba-skyguard", sistema:"Oerlikon Skyguard", base:"cordoba", cantidad:1 },
+  { id:"cba-rbs70", sistema:"RBS-70", base:"cordoba", cantidad:1, detalle:"Cantidad de sistema no individualizada en CHARLIE; se registra presencia." },
+  { id:"cba-tps77", sistema:"TPS-77", base:"cordoba", cantidad:1 },
+
+  { id:"mdz-f16c", sistema:"F-16C Block 40", base:"mendoza", cantidad:14 },
+  { id:"mdz-f16d", sistema:"F-16D Block 42", base:"mendoza", cantidad:6 },
+  { id:"mdz-dhc6", sistema:"DHC6-400", base:"mendoza", cantidad:4 },
+  { id:"mdz-kc135", sistema:"KC-135", base:"mendoza", cantidad:3 },
+  { id:"mdz-b412", sistema:"B-412", base:"mendoza", cantidad:2 },
+  { id:"mdz-uh1y", sistema:"UH-1Y", base:"mendoza", cantidad:4 },
+  { id:"mdz-patriot", sistema:"Patriot", base:"mendoza", cantidad:1 },
+  { id:"mdz-skyguard", sistema:"Oerlikon Skyguard", base:"mendoza", cantidad:1 },
+  { id:"mdz-rbs70", sistema:"RBS-70", base:"mendoza", cantidad:1, detalle:"Cantidad de sistema no individualizada en CHARLIE; se registra presencia." },
+
+  { id:"ga-f16cj", sistema:"F-16CJ Block 50", base:"gral-acha", cantidad:10 },
+  { id:"ga-harpy", sistema:"IAI Harpy", base:"gral-acha", cantidad:36 },
+  { id:"ga-lj60", sistema:"Learjet 60", base:"gral-acha", cantidad:3 },
+  { id:"ga-hermes", sistema:"Hermes 450", base:"gral-acha", cantidad:3 },
+  { id:"ga-ec130", sistema:"EC-130H", base:"gral-acha", cantidad:2 },
+  { id:"ga-b412", sistema:"B-412", base:"gral-acha", cantidad:2 },
+  { id:"ga-ch47", sistema:"CH-47F", base:"gral-acha", cantidad:6 },
+  { id:"ga-nasams", sistema:"NASAMS", base:"gral-acha", cantidad:1 },
+  { id:"ga-skyguard", sistema:"Oerlikon Skyguard", base:"gral-acha", cantidad:1 },
+  { id:"ga-rbs70", sistema:"RBS-70", base:"gral-acha", cantidad:1, detalle:"Cantidad de sistema no individualizada en CHARLIE; se registra presencia." },
+  { id:"ga-gm400", sistema:"GM400A", base:"gral-acha", cantidad:1 },
+
+  { id:"mal-nasams", sistema:"NASAMS", base:"malargue", cantidad:2 },
+  { id:"mal-skyguard", sistema:"Oerlikon Skyguard", base:"malargue", cantidad:1 },
+  { id:"mal-rbs70", sistema:"RBS-70", base:"malargue", cantidad:1, detalle:"Cantidad de sistema no individualizada en CHARLIE; se registra presencia." },
+  { id:"mal-coae", sistema:"COAe alternativo", base:"malargue", cantidad:1 },
+  { id:"mal-com", sistema:"Grupo 2 COM", base:"malargue", cantidad:1 },
 ];
 
-const p = (j:number,e:number,es:number,a:number,av:number,h:number,esp:number):PersonalTFP => ({
-  jefe:j, encargado:e, estructuras:es, armamento:a, avionica:av, hidraulica:h, especiales:esp
-});
-
-const TFP_SISTEMAS: TfpSistema[] = [
-  { sistema:"F-16C Block 40", meic:p(1,1,8,16,14,8,8), mesc:p(1,1,8,12,8,8,8), erc:p(1,1,4,6,4,4,4), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"F-16D Block 42", meic:p(1,1,8,16,14,8,8), mesc:p(1,1,8,12,8,8,8), erc:p(1,1,4,6,4,4,4), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"F-16CJ Block 50", meic:p(1,1,8,16,14,8,8), mesc:p(1,1,8,12,8,8,8), erc:p(1,1,4,6,4,4,4), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"AMX A-1M", meic:p(1,1,8,16,14,8,8), mesc:p(1,1,8,12,8,8,8), erc:p(1,1,4,6,4,4,4), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"T-6 Texan II", meic:p(1,1,4,8,4,4,4), mesc:p(1,1,4,8,4,4,4), erc:p(1,1,2,4,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"IAI Harpy", meic:p(1,1,2,2,2,0,2), mesc:p(1,1,2,2,2,0,2), erc:p(1,1,1,1,1,0,1), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"EC-130H", meic:p(1,1,4,0,4,4,4), mesc:p(1,1,4,0,4,4,4), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"E-99M", meic:p(1,1,4,0,4,4,4), mesc:p(1,1,4,0,4,4,4), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"Hermes 450", meic:p(1,1,4,0,4,4,4), mesc:p(1,1,4,0,4,4,4), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"C-130J", meic:p(1,1,6,0,6,6,6), mesc:p(1,1,4,0,4,4,6), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"KC-130J", meic:p(1,1,6,0,6,6,6), mesc:p(1,1,4,0,4,4,6), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"KC-135", meic:p(1,1,6,0,6,6,6), mesc:p(1,1,4,0,4,4,6), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"Learjet 60", meic:p(1,1,4,0,4,4,4), mesc:p(1,1,4,0,4,4,4), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"DHC6-400", meic:p(1,1,2,0,4,4,2), mesc:p(1,1,2,0,2,2,2), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"CH-47F", meic:p(1,1,2,0,4,4,2), mesc:p(1,1,2,0,2,2,2), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"UH-1Y", meic:p(1,1,2,0,4,4,2), mesc:p(1,1,2,0,2,2,2), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
-  { sistema:"B-412", meic:p(1,1,2,0,4,4,2), mesc:p(1,1,2,0,2,2,2), erc:p(1,1,2,0,2,2,2), combustibleLitrosHora:null, hhMantPorHoraVuelo:null },
+const ARMAMENTO: ArmamentoInicial[] = [
+  { id:"f16-gbu10", nombre:"GBU-10 Paveway II", familia:"F-16", cantidad:48, ubicacion:"reserva-ton" },
+  { id:"f16-gbu12", nombre:"GBU-12 Paveway II", familia:"F-16", cantidad:48, ubicacion:"reserva-ton" },
+  { id:"f16-gbu38", nombre:"GBU-38 JDAM", familia:"F-16", cantidad:78, ubicacion:"reserva-ton" },
+  { id:"f16-aim9", nombre:"AIM-9M Sidewinder", familia:"F-16", cantidad:180, ubicacion:"reserva-ton" },
+  { id:"f16-aim120", nombre:"AIM-120C-5 AMRAAM", familia:"F-16", cantidad:240, ubicacion:"reserva-ton" },
+  { id:"f16-aim7", nombre:"AIM-7P Sparrow", familia:"F-16", cantidad:220, ubicacion:"reserva-ton" },
+  { id:"f16-agm65", nombre:"AGM-65G Maverick", familia:"F-16", cantidad:120, ubicacion:"reserva-ton" },
+  { id:"f16-agm88", nombre:"AGM-88C HARM", familia:"F-16", cantidad:140, ubicacion:"reserva-ton" },
+  { id:"amx-gbu10", nombre:"GBU-10 Paveway II", familia:"AMX", cantidad:48, ubicacion:"reserva-ton" },
+  { id:"amx-gbu12", nombre:"GBU-12 Paveway II", familia:"AMX", cantidad:48, ubicacion:"reserva-ton" },
+  { id:"amx-gbu16", nombre:"GBU-16 Paveway II", familia:"AMX", cantidad:48, ubicacion:"reserva-ton" },
+  { id:"amx-mar1", nombre:"MAR-1", familia:"AMX", cantidad:96, ubicacion:"reserva-ton" },
+  { id:"amx-aim9", nombre:"AIM-9M Sidewinder", familia:"AMX", cantidad:140, ubicacion:"reserva-ton" },
+  { id:"t6-mk81", nombre:"Mk 81", familia:"T-6", cantidad:180, ubicacion:"reserva-ton" },
+  { id:"t6-mk82", nombre:"Mk 82", familia:"T-6", cantidad:180, ubicacion:"reserva-ton" },
+  { id:"t6-gbu12", nombre:"GBU-12 Paveway II", familia:"T-6", cantidad:48, ubicacion:"reserva-ton" },
+  { id:"harpy", nombre:"IAI Harpy", familia:"UCAV", cantidad:36, ubicacion:"gral-acha" },
 ];
 
-const EQUIPOS_APOYO: EquipoApoyo[] = [
-  { id:"hobart", nombre:"Planta de arranque Hobart", personal24h:2, combustibleLitrosHora:34, pesoKg:2360, capacidadTn:null },
-  { id:"harlan", nombre:"Tractor de arrastre Harlan", personal24h:3, combustibleLitrosHora:8, pesoKg:2950, capacidadTn:22 },
-  { id:"mhu83", nombre:"Elevador de bombas MHU-83", personal24h:6, combustibleLitrosHora:6, pesoKg:3950, capacidadTn:1.36 },
-  { id:"telex", nombre:"TeLex / carretilla elevadora", personal24h:2, combustibleLitrosHora:6, pesoKg:4500, capacidadTn:7 },
-  { id:"abastecedora", nombre:"Abastecedora", personal24h:3, combustibleLitrosHora:null, pesoKg:null, capacidadTn:null },
-  { id:"carro-bombas", nombre:"Carro de bombas", personal24h:null, combustibleLitrosHora:null, pesoKg:1800, capacidadTn:1.8 },
+const MATERIAL: MaterialInicial[] = [
+  { id:"carros-bomba", nombre:"Carros de bombas", cantidad:50, ubicacion:"realico", unidad:"unidades" },
 ];
 
-const VEHICULOS_TFP: VehiculoTFP[] = [
-  { id:"c4", nombre:"Citroën C4", cantidad:5, choferesPorVehiculo:1, capacidadPax:5, capacidadTn:0.4, consumoL100km:7.5 },
-  { id:"landcruiser", nombre:"Toyota Land Cruiser", cantidad:35, choferesPorVehiculo:1, capacidadPax:7, capacidadTn:0.8, consumoL100km:11.5 },
-  { id:"sprinter", nombre:"MB Sprinter", cantidad:12, choferesPorVehiculo:2, capacidadPax:19, capacidadTn:1.5, consumoL100km:10 },
-  { id:"amarok", nombre:"VW Amarok", cantidad:22, choferesPorVehiculo:1, capacidadPax:5, capacidadTn:1, consumoL100km:9.5 },
-  { id:"unimog", nombre:"UNIMOG", cantidad:30, choferesPorVehiculo:2, capacidadPax:14, capacidadTn:2.5, consumoL100km:24 },
-  { id:"omnibus", nombre:"Ómnibus", cantidad:10, choferesPorVehiculo:2, capacidadPax:40, capacidadTn:3, consumoL100km:28 },
-  { id:"grua15", nombre:"Grúa 15 Tn", cantidad:8, choferesPorVehiculo:2, capacidadPax:null, capacidadTn:15, consumoL100km:45 },
-  { id:"camion5", nombre:"Camión 5 Tn", cantidad:10, choferesPorVehiculo:2, capacidadPax:null, capacidadTn:5, consumoL100km:22 },
-  { id:"camion20", nombre:"Camión 20 Tn", cantidad:7, choferesPorVehiculo:2, capacidadPax:null, capacidadTn:20, consumoL100km:36 },
+const TFP_PERSONAL: TfpPersonal[] = [
+  { sistema:"F-16C Block 40", meic4:56, mesc4:46, erc4:24 },
+  { sistema:"F-16D Block 42", meic4:56, mesc4:46, erc4:24 },
+  { sistema:"F-16CJ Block 50", meic4:56, mesc4:46, erc4:24 },
+  { sistema:"AMX A-1M", meic4:56, mesc4:46, erc4:24 },
+  { sistema:"T-6 Texan II", meic4:26, mesc4:26, erc4:14 },
+  { sistema:"IAI Harpy", meic4:10, mesc4:10, erc4:6 },
+  { sistema:"EC-130H", meic4:18, mesc4:18, erc4:10 },
+  { sistema:"E-99M", meic4:18, mesc4:18, erc4:10 },
+  { sistema:"Hermes 450", meic4:18, mesc4:18, erc4:10 },
+  { sistema:"C-130J", meic4:26, mesc4:20, erc4:10 },
+  { sistema:"KC-130J", meic4:26, mesc4:20, erc4:10 },
+  { sistema:"KC-135", meic4:26, mesc4:20, erc4:10 },
+  { sistema:"Learjet 60", meic4:18, mesc4:18, erc4:10 },
+  { sistema:"DHC6-400", meic4:14, mesc4:10, erc4:10 },
+  { sistema:"CH-47F", meic4:14, mesc4:10, erc4:10 },
+  { sistema:"UH-1Y", meic4:14, mesc4:10, erc4:10 },
+  { sistema:"B-412", meic4:14, mesc4:10, erc4:10 },
 ];
 
-const DIST_TERRESTRE: Partial<Record<BaseId,Partial<Record<BaseId,number>>>> = {
-  "la-rioja":{"villa-mercedes":520,"cordoba":435,"mendoza":600,"gral-acha":1000,"malargue":930,"san-luis":460,"rio-cuarto":610,"realico":806},
-  "villa-mercedes":{"la-rioja":520,"cordoba":290,"mendoza":360,"gral-acha":480,"malargue":580,"san-luis":95,"rio-cuarto":125,"realico":238},
-  "cordoba":{"la-rioja":435,"villa-mercedes":290,"mendoza":610,"gral-acha":720,"malargue":840,"san-luis":410,"rio-cuarto":215,"realico":435},
-  "mendoza":{"la-rioja":600,"villa-mercedes":360,"cordoba":610,"gral-acha":760,"malargue":330,"san-luis":260,"rio-cuarto":480,"realico":609},
-  "gral-acha":{"la-rioja":1000,"villa-mercedes":480,"cordoba":720,"mendoza":760,"malargue":580,"san-luis":440,"rio-cuarto":505,"realico":294},
-  "malargue":{"la-rioja":930,"villa-mercedes":580,"cordoba":840,"mendoza":330,"gral-acha":580,"san-luis":480,"rio-cuarto":620,"realico":582},
-  "san-luis":{"la-rioja":460,"villa-mercedes":95,"cordoba":410,"mendoza":260,"gral-acha":440,"malargue":480,"rio-cuarto":220,"realico":331},
-  "rio-cuarto":{"la-rioja":610,"villa-mercedes":125,"cordoba":215,"mendoza":480,"gral-acha":505,"malargue":620,"san-luis":220,"realico":223},
-  "realico":{"la-rioja":806,"villa-mercedes":238,"cordoba":435,"mendoza":609,"gral-acha":294,"malargue":582,"san-luis":331,"rio-cuarto":223},
-};
+const MOVIMIENTOS_PREVISTOS: Movimiento[] = [
+  { id:"prev-f16cj", periodoId:"f1m2-despl", tipo:"medio", itemId:"F-16CJ Block 50", descripcion:"10 F-16CJ · Gral. Acha → Córdoba", origen:"gral-acha", destino:"cordoba", cantidad:10, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-e99", periodoId:"f1m2-despl", tipo:"medio", itemId:"E-99M", descripcion:"3 E-99M · Córdoba → Villa Mercedes", origen:"cordoba", destino:"villa-mercedes", cantidad:3, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-kc130", periodoId:"f1m2-despl", tipo:"medio", itemId:"KC-130J", descripcion:"4 KC-130J · La Rioja → Villa Mercedes", origen:"la-rioja", destino:"villa-mercedes", cantidad:4, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-c130-mdz", periodoId:"f1m2-despl", tipo:"medio", itemId:"C-130J", descripcion:"3 C-130J · La Rioja → Mendoza", origen:"la-rioja", destino:"mendoza", cantidad:3, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-c130-ga", periodoId:"f1m2-despl", tipo:"medio", itemId:"C-130J", descripcion:"4 C-130J · La Rioja → Gral. Acha", origen:"la-rioja", destino:"gral-acha", cantidad:4, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-c130-cba", periodoId:"f1m2-despl", tipo:"medio", itemId:"C-130J", descripcion:"3 C-130J · La Rioja → Córdoba", origen:"la-rioja", destino:"cordoba", cantidad:3, personalTfpMovido:0, aplicado:false, predefinido:true },
 
-const DIST_AEREA: Partial<Record<BaseId,Partial<Record<BaseId,number>>>> = {
-  "la-rioja":{"villa-mercedes":445,"cordoba":365,"mendoza":450,"gral-acha":875,"malargue":750,"san-luis":430,"rio-cuarto":465,"realico":655},
-  "villa-mercedes":{"la-rioja":445,"cordoba":260,"mendoza":320,"gral-acha":420,"malargue":460,"san-luis":95,"rio-cuarto":120,"realico":195},
-  "cordoba":{"la-rioja":365,"villa-mercedes":260,"mendoza":470,"gral-acha":640,"malargue":690,"san-luis":290,"rio-cuarto":200,"realico":405},
-  "mendoza":{"la-rioja":450,"villa-mercedes":320,"cordoba":470,"gral-acha":740,"malargue":295,"san-luis":235,"rio-cuarto":400,"realico":475},
-  "gral-acha":{"la-rioja":875,"villa-mercedes":420,"cordoba":640,"mendoza":740,"malargue":510,"san-luis":430,"rio-cuarto":480,"realico":265},
-  "malargue":{"la-rioja":750,"villa-mercedes":460,"cordoba":690,"mendoza":295,"gral-acha":510,"san-luis":410,"rio-cuarto":540,"realico":485},
-  "san-luis":{"la-rioja":430,"villa-mercedes":95,"cordoba":290,"mendoza":235,"gral-acha":430,"malargue":410,"rio-cuarto":195,"realico":275},
-  "rio-cuarto":{"la-rioja":465,"villa-mercedes":120,"cordoba":200,"mendoza":400,"gral-acha":480,"malargue":540,"san-luis":195,"realico":215},
-  "realico":{"la-rioja":655,"villa-mercedes":195,"cordoba":405,"mendoza":475,"gral-acha":265,"malargue":485,"san-luis":275,"rio-cuarto":215},
-};
-
-const MOVIMIENTOS_PREDEFINIDOS: MovimientoMedio[] = [
-  { id:"pre-f16cj", periodoId:"f1m2-despl", sistema:"F-16CJ Block 50", origen:"gral-acha", destino:"cordoba", cantidad:10, equipos:{}, fecha:"", predefinido:true },
-  { id:"pre-hermes", periodoId:"f1m2-despl", sistema:"Hermes 450", origen:"gral-acha", destino:"la-rioja", cantidad:3, equipos:{}, fecha:"", predefinido:true },
-  { id:"pre-kc130", periodoId:"f1m2-despl", sistema:"KC-130J", origen:"la-rioja", destino:"villa-mercedes", cantidad:4, equipos:{}, fecha:"", predefinido:true },
-  { id:"pre-c130-cor", periodoId:"f1m2-despl", sistema:"C-130J", origen:"la-rioja", destino:"cordoba", cantidad:5, equipos:{}, fecha:"", predefinido:true },
-  { id:"pre-c130-vm", periodoId:"f1m2-despl", sistema:"C-130J", origen:"la-rioja", destino:"villa-mercedes", cantidad:5, equipos:{}, fecha:"", predefinido:true },
-  { id:"pre-e99", periodoId:"f1m2-despl", sistema:"E-99M", origen:"cordoba", destino:"villa-mercedes", cantidad:3, equipos:{}, fecha:"", predefinido:true },
+  { id:"prev-harm", periodoId:"f1m2-arm", tipo:"armamento", itemId:"f16-agm88", descripcion:"4 AGM-88C HARM · Reserva TON → Córdoba", origen:"reserva-ton", destino:"cordoba", cantidad:4, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-mar1", periodoId:"f1m2-arm", tipo:"armamento", itemId:"amx-mar1", descripcion:"6 MAR-1 · Reserva TON → Córdoba", origen:"reserva-ton", destino:"cordoba", cantidad:6, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-gbu10-cba", periodoId:"f1m2-arm", tipo:"armamento", itemId:"f16-gbu10", descripcion:"34 GBU-10 F-16 · Reserva TON → Córdoba", origen:"reserva-ton", destino:"cordoba", cantidad:34, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-amraam", periodoId:"f1m2-arm", tipo:"armamento", itemId:"f16-aim120", descripcion:"24 AIM-120C-5 · Reserva TON → Villa Mercedes", origen:"reserva-ton", destino:"villa-mercedes", cantidad:24, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-gbu10-mdz", periodoId:"f1m2-arm", tipo:"armamento", itemId:"f16-gbu10", descripcion:"16 GBU-10 F-16 · Reserva TON → Mendoza", origen:"reserva-ton", destino:"mendoza", cantidad:16, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-gbu12-mdz", periodoId:"f1m2-arm", tipo:"armamento", itemId:"f16-gbu12", descripcion:"6 GBU-12 F-16 · Reserva TON → Mendoza", origen:"reserva-ton", destino:"mendoza", cantidad:6, personalTfpMovido:0, aplicado:false, predefinido:true },
+  { id:"prev-carros", periodoId:"f1m2-arm", tipo:"material", itemId:"carros-bomba", descripcion:"50 carros de bombas · Realicó → Villa Mercedes", origen:"realico", destino:"villa-mercedes", cantidad:50, personalTfpMovido:0, aplicado:false, predefinido:true },
 ];
 
-const PERSONAL_PREDEFINIDO: MovimientoPersonal[] = [
-  { id:"p1",periodoId:"f1m2-despl",origen:"cordoba",destino:"villa-mercedes",oficiales:12,suboficiales:68,sv:28,civiles:1,predefinido:true },
-  { id:"p2",periodoId:"f1m2-despl",origen:"la-rioja",destino:"villa-mercedes",oficiales:24,suboficiales:52,sv:12,civiles:3,predefinido:true },
-  { id:"p3",periodoId:"f1m2-despl",origen:"gral-acha",destino:"cordoba",oficiales:20,suboficiales:48,sv:26,civiles:1,predefinido:true },
-  { id:"p4",periodoId:"f1m2-despl",origen:"villa-mercedes",destino:"cordoba",oficiales:0,suboficiales:30,sv:0,civiles:0,predefinido:true },
-  { id:"p5",periodoId:"f1m2-despl",origen:"mendoza",destino:"cordoba",oficiales:0,suboficiales:62,sv:0,civiles:0,predefinido:true },
-  { id:"p6",periodoId:"f1m2-despl",origen:"la-rioja",destino:"realico",oficiales:12,suboficiales:34,sv:15,civiles:4,predefinido:true },
-  { id:"p7",periodoId:"f1m2-despl",origen:"la-rioja",destino:"mendoza",oficiales:12,suboficiales:34,sv:15,civiles:4,predefinido:true },
-  { id:"p8",periodoId:"f1m2-despl",origen:"la-rioja",destino:"gral-acha",oficiales:16,suboficiales:44,sv:20,civiles:5,predefinido:true },
-  { id:"p9",periodoId:"f1m2-despl",origen:"san-luis",destino:"la-rioja",oficiales:2,suboficiales:10,sv:4,civiles:4,predefinido:true },
-  { id:"p10",periodoId:"f1m2-despl",origen:"san-luis",destino:"rio-cuarto",oficiales:2,suboficiales:16,sv:4,civiles:3,predefinido:true },
-];
-
-const MATERIAL_PREDEFINIDO: MovimientoMaterial[] = [
-  { id:"mat-carros",periodoId:"f1m2-arm",origen:"realico",destino:"villa-mercedes",material:"Carros de bombas",cantidad:50,pesoKgUnidad:1800,predefinido:true },
-];
-
-const MISIONES: Mision[] = [
-  {id:"m-ec130",periodoId:"f1m3",dia:"M a D+9",operacion:"EYRA",aeronave:"EC-130H",cantidad:1,armamento:"—",armamentoPorAvion:null,base:"gral-acha",horasVuelo:5},
-  {id:"m-awacs",periodoId:"f2",dia:"D a D+9",operacion:"AWACS",aeronave:"E-99M",cantidad:1,armamento:"—",armamentoPorAvion:null,base:"villa-mercedes",horasVuelo:8},
-  {id:"m-d1",periodoId:"f2",dia:"D",operacion:"SEAD Catamarca",aeronave:"F-16CJ Block 50",cantidad:2,armamento:"AGM-88C HARM",armamentoPorAvion:2,base:"cordoba",horasVuelo:2},
-  {id:"m-d2",periodoId:"f2",dia:"D",operacion:"SEAD Catamarca",aeronave:"AMX A-1M",cantidad:2,armamento:"MAR-1",armamentoPorAvion:4,base:"cordoba",horasVuelo:2},
-  {id:"m-d3",periodoId:"f2",dia:"D",operacion:"OCA Catamarca",aeronave:"AMX A-1M",cantidad:4,armamento:"GBU-10",armamentoPorAvion:2,base:"cordoba",horasVuelo:2},
-  {id:"m-d4",periodoId:"f2",dia:"D",operacion:"Defensa contra-aérea",aeronave:"F-16",cantidad:2,armamento:"AIM-120",armamentoPorAvion:4,base:"villa-mercedes",horasVuelo:4},
-  {id:"m-d5",periodoId:"f2",dia:"D",operacion:"SEAD Belén",aeronave:"F-16CJ Block 50",cantidad:2,armamento:"AGM-88C HARM",armamentoPorAvion:2,base:"cordoba",horasVuelo:2},
-  {id:"m-d6",periodoId:"f2",dia:"D",operacion:"SEAD Belén",aeronave:"AMX A-1M",cantidad:2,armamento:"MAR-1",armamentoPorAvion:4,base:"villa-mercedes",horasVuelo:3},
-  {id:"m-d7",periodoId:"f2",dia:"D",operacion:"OCA Belén",aeronave:"AMX A-1M",cantidad:4,armamento:"GBU-10",armamentoPorAvion:2,base:"villa-mercedes",horasVuelo:3},
-  {id:"m-d8",periodoId:"f2",dia:"D tarde",operacion:"OCA Tucumán",aeronave:"AMX A-1M",cantidad:4,armamento:"GBU-10",armamentoPorAvion:2,base:"cordoba",horasVuelo:4},
-  {id:"m-d9",periodoId:"f2",dia:"D tarde",operacion:"STRIKE Tucumán",aeronave:"F-16C Block 40",cantidad:4,armamento:"GBU-38 JDAM",armamentoPorAvion:4,base:"villa-mercedes",horasVuelo:3},
-  {id:"m-d10",periodoId:"f2",dia:"D tarde",operacion:"SEAD Cafayate",aeronave:"AMX A-1M",cantidad:2,armamento:"MAR-1",armamentoPorAvion:2,base:"cordoba",horasVuelo:4},
-  {id:"m-d11",periodoId:"f2",dia:"D tarde",operacion:"SEAD Cafayate",aeronave:"F-16CJ Block 50",cantidad:2,armamento:"AGM-88C HARM",armamentoPorAvion:2,base:"cordoba",horasVuelo:3},
-  {id:"m-d12",periodoId:"f2",dia:"D+1",operacion:"SEAD Salta",aeronave:"F-16CJ Block 50",cantidad:2,armamento:"AGM-88C HARM",armamentoPorAvion:4,base:"cordoba",horasVuelo:3},
-  {id:"m-d13",periodoId:"f2",dia:"D+1",operacion:"SEAD Salta",aeronave:"AMX A-1M",cantidad:2,armamento:"MAR-1",armamentoPorAvion:6,base:"cordoba",horasVuelo:3},
-  {id:"m-f3-1",periodoId:"f3",dia:"D+2",operacion:"STRIKE Tritio",aeronave:"F-16C/D Block 40/42",cantidad:8,armamento:"GBU-10 Paveway II",armamentoPorAvion:2,base:"mendoza",horasVuelo:3},
-  {id:"m-f3-2",periodoId:"f3",dia:"D+2",operacion:"Transformador eléctrico",aeronave:"F-16C/D Block 40/42",cantidad:2,armamento:"GBU-12 Paveway II",armamentoPorAvion:2,base:"mendoza",horasVuelo:3},
-  {id:"m-f3-3",periodoId:"f3",dia:"D a D+9",operacion:"BDA",aeronave:"Hermes 450",cantidad:2,armamento:"—",armamentoPorAvion:null,base:"la-rioja",horasVuelo:null},
-  {id:"m-f3-4",periodoId:"f3",dia:"D+3 a D+9",operacion:"Apoyo",aeronave:"F-16C/D Block 40/42",cantidad:4,armamento:"MK-82",armamentoPorAvion:2,base:"mendoza",horasVuelo:4},
-  {id:"m-f3-5",periodoId:"f3",dia:"D+3 a D+9",operacion:"Apoyo",aeronave:"F-16C/D Block 40/42",cantidad:4,armamento:"MK-82",armamentoPorAvion:2,base:"villa-mercedes",horasVuelo:4},
-  {id:"m-f3-6",periodoId:"f3",dia:"D+3 a D+9",operacion:"Apoyo",aeronave:"AMX A-1M",cantidad:4,armamento:"MK-82",armamentoPorAvion:2,base:"cordoba",horasVuelo:4},
-  {id:"m-f3-7",periodoId:"f3",dia:"D+3 a D+9",operacion:"Apoyo",aeronave:"AMX A-1M",cantidad:4,armamento:"MK-82",armamentoPorAvion:2,base:"villa-mercedes",horasVuelo:4},
-];
-
-const REV_INICIAL: MisionREV[] = [
-  { id:"rev-f2-kc135",periodoId:"f2",nombre:"REV Fase II · KC-135",cisterna:"KC-135",cantidadCisternas:2,receptores:0,litrosPorReceptor:0,capacidadTransferiblePorCisterna:null,ida:true,regreso:true },
-  { id:"rev-f2-kc130",periodoId:"f2",nombre:"REV Fase II · KC-130J",cisterna:"KC-130J",cantidadCisternas:4,receptores:0,litrosPorReceptor:0,capacidadTransferiblePorCisterna:null,ida:true,regreso:true },
-  { id:"rev-f3-kc135",periodoId:"f3",nombre:"REV Fase III · KC-135",cisterna:"KC-135",cantidadCisternas:2,receptores:0,litrosPorReceptor:0,capacidadTransferiblePorCisterna:null,ida:true,regreso:true },
-  { id:"rev-f3-kc130",periodoId:"f3",nombre:"REV Fase III · KC-130J",cisterna:"KC-130J",cantidadCisternas:2,receptores:0,litrosPorReceptor:0,capacidadTransferiblePorCisterna:null,ida:true,regreso:true },
-];
-
-const PLAN_BASE: EstadoPlan = {
-  nombre:"A4 · Base MMA Nº 2",
-  periodoActivo:"f1m2-despl",
-  bases:BASES_INICIALES,
-  medios:MEDIOS_INICIALES,
-  movimientos:MOVIMIENTOS_PREDEFINIDOS,
-  movimientosPersonal:PERSONAL_PREDEFINIDO,
-  movimientosMaterial:MATERIAL_PREDEFINIDO,
-  misiones:MISIONES,
-  misionesREV:REV_INICIAL,
-  reabastecimientos:[],
+const PLAN_BASE: PlanGuardado = {
+  nombre:"A4 · Situación inicial del Plan",
+  periodoActivo:"f1m1",
+  movimientos:MOVIMIENTOS_PREVISTOS,
 };
 
 function clone<T>(v:T):T {
   return JSON.parse(JSON.stringify(v));
 }
 
-function fmt(v:number,d=0) {
-  return new Intl.NumberFormat("es-AR",{maximumFractionDigits:d}).format(v);
+function fmt(v:number) {
+  return new Intl.NumberFormat("es-AR",{maximumFractionDigits:0}).format(v);
 }
 
-function baseNombre(id:BaseId,bases:BasePlan[]) {
-  return bases.find((b)=>b.id===id)?.nombre ?? id;
+function nombreLugar(id:BaseId|"reserva-ton") {
+  if(id==="reserva-ton") return "Reserva TON";
+  return BASES.find((b)=>b.id===id)?.nombre ?? id;
 }
 
-function detalleTfp(sistema:string, esfuerzo:Esfuerzo): PersonalTFP | null {
-  const t=TFP_SISTEMAS.find((x)=>x.sistema===sistema);
-  if (!t) return null;
-  return esfuerzo==="MEIC"?t.meic:esfuerzo==="MESC"?t.mesc:t.erc;
+function tfpPorEsfuerzo(sistema:string, esfuerzo:Esfuerzo) {
+  const t=TFP_PERSONAL.find((x)=>x.sistema===sistema);
+  if(!t) return null;
+  return esfuerzo==="MEIC"?t.meic4:esfuerzo==="MESC"?t.mesc4:t.erc4;
 }
 
-function totalPersonalTFP(sistema:string,cantidad:number,esfuerzo:Esfuerzo) {
-  const d=detalleTfp(sistema,esfuerzo);
-  if (!d) return null;
-  const bloques=Math.ceil(Math.max(0,cantidad)/4);
-  const total=Object.values(d).reduce((a,b)=>a+b,0);
-  return { bloques, detalle:d, total:total*bloques };
-}
-
-function distanciaTerrestre(a:BaseId,b:BaseId) {
-  if (a===b) return 0;
-  return DIST_TERRESTRE[a]?.[b] ?? DIST_TERRESTRE[b]?.[a] ?? null;
-}
-
-function distanciaAerea(a:BaseId,b:BaseId) {
-  if (a===b) return 0;
-  return DIST_AEREA[a]?.[b] ?? DIST_AEREA[b]?.[a] ?? null;
-}
-
-function totalPersonalMovimiento(m:MovimientoPersonal) {
-  return m.oficiales+m.suboficiales+m.sv+m.civiles;
+function personalTfpRequerido(sistema:string,cantidad:number,esfuerzo:Esfuerzo) {
+  const factor=tfpPorEsfuerzo(sistema,esfuerzo);
+  if(factor==null) return null;
+  return Math.ceil((factor*cantidad)/4);
 }
 
 export default function A4LogisticsCalculator() {
   const [open,setOpen]=useState(false);
   const [tab,setTab]=useState<Tab>("situacion");
-  const [plan,setPlan]=useState<EstadoPlan>(clone(PLAN_BASE));
+  const [plan,setPlan]=useState<PlanGuardado>(clone(PLAN_BASE));
   const [planes,setPlanes]=useState<string[]>([]);
-  const [movSistema,setMovSistema]=useState("F-16CJ Block 50");
-  const [movOrigen,setMovOrigen]=useState<BaseId>("gral-acha");
-  const [movDestino,setMovDestino]=useState<BaseId>("cordoba");
-  const [movCantidad,setMovCantidad]=useState(1);
+  const [moverPersonalTfp,setMoverPersonalTfp]=useState(true);
 
   useEffect(()=>{
     try{
@@ -437,79 +289,95 @@ export default function A4LogisticsCalculator() {
     }catch{}
   },[]);
 
-  const periodo=PERIODOS.find((x)=>x.id===plan.periodoActivo)??PERIODOS[0];
-  const sistemas=Array.from(new Set(plan.medios.map((m)=>m.sistema))).sort();
+  const periodo=PERIODOS.find((p)=>p.id===plan.periodoActivo)??PERIODOS[0];
+  const aplicados=plan.movimientos.filter((m)=>m.aplicado);
 
-  const posiciones=useMemo(()=>{
-    const map=new Map<string,Record<BaseId,number>>();
-    for(const m of plan.medios){
-      if(!map.has(m.sistema))map.set(m.sistema,{} as Record<BaseId,number>);
-      const row=map.get(m.sistema)!;
-      row[m.baseInicial]=(row[m.baseInicial]||0)+m.cantidadInicial;
+  const mediosActuales=useMemo(()=>{
+    const result=new Map<string,Record<BaseId,number>>();
+    for(const m of MEDIOS){
+      if(!result.has(m.sistema))result.set(m.sistema,{} as Record<BaseId,number>);
+      const row=result.get(m.sistema)!;
+      row[m.base]=(row[m.base]||0)+m.cantidad;
     }
-    const order=PERIODOS.map((x)=>x.id);
-    const limite=order.indexOf(plan.periodoActivo);
-    for(const mv of plan.movimientos.filter((m)=>order.indexOf(m.periodoId)<=limite)){
-      const row=map.get(mv.sistema)||({} as Record<BaseId,number>);
+    for(const mv of aplicados.filter((m)=>m.tipo==="medio")){
+      const row=result.get(mv.itemId)||({} as Record<BaseId,number>);
+      if(mv.origen!=="reserva-ton")row[mv.origen]=(row[mv.origen]||0)-mv.cantidad;
+      if(mv.destino!=="reserva-ton")row[mv.destino]=(row[mv.destino]||0)+mv.cantidad;
+      result.set(mv.itemId,row);
+    }
+    return result;
+  },[aplicados]);
+
+  const personalActual=useMemo(()=>{
+    const result:Record<BaseId,number|null>={} as Record<BaseId,number|null>;
+    for(const b of BASES)result[b.id]=b.personalInicial;
+    for(const mv of aplicados){
+      if(mv.personalTfpMovido<=0)continue;
+      if(mv.origen!=="reserva-ton" && result[mv.origen]!=null)result[mv.origen]=(result[mv.origen] as number)-mv.personalTfpMovido;
+      if(mv.destino!=="reserva-ton" && result[mv.destino]!=null)result[mv.destino]=(result[mv.destino] as number)+mv.personalTfpMovido;
+    }
+    return result;
+  },[aplicados]);
+
+  const armamentoActual=useMemo(()=>{
+    const out=new Map<string,Record<string,number>>();
+    for(const a of ARMAMENTO){
+      out.set(a.id,{[a.ubicacion]:a.cantidad});
+    }
+    for(const mv of aplicados.filter((m)=>m.tipo==="armamento")){
+      const row=out.get(mv.itemId)||{};
       row[mv.origen]=(row[mv.origen]||0)-mv.cantidad;
       row[mv.destino]=(row[mv.destino]||0)+mv.cantidad;
-      map.set(mv.sistema,row);
-    }
-    return map;
-  },[plan.medios,plan.movimientos,plan.periodoActivo]);
-
-  const disponibleOrigen=posiciones.get(movSistema)?.[movOrigen]||0;
-
-  const personalTfpPorBase=useMemo(()=>{
-    const out:Record<BaseId,number>={} as Record<BaseId,number>;
-    for(const b of plan.bases)out[b.id]=0;
-    for(const [sistema,dist] of posiciones.entries()){
-      for(const [bid,cant] of Object.entries(dist)){
-        if(cant<=0)continue;
-        const p=totalPersonalTFP(sistema,cant,periodo.esfuerzo);
-        if(p)out[bid as BaseId]+=(p.total||0);
-      }
+      out.set(mv.itemId,row);
     }
     return out;
-  },[posiciones,periodo.esfuerzo,plan.bases]);
+  },[aplicados]);
 
-  const personalOrganicoPorBase=useMemo(()=>{
-    const out:Record<BaseId,number>={} as Record<BaseId,number>;
-    for(const b of plan.bases)out[b.id]=0;
-    const order=PERIODOS.map((x)=>x.id);
-    const limite=order.indexOf(plan.periodoActivo);
-    for(const m of plan.movimientosPersonal.filter((x)=>order.indexOf(x.periodoId)<=limite)){
-      out[m.destino]+=totalPersonalMovimiento(m);
-      out[m.origen]-=totalPersonalMovimiento(m);
+  const materialActual=useMemo(()=>{
+    const out=new Map<string,Record<string,number>>();
+    for(const m of MATERIAL)out.set(m.id,{[m.ubicacion]:m.cantidad});
+    for(const mv of aplicados.filter((m)=>m.tipo==="material")){
+      const row=out.get(mv.itemId)||{};
+      row[mv.origen]=(row[mv.origen]||0)-mv.cantidad;
+      row[mv.destino]=(row[mv.destino]||0)+mv.cantidad;
+      out.set(mv.itemId,row);
     }
     return out;
-  },[plan.movimientosPersonal,plan.periodoActivo,plan.bases]);
+  },[aplicados]);
 
-  const alertas=useMemo(()=>{
+  const deficits=useMemo(()=>{
     const a:string[]=[];
-    for(const b of plan.bases){
-      const tfp=personalTfpPorBase[b.id]||0;
-      const org=personalOrganicoPorBase[b.id]||0;
-      const ocup=b.personalPermanente+tfp+org;
-      if(b.capacidadAlojamiento!=null && ocup>b.capacidadAlojamiento){
-        a.push(`${b.nombre}: déficit estimado de alojamiento ${fmt(ocup-b.capacidadAlojamiento)} plazas.`);
+
+    for(const b of BASES){
+      const pers=personalActual[b.id];
+      if(pers!=null && b.capacidadAlojamiento!=null && pers>b.capacidadAlojamiento){
+        a.push(`${b.nombre}: faltan ${fmt(pers-b.capacidadAlojamiento)} plazas de alojamiento.`);
       }
     }
-    for(const r of plan.reabastecimientos.filter((x)=>x.periodoId===plan.periodoActivo)){
-      a.push(`${baseNombre(r.base,plan.bases)} · ${r.recurso}: ETA día ${r.diaSolicitud+r.demoraDias} desde la referencia del período.`);
+
+    const gbu10=armamentoActual.get("f16-gbu10")?.["reserva-ton"]??0;
+    const gbu10Aplicado=aplicados.filter((m)=>m.tipo==="armamento"&&m.itemId==="f16-gbu10").reduce((s,m)=>s+m.cantidad,0);
+    const gbu10Pendiente=plan.movimientos.filter((m)=>!m.aplicado&&m.tipo==="armamento"&&m.itemId==="f16-gbu10").reduce((s,m)=>s+m.cantidad,0);
+    if(gbu10Aplicado+gbu10Pendiente>48){
+      a.push(`GBU-10 para F-16: el MMA Nº2 prevé 50 y el inventario inicial confirmado es 48. Déficit previsto: 2 unidades.`);
     }
-    for(const rev of plan.misionesREV.filter((x)=>x.periodoId===plan.periodoActivo)){
-      const pases=(rev.ida?1:0)+(rev.regreso?1:0);
-      const demanda=rev.receptores*rev.litrosPorReceptor*pases;
-      if(rev.capacidadTransferiblePorCisterna==null){
-        a.push(`${rev.nombre}: capacidad transferible aún pendiente; no se valida el margen REV.`);
-      }else{
-        const cap=rev.capacidadTransferiblePorCisterna*rev.cantidadCisternas;
-        if(cap<demanda)a.push(`${rev.nombre}: déficit REV ${fmt(demanda-cap)} L.`);
+
+    for(const mv of plan.movimientos.filter((m)=>!m.aplicado)){
+      if(mv.tipo==="medio" && mv.origen!=="reserva-ton"){
+        const disponible=mediosActuales.get(mv.itemId)?.[mv.origen]||0;
+        if(disponible<mv.cantidad)a.push(`${mv.descripcion}: no hay cantidad suficiente en el origen.`);
+      }
+      if(mv.tipo==="armamento"){
+        const disponible=armamentoActual.get(mv.itemId)?.[mv.origen]||0;
+        if(disponible<mv.cantidad)a.push(`${mv.descripcion}: faltan ${fmt(mv.cantidad-disponible)} unidades en el origen.`);
+      }
+      if(mv.tipo==="material"){
+        const disponible=materialActual.get(mv.itemId)?.[mv.origen]||0;
+        if(disponible<mv.cantidad)a.push(`${mv.descripcion}: faltan ${fmt(mv.cantidad-disponible)} unidades en el origen.`);
       }
     }
-    return a;
-  },[plan,personalTfpPorBase,personalOrganicoPorBase]);
+    return Array.from(new Set(a));
+  },[plan.movimientos,aplicados,mediosActuales,armamentoActual,materialActual,personalActual]);
 
   function guardar(nombre?:string){
     const n=(nombre??plan.nombre).trim();
@@ -523,14 +391,24 @@ export default function A4LogisticsCalculator() {
   }
 
   function nuevo(){
-    const n=window.prompt("Nombre del nuevo plan","A4 · Nuevo escenario");
+    const n=window.prompt("Nombre del nuevo planeamiento","A4 · Nuevo planeamiento");
     if(!n)return;
-    const next=clone(PLAN_BASE);next.nombre=n;
+    const next=clone(PLAN_BASE);
+    next.nombre=n;
     setPlan(next);
     localStorage.setItem(`${STORAGE_PREFIX}${n}`,JSON.stringify(next));
     localStorage.setItem(`${STORAGE_PREFIX}__ultimo`,n);
     const idx=Array.from(new Set([...planes,n]));
-    localStorage.setItem(STORAGE_INDEX,JSON.stringify(idx));setPlanes(idx);
+    localStorage.setItem(STORAGE_INDEX,JSON.stringify(idx));
+    setPlanes(idx);
+  }
+
+  function abrir(nombre:string){
+    const raw=localStorage.getItem(`${STORAGE_PREFIX}${nombre}`);
+    if(raw){
+      setPlan(JSON.parse(raw));
+      localStorage.setItem(`${STORAGE_PREFIX}__ultimo`,nombre);
+    }
   }
 
   function guardarComo(){
@@ -538,44 +416,50 @@ export default function A4LogisticsCalculator() {
     if(n)guardar(n);
   }
 
-  function abrirPlan(nombre:string){
-    const raw=localStorage.getItem(`${STORAGE_PREFIX}${nombre}`);
-    if(raw){setPlan(JSON.parse(raw));localStorage.setItem(`${STORAGE_PREFIX}__ultimo`,nombre);}
+  function restablecer(){
+    if(!window.confirm("¿Volver a la situación inicial y dejar todos los movimientos como pendientes?"))return;
+    setPlan((p)=>({...clone(PLAN_BASE),nombre:p.nombre}));
   }
 
-  function agregarMovimiento(){
-    if(movOrigen===movDestino||movCantidad<=0||movCantidad>disponibleOrigen)return;
-    const equipos:Record<string,number>={};
-    for(const e of EQUIPOS_APOYO)equipos[e.id]=0;
-    const mv:MovimientoMedio={
-      id:`mv-${Date.now()}`,periodoId:plan.periodoActivo,sistema:movSistema,
-      origen:movOrigen,destino:movDestino,cantidad:movCantidad,equipos,fecha:new Date().toISOString()
-    };
-    setPlan((x)=>({...x,movimientos:[...x.movimientos,mv]}));
+  function aplicarMovimiento(id:string){
+    setPlan((p)=>({
+      ...p,
+      movimientos:p.movimientos.map((m)=>{
+        if(m.id!==id||m.aplicado)return m;
+        let personal=0;
+        if(m.tipo==="medio"&&moverPersonalTfp){
+          personal=personalTfpRequerido(m.itemId,m.cantidad,periodo.esfuerzo)??0;
+        }
+        return {...m,aplicado:true,personalTfpMovido:personal,fecha:new Date().toISOString()};
+      })
+    }));
   }
 
-  function updateEquipoMovimiento(id:string,eid:string,val:number){
-    setPlan((x)=>({...x,movimientos:x.movimientos.map((m)=>m.id===id?{...m,equipos:{...m.equipos,[eid]:val}}:m)}));
+  function deshacerMovimiento(id:string){
+    setPlan((p)=>({
+      ...p,
+      movimientos:p.movimientos.map((m)=>m.id===id?{...m,aplicado:false,personalTfpMovido:0,fecha:undefined}:m)
+    }));
   }
 
-  function addReab(){
-    setPlan((x)=>({...x,reabastecimientos:[...x.reabastecimientos,{
-      id:`r-${Date.now()}`,periodoId:x.periodoActivo,base:"cordoba",recurso:"Combustible",
-      cantidad:0,unidad:"L",diaSolicitud:0,demoraDias:3
-    }]}));
+  function mediosEnBase(base:BaseId){
+    return Array.from(mediosActuales.entries())
+      .map(([s,dist])=>({s,c:dist[base]||0}))
+      .filter((x)=>x.c>0)
+      .sort((a,b)=>a.s.localeCompare(b.s));
   }
 
-  function updateReab(id:string,patch:Partial<Reabastecimiento>){
-    setPlan((x)=>({...x,reabastecimientos:x.reabastecimientos.map((r)=>r.id===id?{...r,...patch}:r)}));
+  function armamentoEnLugar(lugar:BaseId|"reserva-ton"){
+    return ARMAMENTO.map((a)=>({a,c:armamentoActual.get(a.id)?.[lugar]||0})).filter((x)=>x.c>0);
   }
 
-  function updateREV(id:string,patch:Partial<MisionREV>){
-    setPlan((x)=>({...x,misionesREV:x.misionesREV.map((r)=>r.id===id?{...r,...patch}:r)}));
+  function materialEnLugar(lugar:BaseId|"reserva-ton"){
+    return MATERIAL.map((m)=>({m,c:materialActual.get(m.id)?.[lugar]||0})).filter((x)=>x.c>0);
   }
 
   const tabs:[Tab,string][]=[
-    ["situacion","Situación"],["movimientos","Movimientos"],["personal","Personal / Alojamiento"],
-    ["misiones","Misiones / REV"],["reabastecimiento","Reabastecimiento"],["tfp","TFP"],["alertas","Alertas"]
+    ["situacion","Situación"],["movimientos","Movimientos"],["armamento","Armamento / Material"],
+    ["tfp","TFP simplificada"],["deficits","Déficits"],["historial","Historial"]
   ];
 
   return (
@@ -584,8 +468,8 @@ export default function A4LogisticsCalculator() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-black uppercase tracking-[.18em] text-emerald-300">A4 · ZEUS II</p>
-            <h2 className="font-bold text-white">Calculadora logística · TFP cargada</h2>
-            <p className="mt-1 text-xs text-slate-400">Fases · ERC/MESC/MEIC · personal técnico · alojamiento · equipos · transporte · REV</p>
+            <h2 className="font-bold text-white">Situación logística viva</h2>
+            <p className="mt-1 text-xs text-slate-400">Parte del dispositivo inicial documentado y descuenta/suma automáticamente cada movimiento aplicado.</p>
           </div>
           <button onClick={()=>setOpen(true)} className="rounded bg-emerald-700 px-4 py-2 text-sm font-black text-white">Abrir</button>
         </div>
@@ -595,12 +479,20 @@ export default function A4LogisticsCalculator() {
         <div className="fixed inset-0 z-[10000] flex flex-col bg-slate-950 text-white">
           <header className="border-b border-slate-800 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div><p className="text-xs font-black tracking-[.2em] text-emerald-300">ZEUS II · A4</p><h1 className="text-xl font-black">{plan.nombre}</h1></div>
+              <div>
+                <p className="text-xs font-black tracking-[.2em] text-emerald-300">ZEUS II · A4</p>
+                <h1 className="text-xl font-black">{plan.nombre}</h1>
+                <p className="text-xs text-slate-400">Situación inicial → movimientos → situación resultante</p>
+              </div>
               <div className="flex flex-wrap gap-2">
                 <button onClick={nuevo} className="rounded bg-slate-800 px-3 py-2 text-xs">Nuevo</button>
                 <button onClick={()=>guardar()} className="rounded bg-emerald-700 px-3 py-2 text-xs font-bold">Guardar</button>
                 <button onClick={guardarComo} className="rounded bg-slate-800 px-3 py-2 text-xs">Guardar como</button>
-                <select value={plan.nombre} onChange={(e)=>abrirPlan(e.target.value)} className="rounded bg-slate-800 px-3 py-2 text-xs"><option>{plan.nombre}</option>{planes.filter((x)=>x!==plan.nombre).map((x)=><option key={x}>{x}</option>)}</select>
+                <select value={plan.nombre} onChange={(e)=>abrir(e.target.value)} className="max-w-[230px] rounded bg-slate-800 px-3 py-2 text-xs">
+                  <option>{plan.nombre}</option>
+                  {planes.filter((x)=>x!==plan.nombre).map((x)=><option key={x}>{x}</option>)}
+                </select>
+                <button onClick={restablecer} className="rounded border border-amber-700 px-3 py-2 text-xs text-amber-200">Volver al inicio</button>
                 <button onClick={()=>setOpen(false)} className="rounded bg-slate-800 px-3 py-2 text-xs">Cerrar</button>
               </div>
             </div>
@@ -619,7 +511,6 @@ export default function A4LogisticsCalculator() {
 
           <div className="border-b border-slate-800 px-4 py-3 text-xs">
             <b>{periodo.fase}</b> · {periodo.momento} · <span className="font-black text-emerald-300">{periodo.esfuerzo}</span>
-            <span className="ml-3 text-slate-400">{periodo.detalle}</span>
           </div>
 
           <nav className="flex gap-1 overflow-x-auto border-b border-slate-800 px-4 py-2">
@@ -629,181 +520,116 @@ export default function A4LogisticsCalculator() {
           <main className="min-h-0 flex-1 overflow-auto p-4">
             {tab==="situacion"&&(
               <div className="space-y-4">
-                <div className="grid gap-3 md:grid-cols-4">
-                  <div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><p className="text-xs text-slate-500">Período</p><p className="font-black">{periodo.ventana}</p></div>
-                  <div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><p className="text-xs text-slate-500">Esfuerzo</p><p className="text-2xl font-black text-emerald-300">{periodo.esfuerzo}</p></div>
-                  <div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><p className="text-xs text-slate-500">Mov. medios</p><p className="text-2xl font-black">{plan.movimientos.filter((m)=>m.periodoId===plan.periodoActivo).length}</p></div>
-                  <div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><p className="text-xs text-slate-500">Alertas</p><p className="text-2xl font-black">{alertas.length}</p></div>
+                <div className="rounded-xl border border-cyan-900 bg-cyan-950/20 p-4 text-sm">
+                  <b className="text-cyan-300">Cómo leer esta pantalla:</b> los valores grandes son la situación actual. Al inicio coinciden con los documentos. Cuando aplicás un movimiento, el origen disminuye y el destino aumenta. La situación inicial nunca se borra y puede recuperarse con “Volver al inicio”.
                 </div>
-                <div className="grid gap-4 xl:grid-cols-2">
-                  {plan.bases.map((b)=>{
-                    const tec=personalTfpPorBase[b.id]||0;
-                    const org=personalOrganicoPorBase[b.id]||0;
-                    const ocup=b.personalPermanente+tec+org;
-                    const libres=b.capacidadAlojamiento==null?null:b.capacidadAlojamiento-ocup;
-                    return <section key={b.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-                      <div className="flex justify-between gap-3"><h2 className="font-black">{b.nombre}</h2><span className={`rounded px-2 py-1 text-[10px] ${libres!=null&&libres<0?"bg-red-950 text-red-300":"bg-slate-800"}`}>{libres==null?"Capacidad pendiente":libres<0?`Déficit: ${fmt(Math.abs(libres))} plazas`:`Disponibles: ${fmt(libres)} plazas`}</span></div>
-                      <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
-                        <div className="rounded bg-slate-950 p-2">Permanente<b className="block text-lg">{fmt(b.personalPermanente)}</b></div>
-                        <div className="rounded bg-slate-950 p-2">TFP medios<b className="block text-lg">{fmt(tec)}</b></div>
-                        <div className="rounded bg-slate-950 p-2">Mov. orgánico<b className="block text-lg">{fmt(org)}</b></div>
-                      </div>
-                      <div className="mt-3 space-y-1">
-                        {Array.from(posiciones.entries()).flatMap(([s,d])=>{const q=d[b.id]||0;return q>0?[<div key={s} className="flex justify-between rounded bg-slate-950 px-3 py-2 text-xs"><span>{s}</span><b>{q}</b></div>]:[];})}
-                      </div>
-                    </section>
-                  })}
-                </div>
-              </div>
-            )}
 
-            {tab==="movimientos"&&(
-              <div className="grid gap-4 xl:grid-cols-[360px_1fr]">
-                <section className="rounded-xl border border-emerald-900 bg-slate-900 p-4">
-                  <h2 className="mb-3 font-black text-emerald-300">Mover medio · {periodo.ventana}</h2>
-                  <label className="mb-2 block text-xs">Sistema<select value={movSistema} onChange={(e)=>setMovSistema(e.target.value)} className="mt-1 w-full rounded bg-slate-800 p-2">{sistemas.map((s)=><option key={s}>{s}</option>)}</select></label>
-                  <label className="mb-2 block text-xs">Origen<select value={movOrigen} onChange={(e)=>setMovOrigen(e.target.value as BaseId)} className="mt-1 w-full rounded bg-slate-800 p-2">{plan.bases.map((b)=><option key={b.id} value={b.id}>{b.nombre}</option>)}</select></label>
-                  <label className="mb-2 block text-xs">Destino<select value={movDestino} onChange={(e)=>setMovDestino(e.target.value as BaseId)} className="mt-1 w-full rounded bg-slate-800 p-2">{plan.bases.map((b)=><option key={b.id} value={b.id}>{b.nombre}</option>)}</select></label>
-                  <label className="mb-2 block text-xs">Cantidad<input type="number" min="1" value={movCantidad} onChange={(e)=>setMovCantidad(Number(e.target.value))} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
-                  <div className="mb-3 rounded bg-slate-950 p-3 text-xs">
-                    <p>Disponible origen: <b>{disponibleOrigen}</b></p>
-                    <p>Distancia aérea TFP: <b>{distanciaAerea(movOrigen,movDestino)??"—"} km</b></p>
-                    <p>Distancia terrestre TFP: <b>{distanciaTerrestre(movOrigen,movDestino)??"—"} km</b></p>
-                    <p>Personal técnico asociado: <b>{totalPersonalTFP(movSistema,movCantidad,periodo.esfuerzo)?.total??"Sin TFP"}</b></p>
-                  </div>
-                  <button disabled={movOrigen===movDestino||movCantidad<=0||movCantidad>disponibleOrigen} onClick={agregarMovimiento} className="w-full rounded bg-emerald-700 p-2 font-black disabled:opacity-40">Agregar movimiento</button>
-                </section>
-                <section className="space-y-3">
-                  {plan.movimientos.filter((m)=>m.periodoId===plan.periodoActivo).map((m)=>{
-                    const tp=totalPersonalTFP(m.sistema,m.cantidad,periodo.esfuerzo);
-                    return <div key={m.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-                      <div className="flex flex-wrap justify-between gap-2"><b>{m.cantidad} × {m.sistema}</b><span className="text-xs text-slate-400">{baseNombre(m.origen,plan.bases)} → {baseNombre(m.destino,plan.bases)}</span></div>
-                      <div className="mt-2 grid gap-2 md:grid-cols-4 text-xs">
-                        <div className="rounded bg-slate-950 p-2">Grupos TFP necesarios (hasta 4 aeronaves c/u)<b className="block text-lg">{tp?.bloques??"—"}</b></div>
-                        <div className="rounded bg-slate-950 p-2">Personal técnico<b className="block text-lg">{tp?.total??"—"}</b></div>
-                        <div className="rounded bg-slate-950 p-2">Aérea<b className="block text-lg">{distanciaAerea(m.origen,m.destino)??"—"} km</b></div>
-                        <div className="rounded bg-slate-950 p-2">Terrestre<b className="block text-lg">{distanciaTerrestre(m.origen,m.destino)??"—"} km</b></div>
-                      </div>
-                      {tp&&<div className="mt-2 text-[11px] text-slate-400">Por bloque: J {tp.detalle.jefe} · Enc {tp.detalle.encargado} · Est {tp.detalle.estructuras} · Arm {tp.detalle.armamento} · Aviónica {tp.detalle.avionica} · Hid {tp.detalle.hidraulica} · Esp {tp.detalle.especiales}</div>}
-                      <details className="mt-3"><summary className="cursor-pointer text-xs font-bold text-emerald-300">Equipos que acompañan al movimiento</summary>
-                        <div className="mt-2 grid gap-2 md:grid-cols-3">
-                          {EQUIPOS_APOYO.map((e)=><label key={e.id} className="text-xs">{e.nombre}<input type="number" min="0" value={m.equipos[e.id]||0} onChange={(ev)=>updateEquipoMovimiento(m.id,e.id,Number(ev.target.value))} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>)}
-                        </div>
-                      </details>
-                    </div>;
-                  })}
-                  {plan.movimientosMaterial.filter((m)=>m.periodoId===plan.periodoActivo).map((m)=>{
-                    const tn=(m.cantidad*m.pesoKgUnidad)/1000;
-                    return <div key={m.id} className="rounded-xl border border-amber-900 bg-amber-950/10 p-4">
-                      <b>{m.material}: {m.cantidad} unidades</b>
-                      <p className="text-xs">{baseNombre(m.origen,plan.bases)} → {baseNombre(m.destino,plan.bases)} · {fmt(tn,1)} Tn · {distanciaTerrestre(m.origen,m.destino)??"—"} km terrestre</p>
-                    </div>;
-                  })}
-                </section>
-              </div>
-            )}
-
-            {tab==="personal"&&(
-              <div className="space-y-4">
-                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4">
-                  <h2 className="mb-3 font-black">Movimientos de personal cargados para MMA Nº 2</h2>
-                  <table className="w-full min-w-[900px] text-left text-xs">
-                    <thead className="text-slate-400"><tr><th className="p-2">Origen</th><th>Destino</th><th>OF</th><th>SUB</th><th>S/V</th><th>CIV</th><th>Total</th><th>Dist. terrestre</th></tr></thead>
-                    <tbody>{plan.movimientosPersonal.filter((m)=>m.periodoId===plan.periodoActivo).map((m)=><tr key={m.id} className="border-t border-slate-800"><td className="p-2">{baseNombre(m.origen,plan.bases)}</td><td>{baseNombre(m.destino,plan.bases)}</td><td>{m.oficiales}</td><td>{m.suboficiales}</td><td>{m.sv}</td><td>{m.civiles}</td><td className="font-black">{totalPersonalMovimiento(m)}</td><td>{distanciaTerrestre(m.origen,m.destino)??"—"} km</td></tr>)}</tbody>
-                  </table>
-                </div>
                 <div className="grid gap-4 xl:grid-cols-2">
-                  {plan.bases.map((b)=>{
-                    const tec=personalTfpPorBase[b.id]||0;
-                    const org=personalOrganicoPorBase[b.id]||0;
-                    const ocup=b.personalPermanente+tec+org;
-                    const carpasNecesarias=Math.max(0,Math.ceil(ocup/500));
-                    const raciones=ocup*2;
-                    const cocinasNecesarias=Math.max(0,Math.ceil(ocup/500));
-                    const cocinasAsignadas=b.cocinasTfpIniciales;
-                    const cocinasAdicionales=cocinasAsignadas==null?null:Math.max(0,cocinasNecesarias-cocinasAsignadas);
+                  {BASES.map((b)=>{
+                    const pers=personalActual[b.id];
+                    const libres=pers!=null&&b.capacidadAlojamiento!=null?b.capacidadAlojamiento-pers:null;
+                    const meds=mediosEnBase(b.id);
+                    const arms=armamentoEnLugar(b.id);
+                    const mats=materialEnLugar(b.id);
                     return <section key={b.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-                      <div className="flex justify-between"><b>{b.nombre}</b><span className="text-xs text-slate-400">Cap. {b.capacidadAlojamiento??"pendiente"}</span></div>
-                      <div className="mt-3 grid grid-cols-3 gap-2 text-xs"><div className="rounded bg-slate-950 p-2">Personal presente estimado<b className="block text-lg">{fmt(ocup)}</b></div><div className="rounded bg-slate-950 p-2">Carpas requeridas (500 pers.)<b className="block text-lg">{carpasNecesarias}</b></div><div className="rounded bg-slate-950 p-2">Raciones por día (2/pers.)<b className="block text-lg">{fmt(raciones)}</b></div></div>
-                      <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
-                        <div className="rounded bg-slate-950 p-2">Cocinas TFP asignadas<b className="block text-lg">{cocinasAsignadas??"—"}</b></div>
-                        <div className="rounded bg-slate-950 p-2">Cocinas requeridas estimadas<b className="block text-lg">{cocinasNecesarias}</b></div>
-                        <div className="rounded bg-slate-950 p-2">Cocinas adicionales<b className="block text-lg">{cocinasAdicionales??"—"}</b></div>
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div><h2 className="font-black">{b.nombre}</h2><p className="text-[11px] text-slate-500">Situación actual derivada de la situación inicial</p></div>
+                        {libres!=null&&<span className={`rounded px-2 py-1 text-[10px] font-bold ${libres<0?"bg-red-950 text-red-300":"bg-emerald-950 text-emerald-300"}`}>{libres<0?`Déficit alojamiento: ${fmt(Math.abs(libres))}`:`Plazas disponibles: ${fmt(libres)}`}</span>}
                       </div>
-                      <p className="mt-2 text-[11px] text-slate-500">Para mantener coherencia con los valores numéricos de TFP (1), la estimación dinámica usa 1 cocina por cada 500 personas. La asignación inicial indicada por TFP se conserva separada.</p>
+
+                      <div className="mt-3 grid gap-2 sm:grid-cols-3 text-xs">
+                        {pers!=null&&<div className="rounded bg-slate-950 p-2"><span className="text-slate-500">Personal actual</span><b className="block text-lg">{fmt(pers)}</b><span className="text-[10px] text-slate-600">Inicial: {fmt(b.personalInicial as number)}</span></div>}
+                        {b.capacidadAlojamiento!=null&&<div className="rounded bg-slate-950 p-2"><span className="text-slate-500">Alojamiento</span><b className="block text-lg">{fmt(b.capacidadAlojamiento)}</b></div>}
+                        <div className="rounded bg-slate-950 p-2"><span className="text-slate-500">Medios registrados</span><b className="block text-lg">{meds.reduce((s,x)=>s+x.c,0)}</b></div>
+                      </div>
+
+                      {meds.length>0&&<div className="mt-3"><h3 className="mb-1 text-xs font-black text-emerald-300">Medios</h3><div className="grid gap-1 sm:grid-cols-2">{meds.map((x)=><div key={x.s} className="flex justify-between rounded bg-slate-950 px-3 py-2 text-xs"><span>{x.s}</span><b>{x.c}</b></div>)}</div></div>}
+                      {arms.length>0&&<div className="mt-3"><h3 className="mb-1 text-xs font-black text-amber-300">Armamento presente</h3>{arms.map(({a,c})=><div key={a.id} className="flex justify-between rounded bg-slate-950 px-3 py-2 text-xs"><span>{a.nombre} · {a.familia}</span><b>{c}</b></div>)}</div>}
+                      {mats.length>0&&<div className="mt-3"><h3 className="mb-1 text-xs font-black text-cyan-300">Material</h3>{mats.map(({m,c})=><div key={m.id} className="flex justify-between rounded bg-slate-950 px-3 py-2 text-xs"><span>{m.nombre}</span><b>{c} {m.unidad}</b></div>)}</div>}
                     </section>;
                   })}
                 </div>
               </div>
             )}
 
-            {tab==="misiones"&&(
+            {tab==="movimientos"&&(
               <div className="space-y-4">
-                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4">
-                  <h2 className="mb-3 font-black">Paquete de aeronaves</h2>
-                  <table className="w-full min-w-[1000px] text-left text-xs"><thead className="text-slate-400"><tr><th className="p-2">Día</th><th>Operación</th><th>Aeronave</th><th>Cant.</th><th>Armamento</th><th>Por avión</th><th>Base</th><th>Hs vuelo</th></tr></thead>
-                    <tbody>{plan.misiones.filter((m)=>m.periodoId===plan.periodoActivo).map((m)=><tr key={m.id} className="border-t border-slate-800"><td className="p-2">{m.dia}</td><td className="font-bold">{m.operacion}</td><td>{m.aeronave}</td><td>{m.cantidad}</td><td>{m.armamento}</td><td>{m.armamentoPorAvion??"—"}</td><td>{baseNombre(m.base,plan.bases)}</td><td>{m.horasVuelo??"—"}</td></tr>)}</tbody>
-                  </table>
+                <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div><h2 className="font-black">Movimientos previstos para {periodo.ventana}</h2><p className="text-xs text-slate-500">Están cargados como pendientes. No modifican nada hasta que presiones “Aplicar”.</p></div>
+                    <label className="flex items-center gap-2 rounded bg-slate-950 px-3 py-2 text-xs"><input type="checkbox" checked={moverPersonalTfp} onChange={(e)=>setMoverPersonalTfp(e.target.checked)}/> Mover también el personal técnico recomendado por TFP</label>
+                  </div>
                 </div>
-                {plan.misionesREV.filter((r)=>r.periodoId===plan.periodoActivo).map((r)=>{
-                  const pases=(r.ida?1:0)+(r.regreso?1:0);
-                  const demanda=r.receptores*r.litrosPorReceptor*pases;
-                  const cap=r.capacidadTransferiblePorCisterna==null?null:r.capacidadTransferiblePorCisterna*r.cantidadCisternas;
-                  return <section key={r.id} className="rounded-xl border border-cyan-900 bg-slate-900 p-4">
-                    <h3 className="font-black text-cyan-300">{r.nombre}</h3>
-                    <div className="mt-3 grid gap-2 md:grid-cols-5">
-                      <label className="text-xs">Cisternas<input type="number" value={r.cantidadCisternas} onChange={(e)=>updateREV(r.id,{cantidadCisternas:Number(e.target.value)})} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
-                      <label className="text-xs">Receptores<input type="number" value={r.receptores} onChange={(e)=>updateREV(r.id,{receptores:Number(e.target.value)})} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
-                      <label className="text-xs">L/receptor/pase<input type="number" value={r.litrosPorReceptor} onChange={(e)=>updateREV(r.id,{litrosPorReceptor:Number(e.target.value)})} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
-                      <label className="text-xs">L transferibles/cisterna<input type="number" value={r.capacidadTransferiblePorCisterna??""} onChange={(e)=>updateREV(r.id,{capacidadTransferiblePorCisterna:e.target.value===""?null:Number(e.target.value)})} className="mt-1 w-full rounded bg-slate-800 p-2"/></label>
-                      <div className="rounded bg-slate-950 p-2 text-xs">Margen<b className="block text-lg">{cap==null?"Pendiente":`${fmt(cap-demanda)} L`}</b></div>
+
+                {plan.movimientos.filter((m)=>m.periodoId===plan.periodoActivo).map((m)=>{
+                  const sugerido=m.tipo==="medio"?personalTfpRequerido(m.itemId,m.cantidad,periodo.esfuerzo):null;
+                  return <section key={m.id} className={`rounded-xl border p-4 ${m.aplicado?"border-emerald-800 bg-emerald-950/10":"border-slate-800 bg-slate-900"}`}>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div><b>{m.descripcion}</b><p className="mt-1 text-xs text-slate-500">{m.aplicado?"APLICADO · ya modifica la situación actual":"PENDIENTE · todavía no modifica la situación"}</p></div>
+                      {m.aplicado?<button onClick={()=>deshacerMovimiento(m.id)} className="rounded border border-amber-700 px-3 py-2 text-xs text-amber-200">Deshacer</button>:<button onClick={()=>aplicarMovimiento(m.id)} className="rounded bg-emerald-700 px-3 py-2 text-xs font-black">Aplicar</button>}
                     </div>
-                    <div className="mt-2 flex gap-4 text-xs"><label><input type="checkbox" checked={r.ida} onChange={(e)=>updateREV(r.id,{ida:e.target.checked})}/> Ida</label><label><input type="checkbox" checked={r.regreso} onChange={(e)=>updateREV(r.id,{regreso:e.target.checked})}/> Regreso</label></div>
+                    {sugerido!=null&&<div className="mt-3 rounded bg-slate-950 p-3 text-xs">
+                      <span className="text-slate-500">Personal técnico recomendado por TFP para {m.cantidad} {m.itemId} en esfuerzo {periodo.esfuerzo}:</span>
+                      <b className="ml-2 text-lg text-cyan-300">{sugerido}</b>
+                      <p className="mt-1 text-[10px] text-slate-600">Se calcula proporcionalmente desde el valor TFP definido para 4 aeronaves y se redondea hacia arriba. No se muestran “grupos TFP”.</p>
+                    </div>}
+                    {m.aplicado&&m.personalTfpMovido>0&&<p className="mt-2 text-xs text-emerald-300">También se trasladaron {m.personalTfpMovido} personas técnicas del origen al destino.</p>}
                   </section>;
                 })}
+
+                {!plan.movimientos.some((m)=>m.periodoId===plan.periodoActivo)&&<div className="rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-500">No hay movimientos previstos cargados para este momento.</div>}
               </div>
             )}
 
-            {tab==="reabastecimiento"&&(
+            {tab==="armamento"&&(
               <div className="space-y-4">
-                <div className="flex justify-between"><div><h2 className="font-black">Tiempos de reabastecimiento</h2><p className="text-xs text-slate-500">Ciclo general 3 días. Clase III A: 4 días en asiento y 3 días en PRF/apoyo, editable por requerimiento.</p></div><button onClick={addReab} className="rounded bg-emerald-700 px-3 py-2 text-xs font-bold">+ Requerimiento</button></div>
-                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4">
-                  <table className="w-full min-w-[900px] text-left text-xs"><thead className="text-slate-400"><tr><th className="p-2">Base</th><th>Recurso</th><th>Cantidad</th><th>Unidad</th><th>Día solicitud</th><th>Demora</th><th>ETA</th></tr></thead>
-                    <tbody>{plan.reabastecimientos.filter((r)=>r.periodoId===plan.periodoActivo).map((r)=><tr key={r.id} className="border-t border-slate-800"><td className="p-2"><select value={r.base} onChange={(e)=>updateReab(r.id,{base:e.target.value as BaseId})} className="rounded bg-slate-800 p-1">{plan.bases.map((b)=><option key={b.id} value={b.id}>{b.nombre}</option>)}</select></td><td><input value={r.recurso} onChange={(e)=>updateReab(r.id,{recurso:e.target.value})} className="rounded bg-slate-800 p-1"/></td><td><input type="number" value={r.cantidad} onChange={(e)=>updateReab(r.id,{cantidad:Number(e.target.value)})} className="w-24 rounded bg-slate-800 p-1"/></td><td>{r.unidad}</td><td><input type="number" value={r.diaSolicitud} onChange={(e)=>updateReab(r.id,{diaSolicitud:Number(e.target.value)})} className="w-20 rounded bg-slate-800 p-1"/></td><td><input type="number" value={r.demoraDias} onChange={(e)=>updateReab(r.id,{demoraDias:Number(e.target.value)})} className="w-20 rounded bg-slate-800 p-1"/></td><td className="font-black">{r.diaSolicitud+r.demoraDias}</td></tr>)}</tbody>
-                  </table>
-                </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4">
-                  <h2 className="mb-3 font-black">Capacidad de transporte terrestre TFP</h2>
-                  <table className="w-full min-w-[950px] text-left text-xs"><thead className="text-slate-400"><tr><th className="p-2">Vehículo</th><th>Cant.</th><th>Pax</th><th>Tn</th><th>Choferes/veh.</th><th>Choferes 3 turnos</th><th>L/100 km</th></tr></thead>
-                    <tbody>{VEHICULOS_TFP.map((v)=><tr key={v.id} className="border-t border-slate-800"><td className="p-2 font-bold">{v.nombre}</td><td>{v.cantidad}</td><td>{v.capacidadPax??"—"}</td><td>{v.capacidadTn}</td><td>{v.choferesPorVehiculo}</td><td>{v.cantidad*v.choferesPorVehiculo*3}</td><td>{v.consumoL100km}</td></tr>)}</tbody>
-                  </table>
-                </div>
+                <section className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+                  <h2 className="mb-3 font-black">Reserva TON · armamento no distribuido</h2>
+                  <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+                    {armamentoEnLugar("reserva-ton").map(({a,c})=><div key={a.id} className="rounded bg-slate-950 p-3 text-xs"><span>{a.nombre}</span><span className="ml-2 text-slate-500">{a.familia}</span><b className="block text-xl">{c}</b><span className="text-[10px] text-slate-600">Inicial: {a.cantidad}</span></div>)}
+                  </div>
+                </section>
+                <section className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+                  <h2 className="mb-3 font-black">Material con ubicación inicial conocida</h2>
+                  {MATERIAL.map((m)=>{
+                    const lugares=materialActual.get(m.id)||{};
+                    return <div key={m.id} className="mb-2 rounded bg-slate-950 p-3 text-xs"><b>{m.nombre}</b><p className="text-slate-500">Inicial: {m.cantidad} {m.unidad} en {nombreLugar(m.ubicacion)}</p><div className="mt-2 flex flex-wrap gap-2">{Object.entries(lugares).filter(([,q])=>q>0).map(([l,q])=><span key={l} className="rounded bg-slate-800 px-2 py-1">{nombreLugar(l as BaseId|"reserva-ton")}: {q}</span>)}</div></div>;
+                  })}
+                </section>
               </div>
             )}
 
             {tab==="tfp"&&(
               <div className="space-y-4">
-                <div className="rounded-xl border border-emerald-900 bg-emerald-950/20 p-4 text-sm"><b className="text-emerald-300">TFP (1) cargada.</b> El personal aeronáutico se calcula por bloques de hasta 4 aeronaves y cambia automáticamente según ERC, MESC o MEIC.</div>
-                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4">
-                  <p className="mb-3 text-xs text-slate-400">Cada valor indica el personal técnico requerido para un grupo de hasta 4 aeronaves. La calculadora selecciona MEIC, MESC o ERC automáticamente según la fase/momento activo.</p>
-                  <table className="w-full min-w-[1250px] text-left text-xs"><thead className="text-slate-400"><tr><th className="p-2">Sistema</th><th>MEIC · personal / hasta 4 aeronaves</th><th>MESC · personal / hasta 4 aeronaves</th><th>ERC · personal / hasta 4 aeronaves</th><th>Combustible L/h</th><th>HH mant/HV</th></tr></thead>
-                    <tbody>{TFP_SISTEMAS.map((t)=>{
-                      const tm=Object.values(t.meic).reduce((a,b)=>a+b,0), ts=Object.values(t.mesc).reduce((a,b)=>a+b,0), te=Object.values(t.erc).reduce((a,b)=>a+b,0);
-                      return <tr key={t.sistema} className="border-t border-slate-800"><td className="p-2 font-bold">{t.sistema}</td><td>{tm}</td><td>{ts}</td><td>{te}</td><td>{t.combustibleLitrosHora??"Pendiente"}</td><td>{t.hhMantPorHoraVuelo??"Pendiente"}</td></tr>;
-                    })}</tbody>
-                  </table>
+                <div className="rounded-xl border border-cyan-900 bg-cyan-950/20 p-4 text-sm">
+                  <b className="text-cyan-300">TFP simplificada:</b> no necesitás pensar en “grupos”. La tabla sólo dice cuántas personas técnicas hacen falta para 4 aeronaves. ZEUS toma ese valor, lo adapta a la cantidad que movés y redondea hacia arriba.
                 </div>
                 <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4">
-                  <h2 className="mb-3 font-black">Equipos de apoyo · operación 24 h</h2>
-                  <table className="w-full min-w-[900px] text-left text-xs"><thead className="text-slate-400"><tr><th className="p-2">Equipo</th><th>Personal</th><th>L/h</th><th>Peso kg</th><th>Capacidad Tn</th></tr></thead>
-                    <tbody>{EQUIPOS_APOYO.map((e)=><tr key={e.id} className="border-t border-slate-800"><td className="p-2 font-bold">{e.nombre}</td><td>{e.personal24h??"—"}</td><td>{e.combustibleLitrosHora??"—"}</td><td>{e.pesoKg??"—"}</td><td>{e.capacidadTn??"—"}</td></tr>)}</tbody>
+                  <table className="w-full min-w-[850px] text-left text-xs">
+                    <thead className="text-slate-400"><tr><th className="p-2">Sistema</th><th>MEIC · personal para 4</th><th>MESC · personal para 4</th><th>ERC · personal para 4</th><th>Ejemplo para 10 medios</th></tr></thead>
+                    <tbody>{TFP_PERSONAL.map((t)=><tr key={t.sistema} className="border-t border-slate-800"><td className="p-2 font-bold">{t.sistema}</td><td>{t.meic4}</td><td>{t.mesc4}</td><td>{t.erc4}</td><td className="text-cyan-300">MEIC {personalTfpRequerido(t.sistema,10,"MEIC")} · MESC {personalTfpRequerido(t.sistema,10,"MESC")} · ERC {personalTfpRequerido(t.sistema,10,"ERC")}</td></tr>)}</tbody>
                   </table>
+                </div>
+                <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm">
+                  <b>Ejemplo F-16CJ:</b> TFP MEIC = 56 personas para 4 aeronaves. Para 10 F-16: 56 × 10 ÷ 4 = 140. ZEUS muestra directamente <b className="text-cyan-300">140 personas</b>.
                 </div>
               </div>
             )}
 
-            {tab==="alertas"&&(
-              <div className="space-y-2">{alertas.length?alertas.map((x,i)=><div key={i} className="rounded-xl border border-amber-900 bg-amber-950/20 p-4 text-sm text-amber-100">⚠ {x}</div>):<div className="rounded-xl border border-emerald-900 bg-emerald-950/20 p-4 text-sm text-emerald-200">Sin alertas activas.</div>}</div>
+            {tab==="deficits"&&(
+              <div className="space-y-2">
+                {deficits.length?deficits.map((d,i)=><div key={i} className="rounded-xl border border-red-900 bg-red-950/20 p-4 text-sm text-red-100">⚠ {d}</div>):<div className="rounded-xl border border-emerald-900 bg-emerald-950/20 p-4 text-sm text-emerald-200">No hay déficits calculables con los datos actualmente cargados.</div>}
+                <div className="mt-4 rounded-xl border border-slate-800 bg-slate-900 p-4 text-xs text-slate-400">
+                  Si un dato no está documentado (por ejemplo cantidad total de MHU-83 disponible o capacidad de alojamiento de una instalación no incluida en TFP), no se inventa y tampoco se declara déficit.
+                </div>
+              </div>
+            )}
+
+            {tab==="historial"&&(
+              <div className="space-y-2">
+                {aplicados.slice().reverse().map((m)=><div key={m.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm"><b>{m.descripcion}</b><p className="text-xs text-slate-500">{m.fecha?new Date(m.fecha).toLocaleString("es-AR"):""} · {PERIODOS.find((p)=>p.id===m.periodoId)?.ventana}</p>{m.personalTfpMovido>0&&<p className="mt-1 text-xs text-cyan-300">Personal técnico trasladado: {m.personalTfpMovido}</p>}</div>)}
+                {!aplicados.length&&<div className="rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-500">Todavía no aplicaste movimientos. La situación actual es exactamente la situación inicial.</div>}
+              </div>
             )}
           </main>
         </div>
