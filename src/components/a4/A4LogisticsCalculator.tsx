@@ -83,7 +83,7 @@ type EstadoA4 = {
 
 const STORAGE_KEY = "zeus-a4-logistica-v1";
 
-const BASES = [
+const BASES: BasePlan[] = ([
   { id: "la-rioja", nombre: "1ª Brigada Aérea / La Rioja", lat: -29.376201, lon: -66.793409, tipo: "Base aérea" },
   { id: "villa-mercedes", nombre: "2ª Brigada Aérea / Villa Mercedes", lat: -33.738415, lon: -65.370632, tipo: "Base aérea" },
   { id: "cordoba", nombre: "3ª Brigada Aérea / Córdoba", lat: -31.319799, lon: -64.207857, tipo: "Base aérea" },
@@ -94,7 +94,7 @@ const BASES = [
   { id: "san-rafael", nombre: "Área de Material San Rafael", lat: -34.617, lon: -68.33, tipo: "Apoyo logístico" },
   { id: "rio-cuarto", nombre: "COAe / Río Cuarto", lat: -33.085, lon: -64.261, tipo: "Comando" },
   { id: "deposito-ton", nombre: "Depósito TON / sin distribuir", tipo: "Inventario central" },
-] satisfies BasePlan[]).map((b) => ({
+] as BasePlan[]).map((b) => ({
   ...b,
   sostenimientoMinDias: b.id === "deposito-ton" ? undefined : 5,
   cicloReabastecimientoDias: b.id === "deposito-ton" ? undefined : 3,
