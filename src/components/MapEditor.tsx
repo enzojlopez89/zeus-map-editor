@@ -1234,6 +1234,54 @@ function obtenerBase(nombre: string) {
   );
 }
 
+function etiquetaCortaUbicacion(nombre: string): string {
+  const especiales: Record<string, string> = {
+    "COAe / Río Cuarto": "RÍO CUARTO",
+    "COAe enemigo / Ingeniero Juárez": "INGENIERO JUÁREZ",
+    "Laboratorio de procesamiento de tritio": "CAMPAMENTO RATONES",
+    "Área de Material Realicó (AMR)": "REALICÓ",
+    "Área de Material San Rafael (AMSR)": "SAN RAFAEL",
+    "Base Aérea Militar Malargüe": "MALARGÜE",
+    "Grupo 1 COM / San Luis": "SAN LUIS",
+    "Grupo 2 COM / Malargüe": "MALARGÜE",
+  };
+
+  if (especiales[nombre]) return especiales[nombre];
+
+  const partes = nombre.split("/").map((p) => p.trim()).filter(Boolean);
+  const lugar = partes.length > 1 ? partes[partes.length - 1] : nombre;
+
+  return lugar
+    .replace(/\s*\([^)]*\)\s*/g, " ")
+    .replace(/^Base Aérea Militar\s+/i, "")
+    .replace(/^Estación radar\s+/i, "")
+    .replace(/^Ala Aérea n\.?º?\s*\d+\s*/i, "")
+    .replace(/^Escuadrón Aéreo\s*\d+\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+}
+
+function crearEtiquetaBlanca(texto: string) {
+  const etiqueta = document.createElement("div");
+  etiqueta.textContent = texto;
+  etiqueta.style.background = "#ffffff";
+  etiqueta.style.color = "#111827";
+  etiqueta.style.border = "1px solid rgba(15,23,42,0.25)";
+  etiqueta.style.borderRadius = "2px";
+  etiqueta.style.padding = "5px 9px";
+  etiqueta.style.fontSize = "11px";
+  etiqueta.style.fontWeight = "900";
+  etiqueta.style.lineHeight = "1.15";
+  etiqueta.style.textAlign = "center";
+  etiqueta.style.whiteSpace = "nowrap";
+  etiqueta.style.textTransform = "uppercase";
+  etiqueta.style.boxShadow = "0 2px 5px rgba(0,0,0,0.30)";
+  etiqueta.style.pointerEvents = "none";
+  etiqueta.style.userSelect = "none";
+  return etiqueta;
+}
+
 function crearId() {
   return crypto.randomUUID();
 }
@@ -1660,6 +1708,7 @@ export default function MapEditor({
   const etiquetasRef = useRef<Record<string, maplibregl.Marker>>({});
   const oceanosRef = useRef<Record<string, maplibregl.Marker>>({});
   const basesRef = useRef<Record<string, maplibregl.Marker>>({});
+  const etiquetasUbicacionRef = useRef<Record<string, maplibregl.Marker>>({});
   const coaeRef = useRef<maplibregl.Marker | null>(null);
   const coaeEnemigoRef = useRef<maplibregl.Marker | null>(null);
   const comunicacionesRef = useRef<Record<string, maplibregl.Marker>>({});
@@ -1703,6 +1752,7 @@ export default function MapEditor({
     useState(capasIniciales.entornoGeografico ?? true);
   const [mostrarTon, setMostrarTon] = useState(capasIniciales.ton ?? true);
   const [mostrarBases, setMostrarBases] = useState(capasIniciales.bases ?? true);
+  const [mostrarEtiquetasUbicacion, setMostrarEtiquetasUbicacion] = useState(capasIniciales.etiquetasUbicacion ?? true);
   const [mostrarComunicaciones, setMostrarComunicaciones] = useState(capasIniciales.comunicaciones ?? false);
   const [mostrarAeronaves, setMostrarAeronaves] = useState(capasIniciales.aeronaves ?? true);
   const [mostrarRadares, setMostrarRadares] = useState(capasIniciales.radares ?? true);
@@ -2788,6 +2838,28 @@ export default function MapEditor({
         );
       }
 
+      const agregarEtiquetaUbicacion = (
+        id: string,
+        nombre: string,
+        longitude: number,
+        latitude: number,
+      ) => {
+        const existente = etiquetasUbicacionRef.current[id];
+        if (existente) existente.remove();
+
+        const marker = new maplibregl.Marker({
+          element: crearEtiquetaBlanca(etiquetaCortaUbicacion(nombre)),
+          anchor: "left",
+          offset: [30, 0],
+        })
+          .setLngLat([longitude, latitude])
+          .addTo(map);
+
+        marker.getElement().style.display = mostrarEtiquetasUbicacion ? "block" : "none";
+        etiquetasUbicacionRef.current[id] = marker;
+        return marker;
+      };
+
       const crearMarcadorEspecial = (
         elemento: BaseMilitar,
         texto: string,
@@ -2830,6 +2902,7 @@ export default function MapEditor({
         )
         .addTo(map);
       coaeRef.current = marcadorCOAe;
+      agregarEtiquetaUbicacion("coae-propio", COAE_RIO_CUARTO.nombre, COAE_RIO_CUARTO.longitude, COAE_RIO_CUARTO.latitude);
       habilitarMedicionSobreMarcador(marcadorCOAe, [
         COAE_RIO_CUARTO.longitude,
         COAE_RIO_CUARTO.latitude,
@@ -2855,6 +2928,7 @@ export default function MapEditor({
         )
         .addTo(map);
       coaeEnemigoRef.current = marcadorCOAeEnemigo;
+      agregarEtiquetaUbicacion("coae-enemigo", COAE_ENEMIGO_INGENIERO_JUAREZ.nombre, COAE_ENEMIGO_INGENIERO_JUAREZ.longitude, COAE_ENEMIGO_INGENIERO_JUAREZ.latitude);
       habilitarMedicionSobreMarcador(marcadorCOAeEnemigo, [
         COAE_ENEMIGO_INGENIERO_JUAREZ.longitude,
         COAE_ENEMIGO_INGENIERO_JUAREZ.latitude,
@@ -2880,6 +2954,7 @@ export default function MapEditor({
         habilitarMedicionSobreMarcador(marcador, [grupo.longitude, grupo.latitude]);
         marcador.getElement().style.display = "none";
         comunicacionesRef.current[grupo.nombre] = marcador;
+        agregarEtiquetaUbicacion(`com-${grupo.nombre}`, grupo.nombre, grupo.longitude, grupo.latitude);
       });
 
 
@@ -2934,8 +3009,9 @@ export default function MapEditor({
         LABORATORIO_TRITIO.longitude,
         LABORATORIO_TRITIO.latitude,
       ]);
+      agregarEtiquetaUbicacion("laboratorio-tritio", LABORATORIO_TRITIO.nombre, LABORATORIO_TRITIO.longitude, LABORATORIO_TRITIO.latitude);
 
-            TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
+      TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
         const marker = new maplibregl.Marker({
           element: crearIconoBase(base),
           anchor: "center",
@@ -2952,6 +3028,7 @@ export default function MapEditor({
         habilitarMedicionSobreMarcador(marker, [base.longitude, base.latitude]);
 
         basesRef.current[base.nombre] = marker;
+        agregarEtiquetaUbicacion(`base-${base.nombre}`, base.nombre, base.longitude, base.latitude);
       });
 
       for (const mascara of MASCARAS_RADAR) {
@@ -3552,6 +3629,66 @@ export default function MapEditor({
   }, [mostrarBases, vistaFuerzas, basesVisibles, mapReady]);
 
   useEffect(() => {
+    const mostrarEtiqueta = (id: string, visible: boolean) => {
+      const marker = etiquetasUbicacionRef.current[id];
+      if (marker) {
+        marker.getElement().style.display =
+          mostrarEtiquetasUbicacion && visible ? "block" : "none";
+      }
+    };
+
+    TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
+      mostrarEtiqueta(
+        `base-${base.nombre}`,
+        mostrarBases &&
+          Boolean(basesVisibles[base.nombre]) &&
+          bandoVisible(base.bando, vistaFuerzas),
+      );
+    });
+
+    mostrarEtiqueta(
+      "coae-propio",
+      mostrarBases &&
+        mostrarCOAe &&
+        bandoVisible("propio", vistaFuerzas),
+    );
+
+    mostrarEtiqueta(
+      "coae-enemigo",
+      mostrarBases &&
+        mostrarCOAeEnemigo &&
+        bandoVisible("enemigo", vistaFuerzas),
+    );
+
+    mostrarEtiqueta(
+      "laboratorio-tritio",
+      mostrarBases &&
+        mostrarLaboratorioTritio &&
+        bandoVisible("enemigo", vistaFuerzas),
+    );
+
+    GRUPOS_COMUNICACIONES.forEach((grupo) => {
+      mostrarEtiqueta(
+        `com-${grupo.nombre}`,
+        mostrarBases &&
+          mostrarComunicaciones &&
+          bandoVisible("propio", vistaFuerzas),
+      );
+    });
+  }, [
+    mostrarEtiquetasUbicacion,
+    mostrarBases,
+    mostrarEtiquetasUbicacion,
+    mostrarComunicaciones,
+    mostrarCOAe,
+    mostrarCOAeEnemigo,
+    mostrarLaboratorioTritio,
+    vistaFuerzas,
+    basesVisibles,
+    mapReady,
+  ]);
+
+  useEffect(() => {
     const marcador = coaeRef.current;
     if (!marcador) return;
 
@@ -3721,6 +3858,7 @@ export default function MapEditor({
           entornoGeografico: mostrarEntornoGeografico,
           ton: mostrarTon,
           bases: mostrarBases,
+          etiquetasUbicacion: mostrarEtiquetasUbicacion,
           comunicaciones: mostrarComunicaciones,
           aeronaves: mostrarAeronaves,
           radares: mostrarRadares,
@@ -3949,6 +4087,21 @@ export default function MapEditor({
             />
             Bases y estaciones
           </label>
+
+          <label className="mt-3 flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={mostrarEtiquetasUbicacion}
+              onChange={(event) =>
+                setMostrarEtiquetasUbicacion(event.target.checked)
+              }
+            />
+            Rótulos blancos de ubicación
+          </label>
+
+          <p className="mt-1 text-xs text-slate-400">
+            Muestra u oculta cuadros blancos con nombres abreviados de bases, estaciones y blancos principales.
+          </p>
 
           <label className="mt-3 flex items-center gap-2">
             <input
