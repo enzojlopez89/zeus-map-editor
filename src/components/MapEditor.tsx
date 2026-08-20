@@ -486,17 +486,16 @@ function coordenadasDetalladasHtml(
   longitude: number,
   altitudeMeters?: number,
 ) {
-  const alturaTexto =
+  const alturaHtml =
     typeof altitudeMeters === "number"
-      ? `${altitudeMeters.toLocaleString("es-AR")} m s. n. m.`
-      : "Altura no cargada";
+      ? `<br /><strong>Altura:</strong> ${altitudeMeters.toLocaleString("es-AR")} m s. n. m.`
+      : "";
 
   return `
     <hr style="margin:8px 0;border:0;border-top:1px solid #475569" />
     <strong>Coordenadas del mapa:</strong><br />
     Decimal: ${formatearNumeroCoordenada(latitude)}, ${formatearNumeroCoordenada(longitude)}<br />
-    DMS: ${formatearDms(latitude, "lat")} / ${formatearDms(longitude, "lon")}<br />
-    <strong>Altura:</strong> ${alturaTexto}
+    DMS: ${formatearDms(latitude, "lat")} / ${formatearDms(longitude, "lon")}${alturaHtml}
   `;
 }
 
@@ -2386,17 +2385,26 @@ export default function MapEditor({
           );
 
     const listar = (items: Array<{ nombre: string; cantidad?: number }>) =>
+      items
+        .map(
+          (item) =>
+            `${item.nombre}${item.cantidad ? ` x ${item.cantidad}` : ""}`,
+        )
+        .join("<br />");
+
+    const seccionMedios = (
+      titulo: string,
+      items: Array<{ nombre: string; cantidad?: number }>,
+    ) =>
       items.length
-        ? items
-            .map(
-              (item) =>
-                `${item.nombre}${item.cantidad ? ` x ${item.cantidad}` : ""}`,
-            )
-            .join("<br />")
-        : "Sin medios registrados";
+        ? `
+          <hr style="margin:8px 0;border:0;border-top:1px solid #475569" />
+          <strong>${titulo}:</strong><br />${listar(items)}
+        `
+        : "";
 
     return `
-      <div style="font-family:Arial;color:#f8fafc;background:#0f172a;min-width:280px;padding:12px;border-radius:8px;line-height:1.45">
+      <div style="font-family:Arial;color:#f8fafc;background:#0f172a;min-width:300px;padding:12px;border-radius:8px;line-height:1.45">
         <strong>${base.nombre}</strong><br />
         <em>${base.tipo} — ${
           base.bando === "propio" ? "PROPIO" : "ENEMIGO"
@@ -2405,12 +2413,9 @@ export default function MapEditor({
         ${coordenadasDetalladasHtml(base.latitude, base.longitude, base.altitudeMeters)}
         ${base.detalle ? `<br /><br /><span>${base.detalle}</span>` : ""}
         ${base.infraestructuraHtml ? `<br /><br />${base.infraestructuraHtml}` : ""}
-        <hr style="margin:8px 0;border:0;border-top:1px solid #475569" />
-        <strong>Aeronaves:</strong><br />${listar(aeronaves)}
-        <br /><br />
-        <strong>Radares:</strong><br />${listar(radares)}
-        <br /><br />
-        <strong>Defensa antiaérea:</strong><br />${listar(defensa)}
+        ${seccionMedios("Aeronaves", aeronaves)}
+        ${seccionMedios("Radares", radares)}
+        ${seccionMedios("Defensa antiaérea", defensa)}
       </div>
     `;
   }
@@ -3086,11 +3091,12 @@ export default function MapEditor({
 
       TODAS_LAS_BASES_Y_ESTABLECIMIENTOS.forEach((base) => {
         const popup = new maplibregl.Popup({
-          offset: 25,
-          maxWidth: "460px",
-          className: "zeus-popup",
+          offset: 28,
+          maxWidth: "540px",
+          className: "zeus-popup zeus-popup-base",
           closeButton: false,
           closeOnClick: false,
+          focusAfterOpen: false,
         }).setHTML(mediosDeBase(base));
 
         const marker = new maplibregl.Marker({
@@ -3102,12 +3108,57 @@ export default function MapEditor({
           .addTo(map);
 
         const elementoMarker = marker.getElement();
+        let cierrePopup: number | null = null;
+
+        const cancelarCierrePopup = () => {
+          if (cierrePopup !== null) {
+            window.clearTimeout(cierrePopup);
+            cierrePopup = null;
+          }
+        };
+
+        const cerrarPopupConDemora = () => {
+          cancelarCierrePopup();
+          cierrePopup = window.setTimeout(() => {
+            popup.remove();
+            cierrePopup = null;
+          }, 220);
+        };
+
+        const prepararPopupVisible = () => {
+          const popupElement = popup.getElement();
+          const content = popupElement?.querySelector(
+            ".maplibregl-popup-content",
+          ) as HTMLElement | null;
+
+          if (popupElement) {
+            popupElement.style.zIndex = "150";
+          }
+
+          if (content) {
+            content.style.maxHeight = "min(70vh, 590px)";
+            content.style.overflowY = "auto";
+            content.style.overscrollBehavior = "contain";
+            content.style.scrollbarGutter = "stable";
+          }
+        };
+
         elementoMarker.addEventListener("mouseenter", () => {
+          cancelarCierrePopup();
           popup.setLngLat([base.longitude, base.latitude]).addTo(map);
+
+          window.requestAnimationFrame(() => {
+            prepararPopupVisible();
+
+            const popupElement = popup.getElement();
+            if (!popupElement) return;
+
+            popupElement.onmouseenter = cancelarCierrePopup;
+            popupElement.onmouseleave = cerrarPopupConDemora;
+          });
         });
-        elementoMarker.addEventListener("mouseleave", () => {
-          popup.remove();
-        });
+
+        elementoMarker.addEventListener("mouseleave", cerrarPopupConDemora);
 
         habilitarMedicionSobreMarcador(marker, [base.longitude, base.latitude]);
 
