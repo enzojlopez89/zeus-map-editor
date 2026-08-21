@@ -6,7 +6,22 @@ type Seccion = "situacion" | "tfp" | "fase1" | "fase2" | "fase3" | "fase4";
 
 type Comunicacion = { equipo: string; cantidad: number };
 type Medio = { nombre: string; cantidad?: number; detalle?: string };
-type Unidad = { nombre: string; ubicacion: string; medios: Medio[]; comunicaciones: Comunicacion[]; observaciones?: string[] };
+type LogisticaInicial = {
+  personal: number;
+  racionesDia: number;
+  cocinas: number;
+  carpasRacionamiento: number;
+  carpasAlojamiento: number;
+};
+
+type Unidad = {
+  nombre: string;
+  ubicacion: string;
+  medios: Medio[];
+  comunicaciones: Comunicacion[];
+  logistica?: LogisticaInicial;
+  observaciones?: string[];
+};
 
 type Fase = { id: Seccion; titulo: string; subtitulo: string; momentos: { nombre: string; periodo: string; detalle: string }[] };
 
@@ -71,47 +86,42 @@ const COMUNICACIONES: Record<string, Comunicacion[]> = {
 };
 
 const UNIDADES: Unidad[] = [
-  {nombre:"COAe",ubicacion:"Río Cuarto",medios:[],comunicaciones:[],observaciones:["CHARLIE identifica la unidad, sin discriminar medios orgánicos en su apartado de Medios Asignados."]},
-  {nombre:"Grupo 1 COM",ubicacion:"San Luis",medios:[],comunicaciones:COMUNICACIONES.g1},
-  {nombre:"1ª Brigada Aérea",ubicacion:"La Rioja",comunicaciones:COMUNICACIONES["1ba"],medios:[
+  {nombre:"Grupo 1 COM",ubicacion:"San Luis",medios:[],comunicaciones:COMUNICACIONES.g1,logistica:{personal:149,racionesDia:298,cocinas:1,carpasRacionamiento:1,carpasAlojamiento:1}},
+  {nombre:"1ª Brigada Aérea",ubicacion:"La Rioja",comunicaciones:COMUNICACIONES["1ba"],logistica:{personal:1305,racionesDia:2610,cocinas:3,carpasRacionamiento:1,carpasAlojamiento:3},medios:[
     {nombre:"C-130J",cantidad:10,detalle:"Escuadrón 1 TA"},{nombre:"KC-130J",cantidad:4,detalle:"Escuadrón 2 TA"},
     {nombre:"LJ-60",cantidad:3,detalle:"Escuadrón 3 TA/VIP"},{nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 4 TA"},
     {nombre:"B-412",cantidad:4,detalle:"1ra Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"1ra Sección H"},
-    {nombre:"NASAMS",cantidad:1,detalle:"Escuadrón 1 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 1 DAa"},
-    {nombre:"RBS-70",detalle:"Escuadrón 1 DAa; CHARLIE no discrimina cantidad"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 4 VyCA"},
+    {nombre:"NASAMS",cantidad:1,detalle:"Escuadrón 1 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 1 DAa"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 4 VyCA"},
   ],observaciones:["ECCO: no cuenta con red alámbrica; las líneas pasan a 2 km de la unidad."]},
-  {nombre:"2ª Brigada Aérea",ubicacion:"Villa Mercedes",comunicaciones:COMUNICACIONES["2ba"],medios:[
+  {nombre:"2ª Brigada Aérea",ubicacion:"Villa Mercedes",comunicaciones:COMUNICACIONES["2ba"],logistica:{personal:1293,racionesDia:2586,cocinas:3,carpasRacionamiento:1,carpasAlojamiento:3},medios:[
     {nombre:"F-16C Block 40",cantidad:20,detalle:"Escuadrón 1 C"},{nombre:"AMX A-1M",cantidad:12,detalle:"1ra Escuadrilla A"},
     {nombre:"T-6 Texan II",cantidad:12,detalle:"7ma Escuadrilla A"},{nombre:"Hermes 450",cantidad:3,detalle:"Escuadrón 1 SIGINT"},
     {nombre:"B-412",cantidad:4,detalle:"2da Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"2da Sección H"},{nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 9 TA"},
-    {nombre:"NASAMS",cantidad:2,detalle:"Escuadrón 2 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 2 DAa"},
-    {nombre:"RBS-70",detalle:"Escuadrón 2 DAa; CHARLIE no discrimina cantidad"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 2 VyCA"},
+    {nombre:"NASAMS",cantidad:2,detalle:"Escuadrón 2 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 2 DAa"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 2 VyCA"},
   ]},
-  {nombre:"3ª Brigada Aérea",ubicacion:"Córdoba",comunicaciones:COMUNICACIONES["3ba"],medios:[
+  {nombre:"3ª Brigada Aérea",ubicacion:"Córdoba",comunicaciones:COMUNICACIONES["3ba"],logistica:{personal:1201,racionesDia:2402,cocinas:3,carpasRacionamiento:1,carpasAlojamiento:3},medios:[
     {nombre:"AMX A-1M",cantidad:12,detalle:"5ta Escuadrilla A"},{nombre:"T-6 Texan II",cantidad:12,detalle:"8va Escuadrilla A"},
     {nombre:"E-99M ERIEYE",cantidad:3,detalle:"Escuadrón AWACS"},{nombre:"B-412",cantidad:2,detalle:"3ra Sección H"},
     {nombre:"UH-1Y",cantidad:4,detalle:"3ra Sección H"},{nombre:"KC-135",cantidad:3,detalle:"Escuadrón 5 TA"},{nombre:"CH-47F",cantidad:6,detalle:"Escuadrón 1 H"},
-    {nombre:"PATRIOT",cantidad:1,detalle:"Escuadrón 3 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 3 DAa"},
-    {nombre:"RBS-70",detalle:"Escuadrón 3 DAa; CHARLIE no discrimina cantidad"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 1 VyCA"},
+    {nombre:"PATRIOT",cantidad:1,detalle:"Escuadrón 3 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 3 DAa"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 1 VyCA"},
   ]},
-  {nombre:"4ª Brigada Aérea",ubicacion:"Mendoza",comunicaciones:COMUNICACIONES["4ba"],medios:[
+  {nombre:"4ª Brigada Aérea",ubicacion:"Mendoza",comunicaciones:COMUNICACIONES["4ba"],logistica:{personal:652,racionesDia:1304,cocinas:2,carpasRacionamiento:1,carpasAlojamiento:2},medios:[
     {nombre:"F-16C Block 40",cantidad:14,detalle:"Escuadrón 3 C"},{nombre:"F-16D Block 42",cantidad:6,detalle:"Escuadrón 3 C"},
     {nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 7 TA"},{nombre:"KC-135",cantidad:3,detalle:"Escuadrón 8 TA"},
     {nombre:"B-412",cantidad:2,detalle:"4ta Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"4ta Sección H"},
     {nombre:"PATRIOT",cantidad:1,detalle:"Escuadrón 4 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 4 DAa"},
-    {nombre:"RBS-70",detalle:"Escuadrón 4 DAa; CHARLIE no discrimina cantidad"},
   ]},
-  {nombre:"5ª Brigada Aérea",ubicacion:"General Acha",comunicaciones:COMUNICACIONES["5ba"],medios:[
+  {nombre:"5ª Brigada Aérea",ubicacion:"General Acha",comunicaciones:COMUNICACIONES["5ba"],logistica:{personal:840,racionesDia:1680,cocinas:2,carpasRacionamiento:1,carpasAlojamiento:2},medios:[
     {nombre:"F-16CJ Block 50",cantidad:10,detalle:"Escuadrón 2 C"},{nombre:"IAI HARPY",cantidad:36,detalle:"Escuadrón 1 UCAV"},
     {nombre:"LJ-60",cantidad:3,detalle:"Escuadrón 1 MEDEVAC"},{nombre:"HERMES 450",cantidad:3,detalle:"Escuadrón 2 EyR"},
     {nombre:"EC-130H COMPASS CALL",cantidad:2,detalle:"Escuadrón 1 GE"},{nombre:"B-412",cantidad:2,detalle:"5ta Sección H"},
     {nombre:"CH-47F",cantidad:6,detalle:"Escuadrón 2 H"},{nombre:"NASAMS",cantidad:1,detalle:"Escuadrón 5 DAa"},
-    {nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 5 DAa"},{nombre:"RBS-70",detalle:"Escuadrón 5 DAa; CHARLIE no discrimina cantidad"},
+    {nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 5 DAa"},
     {nombre:"GM 400A",cantidad:1,detalle:"Escuadrón 3 VyCA"},
   ],observaciones:["ECCO: el sistema alámbrico presenta grandes deficiencias y cortes debido a la gran inundación de 2022."]},
-  {nombre:"Base Aérea Militar Malargüe",ubicacion:"Malargüe",comunicaciones:COMUNICACIONES.bam,medios:[
+  {nombre:"Base Aérea Militar Malargüe",ubicacion:"Malargüe",comunicaciones:COMUNICACIONES.bam,logistica:{personal:711,racionesDia:1422,cocinas:2,carpasRacionamiento:1,carpasAlojamiento:2},medios:[
     {nombre:"COAe alternativo",cantidad:1},{nombre:"Grupo 2 COM",cantidad:1},{nombre:"NASAMS",cantidad:2,detalle:"Esc. 7 DAa"},
-    {nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Esc. 7 DAa"},{nombre:"RBS-70",detalle:"Esc. 7 DAa; CHARLIE no discrimina cantidad"},
+    {nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Esc. 7 DAa"},
   ]},
   {nombre:"Grupo 2 COM",ubicacion:"Malargüe",medios:[],comunicaciones:COMUNICACIONES.g2},
 ];
@@ -354,13 +364,25 @@ function ControlLogisticoTON(){
 
       <main className="min-h-0 flex-1 overflow-auto p-4 md:p-6"><div className="mx-auto max-w-7xl">
         {seccion==="situacion"&&<div className="space-y-6">
-          <section><h2 className="text-xl font-black text-emerald-300">SITUACIÓN INICIAL</h2><p className="mt-1 text-sm text-slate-400">Dispositivo inicial del CAeC y material logístico antes de aplicar movimientos de campaña.</p></section>
+          <section><h2 className="text-xl font-black text-emerald-300">SITUACIÓN INICIAL</h2><p className="mt-1 text-sm text-slate-400">Dispositivo inicial del CAeC y material logístico antes de aplicar movimientos de campaña.</p><p className="mt-2 rounded border border-cyan-900/50 bg-cyan-950/10 p-3 text-xs text-cyan-100">En esta pantalla sólo se muestran existencias y capacidades iniciales documentadas. No se calcula todavía si alcanzan, sobran o generan déficit; esos cálculos se incorporarán después utilizando las TFP.</p></section>
 
           <section className="space-y-3"><div><h3 className="font-black text-white">UNIDADES Y MEDIOS · ANEXO CHARLIE</h3><p className="text-xs text-slate-500">Cada unidad incorpora además su dotación de comunicaciones del Apéndice 1 de ECCO cuando existe discriminación por unidad.</p></div>
             {UNIDADES.map(u=>{const abierta=unidadAbierta===u.nombre;return <article key={`${u.nombre}-${u.ubicacion}`} className="rounded-xl border border-slate-800 bg-slate-900">
               <button onClick={()=>setUnidadAbierta(abierta?null:u.nombre)} className="flex w-full items-center justify-between gap-3 p-4 text-left"><div><b>{u.nombre}</b><p className="text-xs text-slate-500">{u.ubicacion}</p></div><span className="text-slate-400">{abierta?"−":"+"}</span></button>
-              {abierta&&<div className="border-t border-slate-800 p-4"><div className="grid gap-5 lg:grid-cols-2"><div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-cyan-300">Medios asignados</h4>{u.medios.length?<div className="space-y-1">{u.medios.map((m,i)=><div key={i} className="flex items-start justify-between gap-3 rounded bg-slate-950 px-3 py-2 text-xs"><div><b>{m.nombre}</b>{m.detalle&&<p className="text-[10px] text-slate-500">{m.detalle}</p>}</div><b className="text-cyan-300">{m.cantidad??"s/d"}</b></div>)}</div>:<p className="rounded bg-slate-950 p-3 text-xs text-slate-500">Sin medios cuantificados en el apartado de medios asignados de CHARLIE.</p>}</div>
-                <div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-sky-300">Comunicaciones</h4>{u.comunicaciones.length?<div className="grid gap-1 sm:grid-cols-2">{u.comunicaciones.map((c,i)=><div key={i} className="flex justify-between gap-2 rounded bg-slate-950 px-3 py-2 text-xs"><span>{c.equipo}</span><b className="text-sky-300">{c.cantidad}</b></div>)}</div>:<p className="rounded bg-slate-950 p-3 text-xs text-slate-500">ECCO no discrimina equipos específicamente para esta unidad.</p>}{u.observaciones?.map((o,i)=><p key={i} className="mt-2 rounded border border-amber-900/50 bg-amber-950/10 p-2 text-[11px] text-amber-200">{o}</p>)}</div></div></div>}
+              {abierta&&<div className="border-t border-slate-800 p-4"><div className="grid gap-5 lg:grid-cols-2">{u.medios.length>0&&<div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-cyan-300">Medios asignados</h4><div className="space-y-1">{u.medios.map((m,i)=><div key={i} className="flex items-start justify-between gap-3 rounded bg-slate-950 px-3 py-2 text-xs"><div><b>{m.nombre}</b>{m.detalle&&<p className="text-[10px] text-slate-500">{m.detalle}</p>}</div>{typeof m.cantidad==="number"&&<b className="text-cyan-300">{m.cantidad}</b>}</div>)}</div></div>}
+                <div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-sky-300">Comunicaciones</h4>{u.comunicaciones.length?<div className="grid gap-1 sm:grid-cols-2">{u.comunicaciones.map((c,i)=><div key={i} className="flex justify-between gap-2 rounded bg-slate-950 px-3 py-2 text-xs"><span>{c.equipo}</span><b className="text-sky-300">{c.cantidad}</b></div>)}</div>:<p className="rounded bg-slate-950 p-3 text-xs text-slate-500">ECCO no discrimina equipos específicamente para esta unidad.</p>}{u.observaciones?.map((o,i)=><p key={i} className="mt-2 rounded border border-amber-900/50 bg-amber-950/10 p-2 text-[11px] text-amber-200">{o}</p>)}</div></div>
+                {u.logistica&&<div className="mt-5">
+                  <h4 className="mb-2 text-xs font-black uppercase tracking-wider text-amber-300">Datos iniciales documentados · personal, racionamiento y alojamiento</h4>
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+                    <div className="rounded bg-slate-950 p-3 text-xs"><span className="text-slate-500">Personal inicial consignado</span><b className="block text-lg text-white">{u.logistica.personal}</b></div>
+                    <div className="rounded bg-slate-950 p-3 text-xs"><span className="text-slate-500">Racionamiento inicial</span><b className="block text-lg text-white">{u.logistica.racionesDia}</b><span className="text-[10px] text-slate-600">raciones por día</span></div>
+                    <div className="rounded bg-slate-950 p-3 text-xs"><span className="text-slate-500">Cocinas disponibles</span><b className="block text-lg text-white">{u.logistica.cocinas}</b></div>
+                    <div className="rounded bg-slate-950 p-3 text-xs"><span className="text-slate-500">Carpas para racionamiento</span><b className="block text-lg text-white">{u.logistica.carpasRacionamiento}</b><span className="text-[10px] text-slate-600">500 personas c/u</span></div>
+                    <div className="rounded bg-slate-950 p-3 text-xs"><span className="text-slate-500">Carpas para alojamiento</span><b className="block text-lg text-white">{u.logistica.carpasAlojamiento}</b><span className="text-[10px] text-slate-600">500 personas c/u</span></div>
+                  </div>
+                  <p className="mt-2 text-[11px] text-slate-400"><b>Capacidad nominal de alojamiento disponible:</b> {u.logistica.carpasAlojamiento*500} personas <span className="text-slate-600">(dato derivado únicamente de la nota TFP: 1 carpa cada 500 personas; no implica todavía evaluación de suficiencia).</span></p>
+                </div>}
+              </div>}
             </article>})}
           </section>
 
