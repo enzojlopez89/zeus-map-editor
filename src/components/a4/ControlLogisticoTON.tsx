@@ -6,11 +6,27 @@ type Seccion = "situacion" | "tfp" | "fase1" | "fase2" | "fase3" | "fase4";
 
 type Comunicacion = { equipo: string; cantidad: number };
 type Medio = { nombre: string; cantidad?: number; detalle?: string };
+
+type PersonalFila = {
+  elemento: string;
+  oficiales: number;
+  suboficiales: number;
+  sv: number;
+  civiles: number;
+  total: number;
+  division?: string;
+};
+
+type PersonalUnidad = {
+  filas: PersonalFila[];
+  total: { oficiales: number; suboficiales: number; sv: number; civiles: number; total: number };
+};
 type Unidad = {
   nombre: string;
   ubicacion: string;
   medios: Medio[];
   comunicaciones: Comunicacion[];
+  personal?: PersonalUnidad;
   observaciones?: string[];
 };
 
@@ -76,33 +92,156 @@ const COMUNICACIONES: Record<string, Comunicacion[]> = {
   ],
 };
 
+
+const PERSONAL_ALFA: Record<string, PersonalUnidad> = {
+  "Grupo 1 COM": {
+    filas: [
+      {elemento:"GRUPO 1 COM",oficiales:14,suboficiales:40,sv:22,civiles:9,total:85},
+      {elemento:"ESC. DE ICIA. UIS",oficiales:13,suboficiales:21,sv:12,civiles:18,total:64},
+    ],
+    total:{oficiales:27,suboficiales:61,sv:34,civiles:27,total:149},
+  },
+  "1ª Brigada Aérea": {
+    filas: [
+      {division:"APOYO / UNIDAD",elemento:"ADMINIST./MANTENIM.",oficiales:28,suboficiales:78,sv:44,civiles:5,total:155},
+      {division:"APOYO / UNIDAD",elemento:"SANIDAD",oficiales:12,suboficiales:30,sv:18,civiles:8,total:68},
+      {division:"APOYO / UNIDAD",elemento:"SEGURIDAD",oficiales:8,suboficiales:18,sv:67,civiles:0,total:93},
+      {division:"SISTEMAS AÉREOS",elemento:"KC-130 J",oficiales:48,suboficiales:148,sv:24,civiles:6,total:226},
+      {division:"SISTEMAS AÉREOS",elemento:"C-130 J",oficiales:40,suboficiales:112,sv:50,civiles:13,total:215},
+      {division:"SISTEMAS AÉREOS",elemento:"LEAR JET 60",oficiales:18,suboficiales:40,sv:14,civiles:4,total:76},
+      {division:"SISTEMAS AÉREOS",elemento:"DHC6-400",oficiales:22,suboficiales:56,sv:18,civiles:3,total:99},
+      {division:"SISTEMAS AÉREOS",elemento:"UH-1Y",oficiales:24,suboficiales:45,sv:18,civiles:0,total:87},
+      {division:"SISTEMAS AÉREOS",elemento:"BELL-412",oficiales:24,suboficiales:48,sv:18,civiles:0,total:90},
+      {division:"DEFENSA ANTIAÉREA",elemento:"NASAMS",oficiales:10,suboficiales:35,sv:28,civiles:0,total:73},
+      {division:"DEFENSA ANTIAÉREA",elemento:"SKYGUARD OERLIKON",oficiales:8,suboficiales:35,sv:24,civiles:0,total:67},
+      {division:"DEFENSA ANTIAÉREA",elemento:"RBS70",oficiales:8,suboficiales:28,sv:20,civiles:0,total:56},
+    ],
+    total:{oficiales:250,suboficiales:673,sv:343,civiles:39,total:1305},
+  },
+  "2ª Brigada Aérea": {
+    filas: [
+      {division:"APOYO / UNIDAD",elemento:"ADMINIST./MANTENIM.",oficiales:18,suboficiales:52,sv:28,civiles:15,total:113},
+      {division:"APOYO / UNIDAD",elemento:"SANIDAD",oficiales:11,suboficiales:28,sv:20,civiles:5,total:64},
+      {division:"APOYO / UNIDAD",elemento:"SEGURIDAD",oficiales:5,suboficiales:21,sv:120,civiles:0,total:146},
+      {division:"SISTEMAS AÉREOS",elemento:"F-16C BLOCK 40",oficiales:48,suboficiales:75,sv:36,civiles:7,total:166},
+      {division:"SISTEMAS AÉREOS",elemento:"AMX A-1M",oficiales:32,suboficiales:80,sv:20,civiles:2,total:134},
+      {division:"SISTEMAS AÉREOS",elemento:"T-6 TEXAN II",oficiales:24,suboficiales:98,sv:18,civiles:3,total:143},
+      {division:"SISTEMAS AÉREOS",elemento:"BELL-412",oficiales:18,suboficiales:24,sv:14,civiles:1,total:57},
+      {division:"SISTEMAS AÉREOS",elemento:"UH-1Y",oficiales:20,suboficiales:28,sv:12,civiles:0,total:60},
+      {division:"SISTEMAS AÉREOS",elemento:"DHC6-400",oficiales:16,suboficiales:29,sv:14,civiles:1,total:60},
+      {division:"SISTEMAS AÉREOS",elemento:"ELBIT HERMES 450",oficiales:14,suboficiales:28,sv:28,civiles:2,total:72},
+      {division:"DEFENSA ANTIAÉREA",elemento:"NASAMS",oficiales:8,suboficiales:25,sv:23,civiles:0,total:56},
+      {division:"DEFENSA ANTIAÉREA",elemento:"SKYGUARD OERLIKON",oficiales:12,suboficiales:20,sv:86,civiles:0,total:118},
+      {division:"DEFENSA ANTIAÉREA",elemento:"RBS69 (según ALFA)",oficiales:8,suboficiales:18,sv:15,civiles:0,total:41},
+      {division:"DEFENSA ANTIAÉREA",elemento:"TPS-77",oficiales:12,suboficiales:28,sv:22,civiles:1,total:63},
+    ],
+    total:{oficiales:246,suboficiales:554,sv:456,civiles:37,total:1293},
+  },
+  "3ª Brigada Aérea": {
+    filas: [
+      {division:"COMANDO / APOYO",elemento:"CAOC",oficiales:35,suboficiales:50,sv:35,civiles:6,total:126},
+      {division:"COMANDO / APOYO",elemento:"ADMINIST./MANTENIM.",oficiales:12,suboficiales:45,sv:20,civiles:5,total:82},
+      {division:"COMANDO / APOYO",elemento:"SANIDAD",oficiales:11,suboficiales:18,sv:15,civiles:5,total:49},
+      {division:"COMANDO / APOYO",elemento:"SEGURIDAD",oficiales:5,suboficiales:21,sv:80,civiles:0,total:106},
+      {division:"SISTEMAS AÉREOS",elemento:"AMX A-1M",oficiales:32,suboficiales:48,sv:12,civiles:2,total:94},
+      {division:"SISTEMAS AÉREOS",elemento:"T-6 TEXAN II",oficiales:24,suboficiales:40,sv:10,civiles:2,total:76},
+      {division:"SISTEMAS AÉREOS",elemento:"BELL-412",oficiales:12,suboficiales:12,sv:12,civiles:1,total:37},
+      {division:"SISTEMAS AÉREOS",elemento:"CH-47F",oficiales:32,suboficiales:60,sv:18,civiles:1,total:111},
+      {division:"SISTEMAS AÉREOS",elemento:"UH-1Y",oficiales:18,suboficiales:20,sv:18,civiles:1,total:57},
+      {division:"SISTEMAS AÉREOS",elemento:"E-99M",oficiales:12,suboficiales:68,sv:28,civiles:1,total:109},
+      {division:"SISTEMAS AÉREOS",elemento:"KC-135",oficiales:18,suboficiales:84,sv:28,civiles:2,total:132},
+      {division:"DEFENSA ANTIAÉREA",elemento:"PATRIOT",oficiales:10,suboficiales:28,sv:32,civiles:0,total:70},
+      {division:"DEFENSA ANTIAÉREA",elemento:"SKYGUARD OERLIKON",oficiales:8,suboficiales:20,sv:25,civiles:0,total:53},
+      {division:"DEFENSA ANTIAÉREA",elemento:"RBS70",oficiales:8,suboficiales:16,sv:25,civiles:0,total:49},
+      {division:"DEFENSA ANTIAÉREA",elemento:"TPS-77",oficiales:12,suboficiales:18,sv:20,civiles:0,total:50},
+    ],
+    total:{oficiales:249,suboficiales:548,sv:378,civiles:26,total:1201},
+  },
+  "4ª Brigada Aérea": {
+    filas: [
+      {division:"APOYO / UNIDAD",elemento:"ADMINIST./MANTENIM.",oficiales:22,suboficiales:34,sv:17,civiles:2,total:75},
+      {division:"APOYO / UNIDAD",elemento:"SANIDAD",oficiales:8,suboficiales:11,sv:10,civiles:3,total:32},
+      {division:"APOYO / UNIDAD",elemento:"SEGURIDAD",oficiales:4,suboficiales:18,sv:45,civiles:0,total:67},
+      {division:"SISTEMAS AÉREOS",elemento:"F-16C/D BLOCK 40/42",oficiales:38,suboficiales:98,sv:20,civiles:3,total:159},
+      {division:"SISTEMAS AÉREOS",elemento:"KC-135",oficiales:12,suboficiales:58,sv:18,civiles:1,total:89},
+      {division:"SISTEMAS AÉREOS",elemento:"DHC-6 400",oficiales:8,suboficiales:22,sv:8,civiles:1,total:39},
+      {division:"SISTEMAS AÉREOS",elemento:"BELL-412",oficiales:6,suboficiales:12,sv:10,civiles:2,total:30},
+      {division:"SISTEMAS AÉREOS",elemento:"UH-1Y",oficiales:12,suboficiales:18,sv:8,civiles:1,total:39},
+      {division:"DEFENSA ANTIAÉREA",elemento:"PATRIOT",oficiales:12,suboficiales:26,sv:12,civiles:0,total:50},
+      {division:"DEFENSA ANTIAÉREA",elemento:"SKYGUARD OERLIKON",oficiales:6,suboficiales:20,sv:10,civiles:0,total:36},
+      {division:"DEFENSA ANTIAÉREA",elemento:"RBS70",oficiales:6,suboficiales:17,sv:13,civiles:0,total:36},
+    ],
+    total:{oficiales:134,suboficiales:334,sv:171,civiles:13,total:652},
+  },
+  "5ª Brigada Aérea": {
+    filas: [
+      {division:"APOYO / UNIDAD",elemento:"ADMINIST./MANTENIM.",oficiales:18,suboficiales:34,sv:17,civiles:2,total:71},
+      {division:"APOYO / UNIDAD",elemento:"SANIDAD",oficiales:9,suboficiales:11,sv:18,civiles:3,total:41},
+      {division:"APOYO / UNIDAD",elemento:"SEGURIDAD",oficiales:6,suboficiales:18,sv:39,civiles:0,total:63},
+      {division:"SISTEMAS AÉREOS",elemento:"F-16CJ BLOCK 50",oficiales:20,suboficiales:48,sv:26,civiles:1,total:95},
+      {division:"SISTEMAS AÉREOS",elemento:"IAI HARPY",oficiales:8,suboficiales:24,sv:25,civiles:0,total:57},
+      {division:"SISTEMAS AÉREOS",elemento:"LJ-60",oficiales:10,suboficiales:27,sv:15,civiles:1,total:53},
+      {division:"SISTEMAS AÉREOS",elemento:"HERMES 450",oficiales:8,suboficiales:18,sv:12,civiles:0,total:38},
+      {division:"SISTEMAS AÉREOS",elemento:"EC-130H",oficiales:12,suboficiales:38,sv:18,civiles:8,total:76},
+      {division:"SISTEMAS AÉREOS",elemento:"BELL-412",oficiales:12,suboficiales:10,sv:22,civiles:2,total:46},
+      {division:"SISTEMAS AÉREOS",elemento:"CH-47F",oficiales:24,suboficiales:60,sv:18,civiles:1,total:103},
+      {division:"DEFENSA ANTIAÉREA",elemento:"NASAMS",oficiales:12,suboficiales:26,sv:20,civiles:0,total:58},
+      {division:"DEFENSA ANTIAÉREA",elemento:"SKYGUARD OERLIKON",oficiales:8,suboficiales:20,sv:20,civiles:0,total:48},
+      {division:"DEFENSA ANTIAÉREA",elemento:"RBS70",oficiales:6,suboficiales:17,sv:18,civiles:0,total:41},
+      {division:"DEFENSA ANTIAÉREA",elemento:"GM 400A",oficiales:6,suboficiales:20,sv:22,civiles:2,total:50},
+    ],
+    total:{oficiales:159,suboficiales:371,sv:290,civiles:20,total:840},
+  },
+  "Base Aérea Militar Malargüe": {
+    filas: [
+      {division:"COMANDO / APOYO",elemento:"ADMINIST./MANTENIM.",oficiales:10,suboficiales:42,sv:28,civiles:4,total:84},
+      {division:"COMANDO / APOYO",elemento:"SANIDAD",oficiales:3,suboficiales:9,sv:18,civiles:2,total:32},
+      {division:"COMANDO / APOYO",elemento:"CAOC ALTERNATIVO",oficiales:26,suboficiales:48,sv:18,civiles:1,total:93},
+      {division:"COMANDO / APOYO",elemento:"GRUPO 2 COM",oficiales:12,suboficiales:50,sv:20,civiles:5,total:87},
+      {division:"COMANDO / APOYO",elemento:"ESC ICIA MALARGÜE",oficiales:7,suboficiales:22,sv:12,civiles:11,total:52},
+      {division:"COMANDO / APOYO",elemento:"SEGURIDAD",oficiales:6,suboficiales:28,sv:77,civiles:2,total:113},
+      {division:"DEFENSA ANTIAÉREA",elemento:"NASAMS",oficiales:16,suboficiales:48,sv:28,civiles:0,total:92},
+      {division:"DEFENSA ANTIAÉREA",elemento:"SKYGUARD OERLIKON",oficiales:8,suboficiales:32,sv:36,civiles:0,total:76},
+      {division:"DEFENSA ANTIAÉREA",elemento:"RBS70",oficiales:6,suboficiales:28,sv:48,civiles:0,total:82},
+    ],
+    total:{oficiales:94,suboficiales:307,sv:285,civiles:25,total:711},
+  },
+};
+
+const PERSONAL_ALFA_ESTADO_MAYOR: PersonalUnidad = {
+  filas: [{elemento:"ESTADO MAYOR",oficiales:52,suboficiales:180,sv:70,civiles:26,total:328}],
+  total:{oficiales:52,suboficiales:180,sv:70,civiles:26,total:328},
+};
+
+const NUMERICA_CAEC_ALFA = {oficiales:1211,suboficiales:3028,sv:2027,civiles:213,total:6479};
+
 const UNIDADES: Unidad[] = [
-  {nombre:"Grupo 1 COM",ubicacion:"San Luis",medios:[],comunicaciones:COMUNICACIONES.g1},
-  {nombre:"1ª Brigada Aérea",ubicacion:"La Rioja",comunicaciones:COMUNICACIONES["1ba"],medios:[
+  {nombre:"Grupo 1 COM",ubicacion:"San Luis",medios:[],comunicaciones:COMUNICACIONES.g1,personal:PERSONAL_ALFA["Grupo 1 COM"]},
+  {nombre:"1ª Brigada Aérea",ubicacion:"La Rioja",comunicaciones:COMUNICACIONES["1ba"],personal:PERSONAL_ALFA["1ª Brigada Aérea"],medios:[
     {nombre:"C-130J",cantidad:10,detalle:"Escuadrón 1 TA"},{nombre:"KC-130J",cantidad:4,detalle:"Escuadrón 2 TA"},
     {nombre:"LJ-60",cantidad:3,detalle:"Escuadrón 3 TA/VIP"},{nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 4 TA"},
     {nombre:"B-412",cantidad:4,detalle:"1ra Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"1ra Sección H"},
     {nombre:"NASAMS",cantidad:1,detalle:"Escuadrón 1 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 1 DAa"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 4 VyCA"},
   ],observaciones:["ECCO: no cuenta con red alámbrica; las líneas pasan a 2 km de la unidad."]},
-  {nombre:"2ª Brigada Aérea",ubicacion:"Villa Mercedes",comunicaciones:COMUNICACIONES["2ba"],medios:[
+  {nombre:"2ª Brigada Aérea",ubicacion:"Villa Mercedes",comunicaciones:COMUNICACIONES["2ba"],personal:PERSONAL_ALFA["2ª Brigada Aérea"],medios:[
     {nombre:"F-16C Block 40",cantidad:20,detalle:"Escuadrón 1 C"},{nombre:"AMX A-1M",cantidad:12,detalle:"1ra Escuadrilla A"},
     {nombre:"T-6 Texan II",cantidad:12,detalle:"7ma Escuadrilla A"},{nombre:"Hermes 450",cantidad:3,detalle:"Escuadrón 1 SIGINT"},
     {nombre:"B-412",cantidad:4,detalle:"2da Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"2da Sección H"},{nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 9 TA"},
     {nombre:"NASAMS",cantidad:2,detalle:"Escuadrón 2 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 2 DAa"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 2 VyCA"},
   ]},
-  {nombre:"3ª Brigada Aérea",ubicacion:"Córdoba",comunicaciones:COMUNICACIONES["3ba"],medios:[
+  {nombre:"3ª Brigada Aérea",ubicacion:"Córdoba",comunicaciones:COMUNICACIONES["3ba"],personal:PERSONAL_ALFA["3ª Brigada Aérea"],medios:[
     {nombre:"AMX A-1M",cantidad:12,detalle:"5ta Escuadrilla A"},{nombre:"T-6 Texan II",cantidad:12,detalle:"8va Escuadrilla A"},
     {nombre:"E-99M ERIEYE",cantidad:3,detalle:"Escuadrón AWACS"},{nombre:"B-412",cantidad:2,detalle:"3ra Sección H"},
     {nombre:"UH-1Y",cantidad:4,detalle:"3ra Sección H"},{nombre:"KC-135",cantidad:3,detalle:"Escuadrón 5 TA"},{nombre:"CH-47F",cantidad:6,detalle:"Escuadrón 1 H"},
     {nombre:"PATRIOT",cantidad:1,detalle:"Escuadrón 3 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 3 DAa"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 1 VyCA"},
   ]},
-  {nombre:"4ª Brigada Aérea",ubicacion:"Mendoza",comunicaciones:COMUNICACIONES["4ba"],medios:[
+  {nombre:"4ª Brigada Aérea",ubicacion:"Mendoza",comunicaciones:COMUNICACIONES["4ba"],personal:PERSONAL_ALFA["4ª Brigada Aérea"],medios:[
     {nombre:"F-16C Block 40",cantidad:14,detalle:"Escuadrón 3 C"},{nombre:"F-16D Block 42",cantidad:6,detalle:"Escuadrón 3 C"},
     {nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 7 TA"},{nombre:"KC-135",cantidad:3,detalle:"Escuadrón 8 TA"},
     {nombre:"B-412",cantidad:2,detalle:"4ta Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"4ta Sección H"},
     {nombre:"PATRIOT",cantidad:1,detalle:"Escuadrón 4 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 4 DAa"},
   ]},
-  {nombre:"5ª Brigada Aérea",ubicacion:"General Acha",comunicaciones:COMUNICACIONES["5ba"],medios:[
+  {nombre:"5ª Brigada Aérea",ubicacion:"General Acha",comunicaciones:COMUNICACIONES["5ba"],personal:PERSONAL_ALFA["5ª Brigada Aérea"],medios:[
     {nombre:"F-16CJ Block 50",cantidad:10,detalle:"Escuadrón 2 C"},{nombre:"IAI HARPY",cantidad:36,detalle:"Escuadrón 1 UCAV"},
     {nombre:"LJ-60",cantidad:3,detalle:"Escuadrón 1 MEDEVAC"},{nombre:"HERMES 450",cantidad:3,detalle:"Escuadrón 2 EyR"},
     {nombre:"EC-130H COMPASS CALL",cantidad:2,detalle:"Escuadrón 1 GE"},{nombre:"B-412",cantidad:2,detalle:"5ta Sección H"},
@@ -110,7 +249,7 @@ const UNIDADES: Unidad[] = [
     {nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 5 DAa"},
     {nombre:"GM 400A",cantidad:1,detalle:"Escuadrón 3 VyCA"},
   ],observaciones:["ECCO: el sistema alámbrico presenta grandes deficiencias y cortes debido a la gran inundación de 2022."]},
-  {nombre:"Base Aérea Militar Malargüe",ubicacion:"Malargüe",comunicaciones:COMUNICACIONES.bam,medios:[
+  {nombre:"Base Aérea Militar Malargüe",ubicacion:"Malargüe",comunicaciones:COMUNICACIONES.bam,personal:PERSONAL_ALFA["Base Aérea Militar Malargüe"],medios:[
     {nombre:"COAe alternativo",cantidad:1},{nombre:"Grupo 2 COM",cantidad:1},{nombre:"NASAMS",cantidad:2,detalle:"Esc. 7 DAa"},
     {nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Esc. 7 DAa"},
   ]},
@@ -357,10 +496,62 @@ function ControlLogisticoTON(){
         {seccion==="situacion"&&<div className="space-y-6">
           <section><h2 className="text-xl font-black text-emerald-300">SITUACIÓN INICIAL</h2><p className="mt-1 text-sm text-slate-400">Dispositivo inicial del CAeC y material logístico antes de aplicar movimientos de campaña.</p><p className="mt-2 rounded border border-cyan-900/50 bg-cyan-950/10 p-3 text-xs text-cyan-100">Esta pantalla muestra únicamente información de situación inicial respaldada por los anexos del Plan de Campaña y el criterio operativo indicado para Realicó. No se incorporan aquí valores provenientes de TFP.</p></section>
 
+          <section className="space-y-3">
+            <div>
+              <h3 className="font-black text-white">PERSONAL ASIGNADO · ANEXO ALFA</h3>
+              <p className="text-xs text-slate-500">Apéndice 1: efectivos asignados al Componente Aeroespacial Conjunto. Los valores corresponden al Anexo ALFA, no a TFP.</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+                <p className="text-[10px] font-black uppercase tracking-wider text-cyan-300">Estado Mayor</p>
+                <p className="mt-1 text-2xl font-black text-white">{PERSONAL_ALFA_ESTADO_MAYOR.total.total}</p>
+                <p className="mt-1 text-[11px] text-slate-500">52 Oficiales · 180 Suboficiales · 70 S/V · 26 Civiles</p>
+              </div>
+              <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 md:col-span-1 xl:col-span-3">
+                <p className="text-[10px] font-black uppercase tracking-wider text-emerald-300">Numérica CAeC</p>
+                <div className="mt-2 grid grid-cols-5 gap-2 text-center text-xs">
+                  <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Oficiales</span><b>{NUMERICA_CAEC_ALFA.oficiales}</b></div>
+                  <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Suboficiales</span><b>{NUMERICA_CAEC_ALFA.suboficiales}</b></div>
+                  <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">S/V</span><b>{NUMERICA_CAEC_ALFA.sv}</b></div>
+                  <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Civiles</span><b>{NUMERICA_CAEC_ALFA.civiles}</b></div>
+                  <div className="rounded bg-emerald-950/40 p-2"><span className="block text-emerald-400">TOTAL</span><b className="text-emerald-200">{NUMERICA_CAEC_ALFA.total}</b></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section className="space-y-3"><div><h3 className="font-black text-white">UNIDADES Y MEDIOS · ANEXO CHARLIE</h3><p className="text-xs text-slate-500">Cada unidad incorpora además su dotación de comunicaciones del Apéndice 1 de ECCO cuando existe discriminación por unidad.</p></div>
             {UNIDADES.map(u=>{const abierta=unidadAbierta===u.nombre;return <article key={`${u.nombre}-${u.ubicacion}`} className="rounded-xl border border-slate-800 bg-slate-900">
               <button onClick={()=>setUnidadAbierta(abierta?null:u.nombre)} className="flex w-full items-center justify-between gap-3 p-4 text-left"><div><b>{u.nombre}</b><p className="text-xs text-slate-500">{u.ubicacion}</p></div><span className="text-slate-400">{abierta?"−":"+"}</span></button>
               {abierta&&<div className="border-t border-slate-800 p-4"><div className="grid gap-5 lg:grid-cols-2">{u.medios.length>0&&<div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-cyan-300">Medios asignados</h4><div className="space-y-1">{u.medios.map((m,i)=><div key={i} className="flex items-start justify-between gap-3 rounded bg-slate-950 px-3 py-2 text-xs"><div><b>{m.nombre}</b>{m.detalle&&<p className="text-[10px] text-slate-500">{m.detalle}</p>}</div>{typeof m.cantidad==="number"&&<b className="text-cyan-300">{m.cantidad}</b>}</div>)}</div></div>}
+                {u.personal&&<div className="lg:col-span-2">
+                  <h4 className="mb-2 text-xs font-black uppercase tracking-wider text-violet-300">Personal asignado · Anexo ALFA</h4>
+                  <div className="mb-3 grid grid-cols-5 gap-2 text-center text-xs">
+                    <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Oficiales</span><b>{u.personal.total.oficiales}</b></div>
+                    <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Suboficiales</span><b>{u.personal.total.suboficiales}</b></div>
+                    <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">S/V</span><b>{u.personal.total.sv}</b></div>
+                    <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Civiles</span><b>{u.personal.total.civiles}</b></div>
+                    <div className="rounded bg-violet-950/30 p-2"><span className="block text-violet-400">TOTAL</span><b className="text-violet-200">{u.personal.total.total}</b></div>
+                  </div>
+                  <div className="overflow-x-auto rounded-lg border border-slate-800">
+                    <table className="w-full min-w-[760px] text-xs">
+                      <thead className="bg-slate-950 text-slate-400">
+                        <tr><th className="px-3 py-2 text-left">División</th><th className="px-3 py-2 text-left">Elemento</th><th className="px-3 py-2 text-center">Of.</th><th className="px-3 py-2 text-center">Subof.</th><th className="px-3 py-2 text-center">S/V</th><th className="px-3 py-2 text-center">Civ.</th><th className="px-3 py-2 text-center">Total</th></tr>
+                      </thead>
+                      <tbody>
+                        {u.personal.filas.map((f,i)=><tr key={i} className="border-t border-slate-800">
+                          <td className="px-3 py-2 text-[10px] font-bold text-slate-500">{f.division??"—"}</td>
+                          <td className="px-3 py-2 font-semibold text-slate-200">{f.elemento}</td>
+                          <td className="px-3 py-2 text-center text-slate-300">{f.oficiales}</td>
+                          <td className="px-3 py-2 text-center text-slate-300">{f.suboficiales}</td>
+                          <td className="px-3 py-2 text-center text-slate-300">{f.sv}</td>
+                          <td className="px-3 py-2 text-center text-slate-300">{f.civiles}</td>
+                          <td className="px-3 py-2 text-center font-black text-violet-200">{f.total}</td>
+                        </tr>)}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>}
                 <div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-sky-300">Comunicaciones</h4>{u.comunicaciones.length?<div className="grid gap-1 sm:grid-cols-2">{u.comunicaciones.map((c,i)=><div key={i} className="flex justify-between gap-2 rounded bg-slate-950 px-3 py-2 text-xs"><span>{c.equipo}</span><b className="text-sky-300">{c.cantidad}</b></div>)}</div>:<p className="rounded bg-slate-950 p-3 text-xs text-slate-500">ECCO no discrimina equipos específicamente para esta unidad.</p>}{u.observaciones?.map((o,i)=><p key={i} className="mt-2 rounded border border-amber-900/50 bg-amber-950/10 p-2 text-[11px] text-amber-200">{o}</p>)}</div></div>
               </div>}
             </article>})}
