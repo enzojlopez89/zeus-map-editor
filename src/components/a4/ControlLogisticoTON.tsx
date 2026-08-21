@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Seccion = "situacion" | "tfp" | "fase1" | "fase2" | "fase3" | "fase4";
 
@@ -438,10 +438,17 @@ const MATERIAL_DELTA = {
     ["UNIMOG","30"],["Ómnibus 40 pasajeros","10"],["Grúas hasta 15.000 kg","8"],["Camiones 20 Tn","7"],["Camiones 5 Tn","10"],
   ],
   aeronavesApoyo:[
-    ["EC-130H Compass Call","2","GE / AE / ERA / C2"],["E-99M Erieye","3","VyCA aerotransportado / C2"],["Elbit Hermes 450","6","ELINT / COMINT"],
-    ["C-130J","10","TPT carga / tropas / asalto aéreo"],["KC-130J","4","REV / TPT carga"],["KC-135 Stratotanker","6","REV"],
-    ["Learjet 60","6","VIP / MEDEVAC"],["DHC6-400","12","TPT carga / tropas / asalto aéreo"],
-    ["CH-47F","12","TPT carga / asalto aéreo / BYRCOM"],["UH-1Y","16","TPT carga / asalto aéreo / BYRCOM"],["B-412","14","CASEVAC / BYS / TPT tropas / carga / asalto aéreo"],
+    ["EC-130H Compass Call","2","General Acha","GE / AE / ERA / C2"],
+    ["E-99M Erieye","3","Córdoba","VyCA aerotransportado / C2"],
+    ["Elbit Hermes 450","6","Villa Mercedes (3) / General Acha (3)","ELINT / COMINT"],
+    ["C-130J","10","La Rioja","TPT carga / tropas / asalto aéreo"],
+    ["KC-130J","4","La Rioja","REV / TPT carga"],
+    ["KC-135 Stratotanker","6","Córdoba (3) / Mendoza (3)","REV"],
+    ["Learjet 60","6","La Rioja (3) / General Acha (3)","VIP / MEDEVAC"],
+    ["DHC6-400","12","La Rioja (4) / Villa Mercedes (4) / Mendoza (4)","TPT carga / tropas / asalto aéreo"],
+    ["CH-47F","12","Córdoba (6) / General Acha (6)","TPT carga / asalto aéreo / BYRCOM"],
+    ["UH-1Y","16","La Rioja (4) / Villa Mercedes (4) / Córdoba (4) / Mendoza (4)","TPT carga / asalto aéreo / BYRCOM"],
+    ["B-412","14","La Rioja (4) / Villa Mercedes (4) / Córdoba (2) / Mendoza (2) / General Acha (2)","CASEVAC / BYS / TPT tropas / carga / asalto aéreo"],
   ],
   defensa:[
     ["RADAR TPS-77 MRR","3 unidades","Max rango 250–300 NM (360°)"],["RADAR GM 400 ALPHA","1 unidad","Max rango 270–320 NM (360°)"],
@@ -451,7 +458,13 @@ const MATERIAL_DELTA = {
     ["RBS-70 NG","80 unidades de lanzamiento","Max rango 9 km; max altitud 5.000 m"],
   ],
   abastecedoras:[
-    ["1ª BA","20.000 L","3"],["2ª BA","10.000 L","4"],["3ª BA","10.000 L","5"],["4ª BA","10.000 L","4"],["5ª BA","20.000 L","2"],["BAM Malargüe","10.000 L","3"],
+    ["1ª BA","3","20.000 L","60.000 L"],
+    ["2ª BA","4","10.000 L","40.000 L"],
+    ["3ª BA","5","10.000 L","50.000 L"],
+    ["4ª BA","4","10.000 L","40.000 L"],
+    ["5ª BA","2","20.000 L","40.000 L"],
+    ["BAM Malargüe","3","10.000 L","30.000 L"],
+    ["TOTAL","21","—","260.000 L"],
   ],
   mantenimiento:[
     "Armamento aéreo: sin novedades significativas; mantenimiento desde unidades de asiento natural.",
@@ -468,6 +481,15 @@ const MATERIAL_DELTA = {
     "Torres móviles completas: 1ª, 2ª y 5ª Brigadas Aéreas; transportables por vía aérea.",
   ],
 };
+
+const FUELTAINER_DYMAC = [
+  ["FTV-SSA-12000L","12.000 L","Portable / almacenamiento de combustible aeronáutico"],
+  ["FTV-SSA-18000L","18.000 L","Portable / almacenamiento de combustible aeronáutico"],
+  ["FTV-SSA-30000L","30.000 L","Portable / almacenamiento de combustible aeronáutico"],
+  ["FTV-SSA-38000L","38.000 L","Portable / almacenamiento de combustible aeronáutico"],
+  ["FTV-SSA-68000L","68.000 L","Gran capacidad; despliegue vacío y llenado en PRF"],
+  ["FTV-SSA-75000L","75.000 L","Gran capacidad / almacenamiento estático desplegable"],
+];
 
 const TFP_AVIONES = {
   meic:{titulo:"3 DÍAS · MEIC · 4 AERONAVES",filas:[
@@ -492,18 +514,55 @@ const TFP_AVIONES = {
 
 const AVIONES_TFP=["F-16C Block 40 / F-16D Block 42","AMX A-1M","T-6 Texan II","IAI Harpy (UCAV)","EC-130H Compass Call","E-99M Erieye","Elbit Hermes 450","C-130J","KC-130J","KC-135 Stratotanker","Learjet 60","DHC6-400","CH-47F","UH-1Y","B-412"];
 
+const RENDIMIENTO_AERONAVES_TFP = [
+  ["F-16C/D/CJ","Crucero alto","≈ 1.400 L/h","≈ 880 km/h","Referencia pública de crucero; varía por configuración"],
+  ["F-16C/D/CJ","Baja cota","≈ 2.130 L/h","≈ 610 km/h","Mayor consumo; referencia de planeamiento"],
+  ["F-16C/D/CJ","Alto-Bajo-Alto","≈ 1.750 L/h","Variable","Promedio provisional para modelar configuración"],
+  ["AMX A-1M","Crucero","s/d","≈ 900 km/h","Pendiente de fuente de consumo validada"],
+  ["T-6 Texan II","Crucero LRC","≈ 220–330 L/h","≈ 470–500 km/h","Según altitud; tabla pública de planeamiento T-6"],
+  ["IAI Harpy","Misión / merodeo","s/d","s/d","Hasta 9 h de misión; consumo no publicado"],
+  ["EC-130H Compass Call","Crucero","≈ 2.550 L/h","≈ 550–600 km/h","Referencia familia C-130; validar variante H"],
+  ["E-99M Erieye","Crucero","≈ 1.500 L/h","≈ 800 km/h","Referencia ERJ-145; provisional"],
+  ["Elbit Hermes 450","Crucero","s/d","≈ 130 km/h","Consumo no publicado en fuente cargada"],
+  ["C-130J","Crucero","≈ 2.550 L/h","≈ 640–675 km/h","Referencia AFMAN: 4.500 lb/h"],
+  ["KC-130J","Crucero","≈ 2.550 L/h","≈ 640 km/h","Consumo propio; transferencia REV aparte"],
+  ["KC-135","Crucero / planeamiento","≈ 11.900 L/h","≈ 850 km/h","Valor provisional; transferencia depende del radio"],
+  ["Learjet 60","Crucero","≈ 814 L/h","≈ 787 km/h","≈215 US gal/h"],
+  ["DHC6-400","Crucero","≈ 320 L/h","≈ 338 km/h","Referencia pública Series 400"],
+  ["CH-47F","Crucero","≈ 1.250 L/h","≈ 220–269 km/h","≈330 US gal/h"],
+  ["UH-1Y","Crucero","s/d","≈ 272 km/h","Consumo no validado; capacidad 388 US gal"],
+  ["B-412","Crucero","≈ 416 L/h","≈ 230–240 km/h","≈110 US gal/h"],
+];
+
+const BUNKERES_TFP = [
+  {ubicacion:"Córdoba",bombasReq:44,bombasBunkeres:3,misilesReq:null,misilesBunkeres:null,harpyReq:null,harpyBunkeres:null},
+  {ubicacion:"Villa Mercedes",bombasReq:null,bombasBunkeres:null,misilesReq:24,misilesBunkeres:1,harpyReq:null,harpyBunkeres:null},
+  {ubicacion:"Mendoza",bombasReq:22,bombasBunkeres:2,misilesReq:null,misilesBunkeres:null,harpyReq:null,harpyBunkeres:null},
+  {ubicacion:"General Acha",bombasReq:null,bombasBunkeres:null,misilesReq:null,misilesBunkeres:null,harpyReq:15,harpyBunkeres:1},
+];
+
 const VEHICULOS_TFP = [
-  ["Citroën C4",5,1,5,15,7.5,5,0.4,37.5],["Toyota Land Cruiser",35,1,35,105,11.5,7,0.8,57.5],
-  ["VW Amarok",22,1,22,66,9.5,5,1,47.5],["MB Sprinter",12,2,24,72,10,19,1.5,50],
-  ["UNIMOG",30,2,60,180,24,14,2.5,120],["Ómnibus",10,2,20,60,28,40,3,140],
-  ["Grúas 15 Tn",8,2,16,48,45,"—",15,225],["Camiones 5 Tn",10,2,20,60,22,"—",5,110],
-  ["Camiones 20 Tn",7,2,14,42,36,"—",20,180],
+  ["Citroën C4",5,1,5,15,7.5,0.075,80,5,0.4,37.5],
+  ["Toyota Land Cruiser",35,1,35,105,11.5,0.115,75,7,0.8,57.5],
+  ["VW Amarok",22,1,22,66,9.5,0.095,80,5,1,47.5],
+  ["MB Sprinter",12,2,24,72,10,0.10,70,19,1.5,50],
+  ["UNIMOG",30,2,60,180,24,0.24,55,14,2.5,120],
+  ["Ómnibus",10,2,20,60,28,0.28,60,40,3,140],
+  ["Grúas 15 Tn",8,2,16,48,45,0.45,45,"—",15,225],
+  ["Camiones 5 Tn",10,2,20,60,22,0.22,60,"—",5,110],
+  ["Camiones 20 Tn",7,2,14,42,36,0.36,55,"—",20,180],
 ];
 
 const RACIONAMIENTO = [
-  ["Estado Mayor",328,656,1,1,1],["Grupo 1 COM Esc. INCIA UIS",149,298,1,1,1],["1ª Brigada Aérea",1305,2610,3,1,3],
-  ["2ª Brigada Aérea",1293,2586,3,1,3],["3ª Brigada Aérea",1201,2402,3,1,3],["4ª Brigada Aérea",652,1304,2,1,2],
-  ["5ª Brigada Aérea",840,1680,2,1,2],["Base Aérea Militar",711,1422,2,1,2],["TOTAL",6479,12958,17,8,17],
+  ["Estado Mayor",328,656,1,1,1,17],
+  ["Grupo 1 COM Esc. INCIA UIS",149,298,1,1,1,8],
+  ["1ª Brigada Aérea",1305,2610,3,1,3,66],
+  ["2ª Brigada Aérea",1293,2586,3,1,3,65],
+  ["3ª Brigada Aérea",1201,2402,3,1,3,61],
+  ["4ª Brigada Aérea",652,1304,2,1,2,33],
+  ["5ª Brigada Aérea",840,1680,2,1,2,42],
+  ["Base Aérea Militar",711,1422,2,1,2,36],
+  ["TOTAL",6479,12958,17,8,17,325],
 ];
 
 const EQUIPO_APOYO = [
@@ -514,18 +573,39 @@ const EQUIPO_APOYO = [
   ["TeLex (Cap. 5 a 7 Tons.)",1,1,0,0,2,6,4500,7,"—"],
 ];
 
-const DISTANCIAS = [
-  ["La Rioja","—","520","435","600","1000","930","460","610","806","—","445","365","450","875","750","430","465","655"],
-  ["Villa Mercedes","520","—","290","360","480","580","95","125","238","445","—","260","320","420","460","95","120","195"],
-  ["Córdoba","435","290","—","610","720","840","410","215","435","365","260","—","470","640","690","290","200","405"],
-  ["Mendoza","600","360","610","—","760","330","260","480","609","450","320","470","—","740","295","235","400","475"],
-  ["General Acha","1000","480","720","760","—","580","440","505","294","875","420","640","740","—","510","430","480","265"],
-  ["Malargüe","930","580","840","330","580","—","480","620","582","750","460","690","295","510","—","410","540","485"],
-  ["San Luis","460","95","410","260","440","480","—","220","331","430","95","290","235","430","410","—","195","275"],
-  ["Río Cuarto","610","125","215","480","505","620","220","—","223","465","120","200","400","480","540","195","—","215"],
-  ["Realicó","806","238","435","609","294","582","331","223","—","655","195","405","475","265","485","275","215","—"],
+const LUGARES_DIST=["La Rioja", "Villa Mercedes", "Córdoba", "Mendoza", "General Acha", "Malargüe", "San Luis", "Río Cuarto", "Realicó", "Aimogasta", "Lucio Mansilla", "Chamical", "San Juan", "Chepes"];
+const DISTANCIAS_TERRESTRES = [
+  ["La Rioja", "—", "520", "435", "600", "1000", "930", "460", "610", "806", "~108", "~241", "~137", "~335", "~252"],
+  ["Villa Mercedes", "520", "—", "290", "360", "480", "580", "95", "125", "238", "~687", "~513", "~448", "~432", "~336"],
+  ["Córdoba", "435", "290", "—", "610", "720", "840", "410", "215", "435", "~462", "~203", "~262", "~464", "~262"],
+  ["Mendoza", "600", "360", "610", "—", "760", "330", "260", "480", "609", "~594", "~597", "~422", "~167", "~310"],
+  ["General Acha", "1000", "480", "720", "760", "—", "580", "440", "505", "294", "~1163", "~978", "~925", "~851", "~809"],
+  ["Malargüe", "930", "580", "840", "330", "580", "—", "480", "620", "582", "~943", "~906", "~753", "~520", "~625"],
+  ["San Luis", "460", "95", "410", "260", "440", "480", "—", "220", "331", "~611", "~484", "~378", "~314", "~253"],
+  ["Río Cuarto", "610", "125", "215", "480", "505", "620", "220", "—", "223", "~651", "~427", "~418", "~493", "~340"],
+  ["Realicó", "806", "238", "435", "609", "294", "582", "331", "223", "—", "~884", "~677", "~645", "~635", "~541"],
+  ["Aimogasta", "~108", "~687", "~462", "~594", "~1163", "~943", "~611", "~651", "~884", "—", "~290", "~239", "~428", "~360"],
+  ["Lucio Mansilla", "~241", "~513", "~203", "~597", "~978", "~906", "~484", "~427", "~677", "~290", "—", "~193", "~472", "~289"],
+  ["Chamical", "~137", "~448", "~262", "~422", "~925", "~753", "~378", "~418", "~645", "~239", "~193", "—", "~283", "~131"],
+  ["San Juan", "~335", "~432", "~464", "~167", "~851", "~520", "~314", "~493", "~635", "~428", "~472", "~283", "—", "~204"],
+  ["Chepes", "~252", "~336", "~262", "~310", "~809", "~625", "~253", "~340", "~541", "~360", "~289", "~131", "~204", "—"],
 ];
-const LUGARES_DIST=["La Rioja","Villa Mercedes","Córdoba","Mendoza","General Acha","Malargüe","San Luis","Río Cuarto","Realicó"];
+const DISTANCIAS_AEREAS = [
+  ["La Rioja", "—", "445", "365", "450", "875", "750", "430", "465", "655", "93", "208", "118", "289", "217"],
+  ["Villa Mercedes", "445", "—", "260", "320", "420", "460", "95", "120", "195", "592", "442", "386", "372", "290"],
+  ["Córdoba", "365", "260", "—", "470", "640", "690", "290", "200", "405", "398", "175", "226", "400", "226"],
+  ["Mendoza", "450", "320", "470", "—", "740", "295", "235", "400", "475", "512", "515", "364", "144", "267"],
+  ["General Acha", "875", "420", "640", "740", "—", "510", "430", "480", "265", "1003", "843", "797", "734", "697"],
+  ["Malargüe", "750", "460", "690", "295", "510", "—", "410", "540", "485", "813", "781", "649", "448", "539"],
+  ["San Luis", "430", "95", "290", "235", "430", "410", "—", "195", "275", "527", "417", "326", "271", "218"],
+  ["Río Cuarto", "465", "120", "200", "400", "480", "540", "195", "—", "215", "561", "368", "360", "425", "293"],
+  ["Realicó", "655", "195", "405", "475", "265", "485", "275", "215", "—", "762", "584", "556", "547", "466"],
+  ["Aimogasta", "93", "592", "398", "512", "1003", "813", "527", "561", "762", "—", "250", "206", "369", "310"],
+  ["Lucio Mansilla", "208", "442", "175", "515", "843", "781", "417", "368", "584", "250", "—", "166", "407", "249"],
+  ["Chamical", "118", "386", "226", "364", "797", "649", "326", "360", "556", "206", "166", "—", "244", "113"],
+  ["San Juan", "289", "372", "400", "144", "734", "448", "271", "425", "547", "369", "407", "244", "—", "176"],
+  ["Chepes", "217", "290", "226", "267", "697", "539", "218", "293", "466", "310", "249", "113", "176", "—"],
+];
 
 
 function resumenPersonalPorDivision(personal: PersonalUnidad){
@@ -587,6 +667,14 @@ function ControlLogisticoTON(){
   const [destinoOperacion,setDestinoOperacion]=useState("");
   const [transporteOperacion,setTransporteOperacion]=useState<OperacionLogistica["transporte"]>("Camión 20 Tn");
   const [tipoEmpleo,setTipoEmpleo]=useState<"operacion"|"movilizacion"|"abastecimiento"|"repliegue">("operacion");
+  const [fasesConfirmadas,setFasesConfirmadas]=useState<Record<string,boolean>>({});
+  const [viaDistancia,setViaDistancia]=useState<"aerea"|"terrestre">("aerea");
+  const [destinoTabla,setDestinoTabla]=useState<string>("Córdoba");
+
+  useEffect(()=>{
+    try{const raw=localStorage.getItem("zeus-control-logistico-ton-v20"); if(raw){const d=JSON.parse(raw); if(Array.isArray(d.operaciones)) setOperaciones(d.operaciones); if(d.fasesConfirmadas) setFasesConfirmadas(d.fasesConfirmadas);}}catch{}
+  },[]);
+  useEffect(()=>{try{localStorage.setItem("zeus-control-logistico-ton-v20",JSON.stringify({operaciones,fasesConfirmadas}));}catch{}},[operaciones,fasesConfirmadas]);
 
   const faseActiva=FASES.find(f=>f.id===seccion);
 
@@ -622,6 +710,14 @@ function ControlLogisticoTON(){
 
   const personalTFP=personalTecnicoTFP(sistemaOperacion,cantidadOperacion,esfuerzoSeleccionado);
   const combustibleInfo=COMBUSTIBLE_DOCUMENTADO[sistemaOperacion];
+  const indiceOrigen=LUGARES_DIST.indexOf(baseOperacion);
+  const indiceDestino=LUGARES_DIST.indexOf(destinoTabla);
+  const matrizDist=viaDistancia==="aerea"?DISTANCIAS_AEREAS:DISTANCIAS_TERRESTRES;
+  const distanciaTabla=indiceOrigen>=0&&indiceDestino>=0?Number(String(matrizDist[indiceOrigen][indiceDestino+1]).replace("~","")):0;
+  const distanciaCalculada=destinoTabla==="OTRO"?distanciaOperacion:distanciaTabla;
+  const faseIndice=FASES.findIndex(f=>f.id===seccion);
+  const faseAnterior=FASES[faseIndice-1];
+  const puedeConfirmarFase=faseIndice<=0||!!fasesConfirmadas[faseAnterior?.id];
   const nav=[
     ["situacion","SITUACIÓN INICIAL"],["tfp","TFP"],["fase1","FASE I"],["fase2","FASE II"],["fase3","FASE III"],["fase4","FASE IV"]
   ] as [Seccion,string][];
@@ -675,6 +771,7 @@ function ControlLogisticoTON(){
                         type="button"
                         onClick={()=>{
                           setSeccion(id);
+                          setMomentoPlan(m.nombre);
                           setFasesAbiertas((x)=>({...x,[id]:false}));
                         }}
                         className="block w-full rounded px-2 py-2 text-left text-xs text-slate-200 hover:bg-slate-800"
@@ -797,39 +894,107 @@ function ControlLogisticoTON(){
 
             <details className="rounded-xl border border-slate-800 bg-slate-900" open><summary className="cursor-pointer p-4 font-black text-amber-300">ARMAMENTO · DEPÓSITO INICIAL REALICÓ</summary><div className="space-y-4 border-t border-slate-800 p-4">{ARMAMENTO.map((g,i)=><div key={i}><h4 className="mb-2 text-xs font-black uppercase tracking-wider">{g.grupo}</h4><Tabla headers={["Material","Cantidad","Características"]} rows={g.filas}/></div>)}</div></details>
 
-            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">AERONAVES DE APOYO / TRANSPORTE</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Sistema","Cantidad","Capacidad / función"]} rows={MATERIAL_DELTA.aeronavesApoyo}/></div></details>
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">AERONAVES DE APOYO / TRANSPORTE</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Sistema","Cantidad","Base/s de asiento","Capacidad / función"]} rows={MATERIAL_DELTA.aeronavesApoyo}/></div></details>
             <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">VYCA Y DEFENSA ANTIAÉREA</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Sistema","Cantidad","Características"]} rows={MATERIAL_DELTA.defensa}/></div></details>
             <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">TRANSPORTE TERRESTRE</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Vehículo","Cantidad"]} rows={MATERIAL_DELTA.transporte}/></div></details>
-            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">ABASTECEDORAS DE COMBUSTIBLE AERONÁUTICO</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Ubicación","Capacidad por unidad","Cantidad"]} rows={MATERIAL_DELTA.abastecedoras}/></div></details>
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">ABASTECEDORAS DE COMBUSTIBLE AERONÁUTICO</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Ubicación","Cantidad","Capacidad por unidad","Capacidad total"]} rows={MATERIAL_DELTA.abastecedoras}/></div></details>
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">ABASTECIMIENTO MEDIANTE DYMAC FUELTAINER</summary><div className="space-y-3 border-t border-slate-800 p-4"><p className="text-xs text-slate-400">Alternativa de almacenamiento contenerizado y desplegable para combustible aeronáutico en PRF. La familia FuelTainer Aviation se ofrece en capacidades de 12.000 a 75.000 L.</p><Tabla headers={["Modelo","Capacidad","Empleo"]} rows={FUELTAINER_DYMAC}/></div></details>
             <div className="grid gap-3 lg:grid-cols-2"><div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><h4 className="font-black">Mantenimiento</h4><ul className="mt-2 space-y-1 text-xs text-slate-300">{MATERIAL_DELTA.mantenimiento.map((x,i)=><li key={i}>• {x}</li>)}</ul></div><div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><h4 className="font-black">Servicios e infraestructura logística</h4><ul className="mt-2 space-y-1 text-xs text-slate-300">{MATERIAL_DELTA.servicios.map((x,i)=><li key={i}>• {x}</li>)}</ul></div></div>
           </section>
           <p className="text-right text-[10px] text-slate-600">Equipos de comunicaciones discriminados: {totalCom} unidades en la tabla ECCO.</p>
         </div>}
 
         {seccion==="tfp"&&<div className="space-y-5"><div><h2 className="text-xl font-black text-emerald-300">TFP</h2><p className="mt-1 text-sm text-slate-400">Transcripción organizada de las cinco hojas de TFP (1). En esta etapa sólo se exhiben los factores; todavía no se aplican cálculos a las fases.</p></div>
-          <div className="flex flex-wrap gap-2">{[["aviones","Aeronaves"],["vehiculos","Vehículos terrestres"],["racion","Racionamiento y alojamiento"],["apoyo","Equipo de apoyo"],["distancias","Distancias"]].map(([id,l])=><button key={id} onClick={()=>setTfpBloque(id)} className={`rounded px-3 py-2 text-xs font-bold ${tfpBloque===id?"bg-emerald-700":"bg-slate-800 text-slate-300"}`}>{l}</button>)}</div>
+          <div className="flex flex-wrap gap-2">{[["aviones","Aeronaves / personal"],["rendimiento","Consumo y velocidad"],["vehiculos","Vehículos terrestres"],["racion","Racionamiento y alojamiento"],["apoyo","Equipo de apoyo"],["bunkeres","Búnkeres de armamento"],["distancias","Distancias"]].map(([id,l])=><button key={id} onClick={()=>setTfpBloque(id)} className={`rounded px-3 py-2 text-xs font-bold ${tfpBloque===id?"bg-emerald-700":"bg-slate-800 text-slate-300"}`}>{l}</button>)}</div>
 
           {tfpBloque==="aviones"&&<div className="space-y-5">{Object.values(TFP_AVIONES).map((b,i)=><div key={i}><h3 className="mb-2 font-black text-cyan-300">{b.titulo}</h3><div className="overflow-x-auto rounded-lg border border-slate-800"><table className="min-w-[1800px] w-full text-xs"><thead className="bg-slate-950 text-slate-400"><tr><th className="sticky left-0 bg-slate-950 px-3 py-2 text-left">Especialidad</th>{AVIONES_TFP.map(x=><th key={x} className="px-3 py-2 text-center">{x}</th>)}</tr></thead><tbody>{b.filas.map((r,ri)=><tr key={ri} className="border-t border-slate-800"><td className="sticky left-0 bg-slate-900 px-3 py-2 font-bold">{r[0]}</td>{r.slice(1).map((v,j)=><td key={j} className="px-3 py-2 text-center text-slate-300">{v}</td>)}</tr>)}</tbody></table></div></div>)}</div>}
-          {tfpBloque==="vehiculos"&&<><Tabla headers={["Vehículo","Cantidad","Choferes/veh.","Choferes/turno","Choferes 3 turnos","L/100 km","Pax","Tn","L/500 km"]} rows={VEHICULOS_TFP}/><div className="rounded bg-slate-900 p-3 text-xs text-slate-400">Totales de la hoja: 139 vehículos; 216 choferes por turno; 648 choferes para 3 turnos. Capacidad total consignada: 49,2 Tn.</div></>}
-          {tfpBloque==="racion"&&<><Tabla headers={["Unidad","Personal","Racionamiento","Cocinas","Carpas racionamiento 500 pers.","Carpas alojamiento 500 pers."]} rows={RACIONAMIENTO}/><p className="rounded bg-slate-900 p-3 text-xs text-slate-400">Nota de la hoja: se consideran 2 raciones por día, una cocina de campaña cada 500 raciones y una carpa de alojamiento cada 500 personas.</p></>}
+          {tfpBloque==="rendimiento"&&<div className="space-y-3"><div className="rounded border border-amber-900/40 bg-amber-950/10 p-3 text-xs text-amber-200">Los consumos aeronáuticos varían con configuración, peso, altitud y perfil. Los valores ≈ son referencias de planeamiento y deben sustituirse si se dispone de una TFP validada específica.</div><Tabla headers={["Medio","Configuración / perfil","Consumo combustible","Velocidad promedio","Observación"]} rows={RENDIMIENTO_AERONAVES_TFP}/></div>}
+          {tfpBloque==="vehiculos"&&<><Tabla headers={["Vehículo","Cantidad","Choferes/veh.","Choferes/turno","Choferes 3 turnos","L/100 km","L/km","Velocidad prom. km/h","Pax","Tn","L/500 km"]} rows={VEHICULOS_TFP}/><div className="rounded bg-slate-900 p-3 text-xs text-slate-400">Totales de la hoja: 139 vehículos; 216 choferes por turno; 648 choferes para 3 turnos. Capacidad total consignada: 49,2 Tn.</div></>}
+          {tfpBloque==="racion"&&<><Tabla headers={["Unidad","Personal","Racionamiento","Cocinas","Carpas racionamiento 500 pers.","Carpas alojamiento 500 pers.","Baños químicos (1 cada 20 pers.)"]} rows={RACIONAMIENTO}/><p className="rounded bg-slate-900 p-3 text-xs text-slate-400">Racionamiento y alojamiento conservan TFP (1). Baños químicos: 1 cada 20 personas, redondeando siempre hacia arriba.</p></>}
           {tfpBloque==="apoyo"&&<Tabla headers={["Equipo","Operador","Ayudante carga","Auxiliar","Supervisor","Total pers. 24h","Diesel L/h","Peso vacío kg","Elevación Tn","Arrastre Tn"]} rows={EQUIPO_APOYO}/>} 
-          {tfpBloque==="distancias"&&<div className="space-y-4"><div className="overflow-x-auto rounded-lg border border-slate-800"><table className="min-w-[1800px] w-full text-xs"><thead className="bg-slate-950 text-slate-400"><tr><th rowSpan={2} className="px-3 py-2 text-left">Origen</th><th colSpan={9} className="px-3 py-2 text-center">VÍA TERRESTRE · km</th><th colSpan={9} className="px-3 py-2 text-center">VÍA AÉREA · km</th></tr><tr>{LUGARES_DIST.map(x=><th key={`t-${x}`} className="px-2 py-2">{x}</th>)}{LUGARES_DIST.map(x=><th key={`a-${x}`} className="px-2 py-2">{x}</th>)}</tr></thead><tbody>{DISTANCIAS.map((r,i)=><tr key={i} className="border-t border-slate-800"><td className="px-3 py-2 font-bold">{r[0]}</td>{r.slice(1).map((v,j)=><td key={j} className="px-2 py-2 text-center text-slate-300">{v}</td>)}</tr>)}</tbody></table></div></div>}
+          {tfpBloque==="bunkeres"&&<div className="space-y-3">
+            <div>
+              <h3 className="mb-1 font-black text-amber-300">BÚNKERES DE ARMAMENTO</h3>
+              <p className="text-xs text-slate-500">Se conserva la diferenciación del cuadro suministrado: bombas, misiles aire-aire y Harpy se contabilizan por separado.</p>
+            </div>
+
+            <div className="overflow-x-auto rounded-lg border border-slate-800">
+              <table className="w-full min-w-[1050px] text-xs">
+                <thead className="bg-slate-950 text-slate-300">
+                  <tr className="border-b border-slate-700">
+                    <th rowSpan={2} className="px-3 py-3 text-left align-middle">Ubicación</th>
+                    <th colSpan={2} className="border-l border-slate-700 px-3 py-3 text-center text-amber-300">BÚNKERES PARA BOMBAS</th>
+                    <th colSpan={2} className="border-l border-slate-700 px-3 py-3 text-center text-sky-300">BÚNKERES PARA MISILES AIRE-AIRE</th>
+                    <th colSpan={2} className="border-l border-slate-700 px-3 py-3 text-center text-violet-300">HARPY</th>
+                  </tr>
+                  <tr className="border-b border-slate-700">
+                    <th className="border-l border-slate-700 px-3 py-2 text-center">Cant. req.</th>
+                    <th className="px-3 py-2 text-center">Búnkeres necesarios</th>
+                    <th className="border-l border-slate-700 px-3 py-2 text-center">Cant. req.</th>
+                    <th className="px-3 py-2 text-center">Búnkeres necesarios</th>
+                    <th className="border-l border-slate-700 px-3 py-2 text-center">Cant. req.</th>
+                    <th className="px-3 py-2 text-center">Búnkeres necesarios</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {BUNKERES_TFP.map((r)=>(
+                    <tr key={r.ubicacion} className="border-t border-slate-800 bg-slate-900">
+                      <td className="px-3 py-3 font-black text-slate-100">{r.ubicacion}</td>
+
+                      <td className="border-l border-slate-800 px-3 py-3 text-center">
+                        {r.bombasReq??"—"}
+                      </td>
+                      <td className="px-3 py-3 text-center font-black text-amber-200">
+                        {r.bombasBunkeres??"—"}
+                      </td>
+
+                      <td className="border-l border-slate-800 px-3 py-3 text-center">
+                        {r.misilesReq??"—"}
+                      </td>
+                      <td className="px-3 py-3 text-center font-black text-sky-200">
+                        {r.misilesBunkeres??"—"}
+                      </td>
+
+                      <td className="border-l border-slate-800 px-3 py-3 text-center">
+                        {r.harpyReq??"—"}
+                      </td>
+                      <td className="px-3 py-3 text-center font-black text-violet-200">
+                        {r.harpyBunkeres??"—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="grid gap-2 md:grid-cols-3">
+              <div className="rounded border border-amber-900/40 bg-amber-950/10 p-3 text-xs">
+                <b className="text-amber-300">Bombas</b>
+                <p className="mt-1 text-slate-300">Córdoba: 44 requeridas → 3 búnkeres.</p>
+                <p className="text-slate-300">Mendoza: 22 requeridas → 2 búnkeres.</p>
+              </div>
+              <div className="rounded border border-sky-900/40 bg-sky-950/10 p-3 text-xs">
+                <b className="text-sky-300">Misiles aire-aire</b>
+                <p className="mt-1 text-slate-300">Villa Mercedes: 24 requeridos → 1 búnker.</p>
+              </div>
+              <div className="rounded border border-violet-900/40 bg-violet-950/10 p-3 text-xs">
+                <b className="text-violet-300">Harpy</b>
+                <p className="mt-1 text-slate-300">General Acha: 15 requeridos → 1 búnker.</p>
+              </div>
+            </div>
+
+            <p className="rounded bg-slate-900 p-3 text-xs text-slate-400">
+              Los campos vacíos del cuadro fuente se mantienen como “—”. No se redistribuyen cantidades entre categorías ni ubicaciones.
+            </p>
+          </div>}
+          {tfpBloque==="distancias"&&<div className="space-y-6">
+            <div><h3 className="mb-2 font-black text-emerald-300">VÍA TERRESTRE · km</h3><p className="mb-2 text-xs text-slate-500">Valores originales de TFP conservados. Para nuevas BAM, ~ indica estimación de planeamiento terrestre.</p><div className="overflow-x-auto rounded-lg border border-slate-800"><table className="min-w-[2300px] w-full text-xs"><thead className="bg-slate-950 text-slate-400"><tr><th className="sticky left-0 bg-slate-950 px-3 py-2 text-left">Origen</th>{LUGARES_DIST.map(x=><th key={`tt-${x}`} className="px-2 py-2">{x}</th>)}</tr></thead><tbody>{DISTANCIAS_TERRESTRES.map((r,i)=><tr key={i} className="border-t border-slate-800"><td className="sticky left-0 bg-slate-900 px-3 py-2 font-bold">{r[0]}</td>{r.slice(1).map((v,j)=><td key={j} className="px-2 py-2 text-center text-slate-300">{v}</td>)}</tr>)}</tbody></table></div></div>
+            <div><h3 className="mb-2 font-black text-cyan-300">VÍA AÉREA · km</h3><p className="mb-2 text-xs text-slate-500">Nuevas BAM calculadas por distancia geodésica usando las coordenadas del Apéndice 2 de CHARLIE.</p><div className="overflow-x-auto rounded-lg border border-cyan-900/40"><table className="min-w-[2300px] w-full text-xs"><thead className="bg-slate-950 text-slate-400"><tr><th className="sticky left-0 bg-slate-950 px-3 py-2 text-left">Origen</th>{LUGARES_DIST.map(x=><th key={`aa-${x}`} className="px-2 py-2">{x}</th>)}</tr></thead><tbody>{DISTANCIAS_AEREAS.map((r,i)=><tr key={i} className="border-t border-slate-800"><td className="sticky left-0 bg-slate-900 px-3 py-2 font-bold">{r[0]}</td>{r.slice(1).map((v,j)=><td key={j} className="px-2 py-2 text-center text-slate-300">{v}</td>)}</tr>)}</tbody></table></div></div>
+          </div>}
         </div>}
 
         {faseActiva&&<div className="space-y-5">
-          <div><h2 className="text-xl font-black text-emerald-300">{faseActiva.titulo}</h2><p className="text-sm text-slate-400">{faseActiva.subtitulo}</p></div>
-
-          <div className="rounded-xl border border-slate-800 bg-slate-900">
-            <button onClick={()=>setFasesAbiertas(x=>({...x,[faseActiva.id]:!x[faseActiva.id]}))} className="flex w-full items-center justify-between p-4 text-left">
-              <div><b>Momentos / denominación</b><p className="text-xs text-slate-500">Seleccione el momento sobre el que desea planificar.</p></div>
-              <span>{fasesAbiertas[faseActiva.id]?"−":"+"}</span>
-            </button>
-            {fasesAbiertas[faseActiva.id]&&<div className="space-y-2 border-t border-slate-800 p-4">
-              {faseActiva.momentos.map((m,i)=><button key={i} onClick={()=>setMomentoPlan(m.nombre)} className={`block w-full rounded-lg p-4 text-left ${momentoSeleccionado===m.nombre?"border border-cyan-600 bg-cyan-950/20":"bg-slate-950"}`}>
-                <b className="text-cyan-300">{m.nombre}</b>
-              </button>)}
-            </div>}
-          </div>
+          <div><h2 className="text-xl font-black text-emerald-300">{faseActiva.titulo}</h2><p className="text-sm text-slate-400">{faseActiva.subtitulo}</p><p className="mt-2 rounded bg-slate-900 p-3 text-xs text-cyan-200">Momento de trabajo: <b>{momentoSeleccionado}</b></p></div>
 
           <section className="rounded-xl border border-emerald-800/60 bg-slate-900 p-4">
             <div className="mb-4">
@@ -847,8 +1012,11 @@ function ControlLogisticoTON(){
               {!sistemaSinArmamento&&<label className="text-xs"><span className="mb-1 block text-slate-400">Armamento</span><select value={armamentoOperacion} onChange={e=>setArmamentoOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">{ARMAMENTO_REALICO.map(a=><option key={a.id}>{a.nombre}</option>)}</select></label>}
               {!sistemaSinArmamento&&<label className="text-xs"><span className="mb-1 block text-slate-400">Armamento por aeronave</span><input type="number" min={0} value={armamentoPorAeronave} onChange={e=>setArmamentoPorAeronave(Math.max(0,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>}
               {sistemaSinArmamento&&<div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Configuración</span><b className="block text-sky-200">Sin armamento de ataque en este empleo</b><span className="text-[10px] text-slate-600">Puede utilizarse para transporte, REV, C2, ISR/GE o apoyo según el sistema.</span></div>}
-              <label className="text-xs"><span className="mb-1 block text-slate-400">Destino / objetivo</span><input value={destinoOperacion} onChange={e=>setDestinoOperacion(e.target.value)} placeholder="Destino" className="w-full rounded bg-slate-950 p-2"/></label>
-              <label className="text-xs"><span className="mb-1 block text-slate-400">Distancia ida (km)</span><input type="number" min={0} value={distanciaOperacion} onChange={e=>setDistanciaOperacion(Math.max(0,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Destino</span><select value={destinoTabla} onChange={e=>setDestinoTabla(e.target.value)} className="w-full rounded bg-slate-950 p-2">{LUGARES_DIST.filter(x=>x!==baseOperacion).map(x=><option key={x}>{x}</option>)}<option value="OTRO">Objetivo / otro (manual)</option></select></label>
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Vía</span><select value={viaDistancia} onChange={e=>setViaDistancia(e.target.value as "aerea"|"terrestre")} className="w-full rounded bg-slate-950 p-2"><option value="aerea">Aérea</option><option value="terrestre">Terrestre</option></select></label>
+              {destinoTabla==="OTRO"&&<label className="text-xs"><span className="mb-1 block text-slate-400">Destino / objetivo</span><input value={destinoOperacion} onChange={e=>setDestinoOperacion(e.target.value)} placeholder="Destino" className="w-full rounded bg-slate-950 p-2"/></label>}
+              {destinoTabla==="OTRO"&&<label className="text-xs"><span className="mb-1 block text-slate-400">Distancia ida (km)</span><input type="number" min={0} value={distanciaOperacion} onChange={e=>setDistanciaOperacion(Math.max(0,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>}
+              {destinoTabla!=="OTRO"&&<div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Distancia automática TFP</span><b className="block text-cyan-200">{distanciaCalculada} km · {viaDistancia==="aerea"?"vía aérea":"vía terrestre"}</b></div>}
             </div>
 
             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -873,13 +1041,27 @@ function ControlLogisticoTON(){
               </div>
             </div>
 
+            <div className="mt-4 rounded-lg border border-cyan-900/50 bg-cyan-950/10 p-4 text-xs">
+              <h4 className="font-black text-cyan-300">RESUMEN DEL CÁLCULO</h4>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <span>Fase/momento: <b>{faseActiva.titulo} · {momentoSeleccionado}</b></span>
+                <span>Origen → destino: <b>{baseOperacion} → {destinoTabla==="OTRO"?(destinoOperacion||"otro"):destinoTabla}</b></span>
+                <span>Distancia: <b>{distanciaCalculada} km ({viaDistancia})</b></span>
+                <span>Medio: <b>{cantidadOperacion} × {sistemaOperacion}</b></span>
+                <span>TFP técnica: <b>{personalTFP??"s/d"} pers.</b></span>
+                <span>Armamento: <b>{sistemaSinArmamento?"No aplica":`${armamentoRequerido} × ${armamentoOperacion}`}</b></span>
+                <span>Remanente medio al aceptar: <b>{remanenteAeronaves(baseOperacion,sistemaOperacion)-cantidadOperacion}</b></span>
+                <span>Remanente armamento: <b>{sistemaSinArmamento?"N/A":armamentoRemanenteRealico-armamentoRequerido}</b></span>
+              </div>
+            </div>
+
             <div className="mt-4 grid gap-3 lg:grid-cols-2">
               <div className="rounded-lg border border-amber-900/50 bg-amber-950/10 p-4">
                 <h4 className="text-xs font-black text-amber-300">COMBUSTIBLE / REV</h4>
                 {combustibleInfo?<div className="mt-2 text-xs text-slate-300">
                   <p>{combustibleInfo.nota}</p>
                   <p className="mt-2 rounded bg-slate-950 p-2 text-amber-200"><b>REV:</b> pendiente de cálculo hasta cargar un factor documental de consumo/radio de misión. No se estima automáticamente.</p>
-                  <p className="mt-2 text-[10px] text-slate-500">Distancia cargada: {distanciaOperacion} km de ida / {distanciaOperacion*2} km ida y regreso.</p>
+                  <p className="mt-2 text-[10px] text-slate-500">Distancia cargada: {distanciaCalculada} km de ida / {distanciaCalculada*2} km ida y regreso.</p>
                 </div>:<p className="mt-2 text-xs text-slate-500">No hay parámetros documentales de combustible cargados para este sistema.</p>}
               </div>
 
@@ -905,7 +1087,7 @@ function ControlLogisticoTON(){
                   const op:OperacionLogistica={
                     id:`op-${Date.now()}`,fase:seccion,momento:momentoSeleccionado,nombre:nombreOperacion||"Operación",
                     base:baseOperacion,sistema:sistemaOperacion,cantidad:cantidadOperacion,armamento:armamentoOperacion,
-                    armamentoPorAeronave,distanciaKm:distanciaOperacion,destino:destinoOperacion,esfuerzo:esfuerzoSeleccionado,
+                    armamentoPorAeronave,distanciaKm:distanciaCalculada,destino:destinoTabla==="OTRO"?destinoOperacion:destinoTabla,esfuerzo:esfuerzoSeleccionado,
                     transporte:transporteOperacion,aceptada:true
                   };
                   setOperaciones(x=>[...x,op]);
@@ -933,6 +1115,14 @@ function ControlLogisticoTON(){
                 </div>
               </div>)}
             </div>}
+          </section>
+
+          <section className="rounded-xl border border-amber-700/50 bg-amber-950/10 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div><h3 className="font-black text-amber-300">CONFIRMACIÓN DE FASE</h3><p className="text-xs text-slate-400">Podés trabajar y guardar operaciones en cualquier fase. Para confirmar esta fase, la fase anterior debe estar confirmada.</p></div>
+              <button type="button" disabled={!puedeConfirmarFase} onClick={()=>setFasesConfirmadas(x=>({...x,[faseActiva.id]:true}))} className="rounded bg-amber-600 px-4 py-2 text-xs font-black disabled:bg-slate-700 disabled:text-slate-500">{fasesConfirmadas[faseActiva.id]?"FASE CONFIRMADA":"CONFIRMAR FASE"}</button>
+            </div>
+            {!puedeConfirmarFase&&<p className="mt-3 rounded bg-red-950/30 p-2 text-xs text-red-300">ALERTA: antes de confirmar {faseActiva.titulo} tenés que confirmar {faseAnterior?.titulo}.</p>}
           </section>
         </div>}
       </div></main>
