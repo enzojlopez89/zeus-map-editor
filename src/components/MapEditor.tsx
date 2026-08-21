@@ -1,5 +1,6 @@
 "use client";
 
+import ControlLogisticoTON from "@/components/a4/ControlLogisticoTON";
 import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import maplibregl from "maplibre-gl";
 import { circle, lineString, length as turfLength } from "@turf/turf";
@@ -5297,6 +5298,8 @@ export default function MapEditor({
             )}
           </section>
         )}
+
+        {workspaceCode === "a4" && !readOnly && <ControlLogisticoTON />}
 
         {workspaceCode === "a3" && seleccionado && !seleccionado.sharedExternal && (
           <section {...propiedadesPanel("operaciones")} className="mb-5 space-y-4 rounded border border-cyan-900 bg-slate-900 p-4">

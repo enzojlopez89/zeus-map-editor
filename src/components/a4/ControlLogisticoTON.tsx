@@ -1,0 +1,397 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
+type Seccion = "situacion" | "tfp" | "fase1" | "fase2" | "fase3" | "fase4";
+
+type Comunicacion = { equipo: string; cantidad: number };
+type Medio = { nombre: string; cantidad?: number; detalle?: string };
+type Unidad = { nombre: string; ubicacion: string; medios: Medio[]; comunicaciones: Comunicacion[]; observaciones?: string[] };
+
+type Fase = { id: Seccion; titulo: string; subtitulo: string; momentos: { nombre: string; periodo: string; detalle: string }[] };
+
+const COMUNICACIONES: Record<string, Comunicacion[]> = {
+  "1ba": [
+    {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:2},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
+    {equipo:"PANASONIC KX-NS500",cantidad:1},{equipo:"CRYPTO HC-8552 1G",cantidad:1},{equipo:"CAT DE50 GC",cantidad:1},
+    {equipo:"APX 5000",cantidad:5},{equipo:"APX 5500",cantidad:3},{equipo:"FREQUENTIS CADAS-ATS",cantidad:1},
+    {equipo:"BECKER TG 160",cantidad:2},{equipo:"BAE/Rockwell Collins MIDS LVT 2/11",cantidad:2},
+  ],
+  "2ba": [
+    {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:1},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
+    {equipo:"IDIRECT X3",cantidad:1},{equipo:"SKYWARE GLOBAL TYPE 180",cantidad:1},{equipo:"PANASONIC KX-NS500",cantidad:1},
+    {equipo:"CRYPTO HC-8552 1G",cantidad:1},{equipo:"CAT DE50 GC",cantidad:1},{equipo:"APX 5000",cantidad:5},
+    {equipo:"APX 5500",cantidad:3},{equipo:"FREQUENTIS CADAS-ATS",cantidad:1},{equipo:"BECKER TG 160",cantidad:2},
+    {equipo:"ELBIT MLT 2920",cantidad:2},
+  ],
+  "3ba": [
+    {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:1},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
+    {equipo:"IDIRECT X3",cantidad:1},{equipo:"SKYWARE GLOBAL TYPE 180",cantidad:1},{equipo:"I DIRECT SERIES 15100 SATELLITE HUB",cantidad:1},
+    {equipo:"PANASONIC KX-NS500",cantidad:1},{equipo:"CRYPTO HC-8552 1G",cantidad:1},{equipo:"CAT DE50 GC",cantidad:1},
+    {equipo:"APX 5000",cantidad:5},{equipo:"APX 5500",cantidad:3},{equipo:"BECKER TG 160",cantidad:2},
+    {equipo:"BAE/Rockwell Collins MIDS LVT 2/11",cantidad:1},
+  ],
+  "4ba": [
+    {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:1},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
+    {equipo:"IDIRECT X3",cantidad:1},{equipo:"GENERAL DYNAMICS SERIE 1251",cantidad:1},{equipo:"PANASONIC KX-NS500",cantidad:1},
+    {equipo:"CRYPTO HC-8552 1G",cantidad:1},{equipo:"CAT DE50 GC",cantidad:1},{equipo:"APX 5000",cantidad:5},
+    {equipo:"APX 5500",cantidad:3},{equipo:"FREQUENTIS VCS3020X",cantidad:1},{equipo:"BECKER TG 160",cantidad:3},
+    {equipo:"ELBIT MLT 2920",cantidad:1},{equipo:"BAE/Rockwell Collins MIDS LVT 2/11",cantidad:1},
+  ],
+  "5ba": [
+    {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:1},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
+    {equipo:"SKYWARE GLOBAL TYPE 180",cantidad:1},{equipo:"GENERAL DYNAMICS SERIE 1251",cantidad:1},{equipo:"PANASONIC KX-NS500",cantidad:1},
+    {equipo:"CRYPTO HC-8552 1G",cantidad:1},{equipo:"CAT DE50 GC",cantidad:1},{equipo:"APX 5000",cantidad:5},
+    {equipo:"APX 5500",cantidad:4},{equipo:"FREQUENTIS VCS3020X",cantidad:1},{equipo:"ELBIT MLT 2920",cantidad:1},
+    {equipo:"BAE/Rockwell Collins MIDS LVT 2/11",cantidad:1},
+  ],
+  "bam": [
+    {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:2},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
+    {equipo:"IDIRECT X3",cantidad:1},{equipo:"SKYWARE GLOBAL TYPE 180",cantidad:1},{equipo:"PANASONIC KX-NS500",cantidad:2},
+    {equipo:"CRYPTO HC-8552 1G",cantidad:1},{equipo:"CAT DE50 GC",cantidad:1},{equipo:"APX 5000",cantidad:10},
+    {equipo:"APX 5500",cantidad:5},{equipo:"FREQUENTIS CADAS-ATS",cantidad:1},{equipo:"BECKER TG 160",cantidad:4},
+    {equipo:"HARRIS FALCON II AN/PRC 150",cantidad:3},{equipo:"HARRIS FALCON III AN/PRC 117G",cantidad:3},
+    {equipo:"ELBIT MLT 2920",cantidad:2},{equipo:"BAE/Rockwell Collins MIDS LVT 2/11",cantidad:2},
+  ],
+  "g1": [
+    {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:2},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
+    {equipo:"IDIRECT X3",cantidad:1},{equipo:"SKYWARE GLOBAL TYPE 180",cantidad:2},{equipo:"PANASONIC KX-NS500",cantidad:1},
+    {equipo:"CRYPTO HC-8552 1G",cantidad:1},{equipo:"CAT DE50 GC",cantidad:1},{equipo:"APX 5000",cantidad:5},
+    {equipo:"APX 5500",cantidad:3},{equipo:"FREQUENTIS AIDA-NG",cantidad:1},{equipo:"FREQUENTIS CADAS-ATS",cantidad:1},
+    {equipo:"BECKER TG 160",cantidad:2},{equipo:"HARRIS FALCON II AN/PRC 150",cantidad:1},
+    {equipo:"HARRIS FALCON III AN/PRC 117G",cantidad:1},{equipo:"ELBIT MLT 2920",cantidad:1},
+  ],
+  "g2": [
+    {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:1},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
+    {equipo:"PANASONIC KX-NS500",cantidad:2},{equipo:"CRYPTO HC-8552 1G",cantidad:1},{equipo:"CAT DE50 GC",cantidad:1},
+    {equipo:"APX 5000",cantidad:5},{equipo:"FREQUENTIS AIDA-NG",cantidad:1},{equipo:"FREQUENTIS CADAS-ATS",cantidad:1},
+    {equipo:"FREQUENTIS VCS3020X",cantidad:1},{equipo:"HARRIS FALCON II AN/PRC 150",cantidad:1},
+    {equipo:"HARRIS FALCON III AN/PRC 117G",cantidad:1},{equipo:"BAE/Rockwell Collins MIDS LVT 2/11",cantidad:4},
+  ],
+};
+
+const UNIDADES: Unidad[] = [
+  {nombre:"COAe",ubicacion:"Río Cuarto",medios:[],comunicaciones:[],observaciones:["CHARLIE identifica la unidad, sin discriminar medios orgánicos en su apartado de Medios Asignados."]},
+  {nombre:"Grupo 1 COM",ubicacion:"San Luis",medios:[],comunicaciones:COMUNICACIONES.g1},
+  {nombre:"1ª Brigada Aérea",ubicacion:"La Rioja",comunicaciones:COMUNICACIONES["1ba"],medios:[
+    {nombre:"C-130J",cantidad:10,detalle:"Escuadrón 1 TA"},{nombre:"KC-130J",cantidad:4,detalle:"Escuadrón 2 TA"},
+    {nombre:"LJ-60",cantidad:3,detalle:"Escuadrón 3 TA/VIP"},{nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 4 TA"},
+    {nombre:"B-412",cantidad:4,detalle:"1ra Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"1ra Sección H"},
+    {nombre:"NASAMS",cantidad:1,detalle:"Escuadrón 1 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 1 DAa"},
+    {nombre:"RBS-70",detalle:"Escuadrón 1 DAa; CHARLIE no discrimina cantidad"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 4 VyCA"},
+  ],observaciones:["ECCO: no cuenta con red alámbrica; las líneas pasan a 2 km de la unidad."]},
+  {nombre:"2ª Brigada Aérea",ubicacion:"Villa Mercedes",comunicaciones:COMUNICACIONES["2ba"],medios:[
+    {nombre:"F-16C Block 40",cantidad:20,detalle:"Escuadrón 1 C"},{nombre:"AMX A-1M",cantidad:12,detalle:"1ra Escuadrilla A"},
+    {nombre:"T-6 Texan II",cantidad:12,detalle:"7ma Escuadrilla A"},{nombre:"Hermes 450",cantidad:3,detalle:"Escuadrón 1 SIGINT"},
+    {nombre:"B-412",cantidad:4,detalle:"2da Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"2da Sección H"},{nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 9 TA"},
+    {nombre:"NASAMS",cantidad:2,detalle:"Escuadrón 2 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 2 DAa"},
+    {nombre:"RBS-70",detalle:"Escuadrón 2 DAa; CHARLIE no discrimina cantidad"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 2 VyCA"},
+  ]},
+  {nombre:"3ª Brigada Aérea",ubicacion:"Córdoba",comunicaciones:COMUNICACIONES["3ba"],medios:[
+    {nombre:"AMX A-1M",cantidad:12,detalle:"5ta Escuadrilla A"},{nombre:"T-6 Texan II",cantidad:12,detalle:"8va Escuadrilla A"},
+    {nombre:"E-99M ERIEYE",cantidad:3,detalle:"Escuadrón AWACS"},{nombre:"B-412",cantidad:2,detalle:"3ra Sección H"},
+    {nombre:"UH-1Y",cantidad:4,detalle:"3ra Sección H"},{nombre:"KC-135",cantidad:3,detalle:"Escuadrón 5 TA"},{nombre:"CH-47F",cantidad:6,detalle:"Escuadrón 1 H"},
+    {nombre:"PATRIOT",cantidad:1,detalle:"Escuadrón 3 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 3 DAa"},
+    {nombre:"RBS-70",detalle:"Escuadrón 3 DAa; CHARLIE no discrimina cantidad"},{nombre:"TPS-77",cantidad:1,detalle:"Escuadrón 1 VyCA"},
+  ]},
+  {nombre:"4ª Brigada Aérea",ubicacion:"Mendoza",comunicaciones:COMUNICACIONES["4ba"],medios:[
+    {nombre:"F-16C Block 40",cantidad:14,detalle:"Escuadrón 3 C"},{nombre:"F-16D Block 42",cantidad:6,detalle:"Escuadrón 3 C"},
+    {nombre:"DHC-6",cantidad:4,detalle:"Escuadrón 7 TA"},{nombre:"KC-135",cantidad:3,detalle:"Escuadrón 8 TA"},
+    {nombre:"B-412",cantidad:2,detalle:"4ta Sección H"},{nombre:"UH-1Y",cantidad:4,detalle:"4ta Sección H"},
+    {nombre:"PATRIOT",cantidad:1,detalle:"Escuadrón 4 DAa"},{nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 4 DAa"},
+    {nombre:"RBS-70",detalle:"Escuadrón 4 DAa; CHARLIE no discrimina cantidad"},
+  ]},
+  {nombre:"5ª Brigada Aérea",ubicacion:"General Acha",comunicaciones:COMUNICACIONES["5ba"],medios:[
+    {nombre:"F-16CJ Block 50",cantidad:10,detalle:"Escuadrón 2 C"},{nombre:"IAI HARPY",cantidad:36,detalle:"Escuadrón 1 UCAV"},
+    {nombre:"LJ-60",cantidad:3,detalle:"Escuadrón 1 MEDEVAC"},{nombre:"HERMES 450",cantidad:3,detalle:"Escuadrón 2 EyR"},
+    {nombre:"EC-130H COMPASS CALL",cantidad:2,detalle:"Escuadrón 1 GE"},{nombre:"B-412",cantidad:2,detalle:"5ta Sección H"},
+    {nombre:"CH-47F",cantidad:6,detalle:"Escuadrón 2 H"},{nombre:"NASAMS",cantidad:1,detalle:"Escuadrón 5 DAa"},
+    {nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Escuadrón 5 DAa"},{nombre:"RBS-70",detalle:"Escuadrón 5 DAa; CHARLIE no discrimina cantidad"},
+    {nombre:"GM 400A",cantidad:1,detalle:"Escuadrón 3 VyCA"},
+  ],observaciones:["ECCO: el sistema alámbrico presenta grandes deficiencias y cortes debido a la gran inundación de 2022."]},
+  {nombre:"Base Aérea Militar Malargüe",ubicacion:"Malargüe",comunicaciones:COMUNICACIONES.bam,medios:[
+    {nombre:"COAe alternativo",cantidad:1},{nombre:"Grupo 2 COM",cantidad:1},{nombre:"NASAMS",cantidad:2,detalle:"Esc. 7 DAa"},
+    {nombre:"OERLIKON SKYGUARD",cantidad:1,detalle:"Esc. 7 DAa"},{nombre:"RBS-70",detalle:"Esc. 7 DAa; CHARLIE no discrimina cantidad"},
+  ]},
+  {nombre:"Grupo 2 COM",ubicacion:"Malargüe",medios:[],comunicaciones:COMUNICACIONES.g2},
+];
+
+const FASES: Fase[] = [
+  {id:"fase1",titulo:"FASE I",subtitulo:"PREPARACIÓN · recepción del Plan hasta D",momentos:[
+    {nombre:"Momento 1 · CONCEPCIÓN",periodo:"Recepción del Plan → día M",detalle:"Planeamiento de comando de componente."},
+    {nombre:"Momento 2 · PREPARACIÓN",periodo:"Día M → día A",detalle:"Alistamiento, movilización y despliegue. En el Plan Esquemático CAeTON se asocia al ERC."},
+    {nombre:"Momento 3 · ALERTA",periodo:"Día A → día D",detalle:"Acciones para hacer efectiva la alerta estratégica. En el Plan Esquemático CAeTON se asocia al MESC."},
+  ]},
+  {id:"fase2",titulo:"FASE II",subtitulo:"TOMAR LA INICIATIVA · D a D+1",momentos:[
+    {nombre:"Fase sin momentos subordinados denominados",periodo:"D → D+1",detalle:"El cuerpo del Plan la define como TOMAR LA INICIATIVA. El Plan Esquemático CAeTON establece MEIC para esta fase."},
+  ]},
+  {id:"fase3",titulo:"FASE III",subtitulo:"DOMINAR · D+2 a D+9",momentos:[
+    {nombre:"Fase sin momentos subordinados denominados",periodo:"D+2 → D+9",detalle:"El cuerpo del Plan la define como DOMINAR. El Plan Esquemático CAeTON establece MESC para esta fase."},
+  ]},
+  {id:"fase4",titulo:"FASE IV",subtitulo:"ESTABILIZACIÓN · D+10 hasta finalizar repliegue",momentos:[
+    {nombre:"Repliegue / estabilización",periodo:"Desde D+10",detalle:"Regreso gradual de las fuerzas a sus asientos naturales. El Plan Esquemático CAeTON prevé ERC durante el repliegue."},
+  ]},
+];
+
+const ABASTECIMIENTO = [
+  {clase:"CLASE I",titulo:"Subsistencia",items:["Adquisición en la zona de emplazamiento de cada Unidad.","Dificultades: informar con al menos 72 h de antelación.","Mercaderías frescas: entrega en el día; víveres secos: entrega periódica."]},
+  {clase:"CLASE II",titulo:"Vestuario, equipo y material general",items:["Vestuario apropiado disponible.","Depósitos Mayores: existencias para requerimientos normales por 12 meses.","Las Unidades carecen en general de elementos para vivaquear.","Vehículos: 75% en servicio; mayoría con 15 años de uso.","Herramientas de mano de mecánicos: suficientes para exigencias normales."]},
+  {clase:"CLASE III",titulo:"Combustibles y lubricantes terrestres",items:["Unidades de asiento: nivel de rutina para hasta 15 días.","PRF: sostener operaciones al menos 5 días.","Ciclo de reabastecimiento en PRF: 3 días desde el requerimiento."]},
+  {clase:"CLASE III A",titulo:"Combustible y lubricantes de aeronaves",items:["Ciclo en aeródromos de asiento: 4 días.","Ciclo en PRF fuera del asiento: 3 días."]},
+  {clase:"CLASES II A y V A",titulo:"Repuestos y consumibles aeronáuticos",items:["Repuestos de mantenimiento menor: normales; depósitos para operación continua de 15 días.","Oxígeno: 10 días de operaciones.","Nitrógeno: 7 días de operaciones."]},
+  {clase:"CLASES V y V A",titulo:"Munición y armamento",items:["Inventario detallado en Apéndice 1.","Las espoletas indicadas son compatibles con las bombas disponibles.","Para esta página, la totalidad del armamento se presenta concentrada inicialmente en Realicó, conforme al criterio de trabajo indicado para A4."]},
+];
+
+const ARMAMENTO = [
+  {grupo:"F-16 C/D/CJ",filas:[
+    ["MARK 84","250","A/T PG 907 kg"],["MARK 83","250","A/T PG 454 kg"],["MARK 82","250","A/T PG 227 kg"],
+    ["GBU-10 Paveway II","48","Guiado láser; se usa con Mk 84"],["GBU-12 Paveway II","48","Guiado láser; se usa con Mk 82"],
+    ["GBU-38 JDAM","78","Joint Direct Attack Munition (Mk 82)"],["LAU-61/66","450 / 450","Cohetes A/S"],
+    ["AIM-9M Sidewinder","180","A/A IR 18 km all aspect"],["AIM-120C-5 AMRAAM","240","BVR A/A 105 km; NEZ 65 km"],
+    ["AIM-7P Sparrow","220","BVR A/A 70 km"],["AGM-65G Maverick","120","A/T; 302 kg; 34 km; guía TV"],
+    ["AN/AAQ-13/14 LANTIRN","34 / 34","NAV / Targeting / FLIR"],["AGM-88C HARM","140","Antirradar A/S 148 km"],
+    ["AN/ASQ-213","10","HARM Targeting System"],["AGM-119 Penguin","80","Antibuque 385 kg / 55 km"],
+    ["AN/ALQ-184/131","32 / 32","PODS ECM"],["Tanques de combustible","106 / 212","76 de 300 US gal / 152 de 370 US gal"],
+    ["CHAFF / FLARE","16000 / 16000",""],["20 mm","68000","Cañón M61A1 Vulcan"],
+  ]},
+  {grupo:"AMX A-1M",filas:[
+    ["MARK 84/83/82","300","A/T PG 454 / 227 / 118 kg"],["GBU-10/12/16","48 / 48 / 48","Paveway II"],
+    ["MAR-1","96","Antirradar A/S 80 km"],["CHAFF / FLARE","6000 / 6000","AN/ALE-47"],
+    ["AIM-9M Sidewinder","140","A/A IR 18 km all aspect"],["LAU-61/A","450","2.75 pulgadas"],["30 mm","24000","2 x DEFA 554"],
+  ]},
+  {grupo:"T-6 TEXAN II",filas:[
+    ["MARK 81/82","180 / 180","A/T PG 227 / 118 kg"],["LAU-61/A","450","2.75 pulgadas"],
+    ["GBU-12 Paveway II","48","Guiado láser; se usa con Mk 82"],["12.7 mm","64000","48 pods disponibles"],
+  ]},
+  {grupo:"Alas rotativas",filas:[
+    ["CH-47F · M134 MINIGUN","12000","Pods y afuste"],["UH-1Y · 12.7 mm","14000","Pods y afuste"],
+    ["UH-1Y · M134 MINIGUN","48000","Pods y afuste"],["UH-1Y · HYDRA 70 APKWS","520","Cohete guía láser"],
+    ["B-412 · M134 MINIGUN","12000","Pods y afuste"],
+  ]},
+  {grupo:"Munición terrestre",filas:[
+    ["9 mm","300000",""],["5,56 mm","380000",""],["7,62 mm","150000",""],[".38","1500",""],[".50","55000",""],
+    ["Mina terrestre antipersonal","500",""],["Mina terrestre antitanque","1800",""],
+  ]},
+  {grupo:"Munición antiaérea",filas:[
+    ["Misil PATRIOT","80",""],["Misil AIM-120B","130",""],["Misil RBS-70NG","250",""],["35 mm","320000",""],
+  ]},
+];
+
+const MATERIAL_DELTA = {
+  transporte:[
+    ["Citroën C4","5"],["Toyota Land Cruiser","35"],["Mercedes Benz Sprinter","12"],["Volkswagen Amarok","22"],
+    ["UNIMOG","30"],["Ómnibus 40 pasajeros","10"],["Grúas hasta 15.000 kg","8"],["Camiones 20 Tn","7"],["Camiones 5 Tn","10"],
+  ],
+  aeronavesApoyo:[
+    ["EC-130H Compass Call","2","GE / AE / ERA / C2"],["E-99M Erieye","3","VyCA aerotransportado / C2"],["Elbit Hermes 450","6","ELINT / COMINT"],
+    ["C-130J","10","TPT carga / tropas / asalto aéreo"],["KC-130J","4","REV / TPT carga"],["KC-135 Stratotanker","6","REV"],
+    ["Learjet 60","6","VIP / MEDEVAC"],["DHC6-400","12","TPT carga / tropas / asalto aéreo"],
+    ["CH-47F","12","TPT carga / asalto aéreo / BYRCOM"],["UH-1Y","16","TPT carga / asalto aéreo / BYRCOM"],["B-412","14","CASEVAC / BYS / TPT tropas / carga / asalto aéreo"],
+  ],
+  defensa:[
+    ["RADAR TPS-77 MRR","3 unidades","Max rango 250–300 NM (360°)"],["RADAR GM 400 ALPHA","1 unidad","Max rango 270–320 NM (360°)"],
+    ["MIM-104B Patriot PAC 1","2 baterías","Max rango 160 km; max altitud 24.240 m"],
+    ["NASAMS 1","6 baterías","MR 35 km / 16.000 m; SR 15 km / 9.000 m"],
+    ["Skyguard III / Oerlikon GDF007","8 baterías","1 unidad control tiro + 2 piezas gemelas 35 mm; 4.000 m"],
+    ["RBS-70 NG","80 unidades de lanzamiento","Max rango 9 km; max altitud 5.000 m"],
+  ],
+  abastecedoras:[
+    ["1ª BA","20.000 L","3"],["2ª BA","10.000 L","4"],["3ª BA","10.000 L","5"],["4ª BA","10.000 L","4"],["5ª BA","20.000 L","2"],["BAM Malargüe","10.000 L","3"],
+  ],
+  mantenimiento:[
+    "Armamento aéreo: sin novedades significativas; mantenimiento desde unidades de asiento natural.",
+    "Artillería antiaérea: promedio 90% de piezas en servicio.",
+    "Vehículos de remolque para artillería antiaérea: cantidad suficiente según TFP.",
+    "Comunicaciones: mantenimiento en las Unidades; los talleres de electrónica pueden limitar despliegue o tiempos en PRF.",
+  ],
+  servicios:[
+    "Construcciones no directamente operativas: suspendidas por razones presupuestarias.",
+    "Deficiencia de búnkeres para aeronaves en 2ª, 3ª y 4ª Brigadas Aéreas.",
+    "Grupo II Construcciones (Río Cuarto): 2 equipos de reparación y mantenimiento de pistas; capacidad hasta 3 búnkeres diarios, dependiendo del lugar.",
+    "Servicio contra incendio: el de cada Unidad; extras vía C4 del TON.",
+    "Todas las Unidades: balizamiento eléctrico, balizado de emergencia y generadores eléctricos.",
+    "Torres móviles completas: 1ª, 2ª y 5ª Brigadas Aéreas; transportables por vía aérea.",
+  ],
+};
+
+const TFP_AVIONES = {
+  meic:{titulo:"3 DÍAS · MEIC · 4 AERONAVES",filas:[
+    ["Jefe",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],["Encargado",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ["Estructuras",8,8,4,2,4,4,4,6,6,6,4,2,2,2,2],["Armamento",16,16,8,2,"—","—","—","—","—","—","—","—","—","—","—"],
+    ["Aviónica",14,14,4,2,4,4,4,6,6,6,4,4,4,4,4],["Hidráulica",8,8,4,"—",4,4,4,6,6,6,4,4,4,4,4],
+    ["Equipos especiales",8,8,4,2,4,4,4,6,6,6,4,2,2,2,2],["TOTALES",56,56,26,10,18,18,18,26,26,26,18,14,14,14,14],
+  ]},
+  mesc:{titulo:"5 DÍAS · MESC · 4 AERONAVES",filas:[
+    ["Jefe",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],["Encargado",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ["Estructuras",8,8,4,2,4,4,4,4,4,4,4,2,2,2,2],["Armamento",12,12,8,2,"—","—","—","—","—","—","—","—","—","—","—"],
+    ["Aviónica",8,8,4,2,4,4,4,4,4,4,4,2,2,2,2],["Hidráulica",8,8,4,"—",4,4,4,4,4,4,4,2,2,2,2],
+    ["Equipos especiales",8,8,4,2,4,4,4,6,6,6,4,2,2,2,2],["TOTALES",46,46,26,10,18,18,18,20,20,20,18,10,10,10,10],
+  ]},
+  erc:{titulo:"5 DÍAS · ERC · 4 AERONAVES",filas:[
+    ["Jefe",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],["Encargado",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ["Estructuras",4,4,2,1,2,2,2,2,2,2,2,2,2,2,2],["Armamento",6,6,4,1,"—","—","—","—","—","—","—","—","—","—","—"],
+    ["Aviónica",4,4,2,1,2,2,2,2,2,2,2,2,2,2,2],["Hidráulica",4,4,2,"—",2,2,2,2,2,2,2,2,2,2,2],
+    ["Equipos especiales",4,4,2,1,2,2,2,2,2,2,2,2,2,2,2],["TOTALES",24,24,14,6,10,10,10,10,10,10,10,10,10,10,10],
+  ]},
+};
+
+const AVIONES_TFP=["F-16C Block 40 / F-16D Block 42","AMX A-1M","T-6 Texan II","IAI Harpy (UCAV)","EC-130H Compass Call","E-99M Erieye","Elbit Hermes 450","C-130J","KC-130J","KC-135 Stratotanker","Learjet 60","DHC6-400","CH-47F","UH-1Y","B-412"];
+
+const VEHICULOS_TFP = [
+  ["Citroën C4",5,1,5,15,7.5,5,0.4,37.5],["Toyota Land Cruiser",35,1,35,105,11.5,7,0.8,57.5],
+  ["VW Amarok",22,1,22,66,9.5,5,1,47.5],["MB Sprinter",12,2,24,72,10,19,1.5,50],
+  ["UNIMOG",30,2,60,180,24,14,2.5,120],["Ómnibus",10,2,20,60,28,40,3,140],
+  ["Grúas 15 Tn",8,2,16,48,45,"—",15,225],["Camiones 5 Tn",10,2,20,60,22,"—",5,110],
+  ["Camiones 20 Tn",7,2,14,42,36,"—",20,180],
+];
+
+const RACIONAMIENTO = [
+  ["Estado Mayor",328,656,1,1,1],["Grupo 1 COM Esc. INCIA UIS",149,298,1,1,1],["1ª Brigada Aérea",1305,2610,3,1,3],
+  ["2ª Brigada Aérea",1293,2586,3,1,3],["3ª Brigada Aérea",1201,2402,3,1,3],["4ª Brigada Aérea",652,1304,2,1,2],
+  ["5ª Brigada Aérea",840,1680,2,1,2],["Base Aérea Militar",711,1422,2,1,2],["TOTAL",6479,12958,17,8,17],
+];
+
+const EQUIPO_APOYO = [
+  ["Planta de arranque Hobart (CUMMIS 140-180 KVA)",2,0,0,0,2,34,2360,"—","—"],
+  ["Tractor de arrastre Harlan (COMMIS HT-30, HT-50)",2,0,1,0,3,8,2950,"—",22],
+  ["Elevador de bombas (MJ-JAMMER, MHU-83)",2,2,1,1,6,6,3950,1.36,"—"],
+  ["Abastecedoras",2,0,1,0,3,"—","—","—","—"],
+  ["TeLex (Cap. 5 a 7 Tons.)",1,1,0,0,2,6,4500,7,"—"],
+];
+
+const DISTANCIAS = [
+  ["La Rioja","—","520","435","600","1000","930","460","610","806","—","445","365","450","875","750","430","465","655"],
+  ["Villa Mercedes","520","—","290","360","480","580","95","125","238","445","—","260","320","420","460","95","120","195"],
+  ["Córdoba","435","290","—","610","720","840","410","215","435","365","260","—","470","640","690","290","200","405"],
+  ["Mendoza","600","360","610","—","760","330","260","480","609","450","320","470","—","740","295","235","400","475"],
+  ["General Acha","1000","480","720","760","—","580","440","505","294","875","420","640","740","—","510","430","480","265"],
+  ["Malargüe","930","580","840","330","580","—","480","620","582","750","460","690","295","510","—","410","540","485"],
+  ["San Luis","460","95","410","260","440","480","—","220","331","430","95","290","235","430","410","—","195","275"],
+  ["Río Cuarto","610","125","215","480","505","620","220","—","223","465","120","200","400","480","540","195","—","215"],
+  ["Realicó","806","238","435","609","294","582","331","223","—","655","195","405","475","265","485","275","215","—"],
+];
+const LUGARES_DIST=["La Rioja","Villa Mercedes","Córdoba","Mendoza","General Acha","Malargüe","San Luis","Río Cuarto","Realicó"];
+
+function Tabla({headers,rows}:{headers:string[];rows:(string|number)[][]}){
+  return <div className="overflow-x-auto rounded-lg border border-slate-800"><table className="w-full min-w-[760px] text-left text-xs"><thead className="bg-slate-950 text-slate-400"><tr>{headers.map(h=><th key={h} className="whitespace-nowrap px-3 py-2">{h}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={i} className="border-t border-slate-800">{r.map((v,j)=><td key={j} className={`px-3 py-2 ${j===0?"font-semibold text-slate-200":"text-slate-300"}`}>{v}</td>)}</tr>)}</tbody></table></div>;
+}
+
+function ControlLogisticoTON(){
+  const [open,setOpen]=useState(false);
+  const [seccion,setSeccion]=useState<Seccion>("situacion");
+  const [fasesAbiertas,setFasesAbiertas]=useState<Record<string,boolean>>({});
+  const [unidadAbierta,setUnidadAbierta]=useState<string|null>("5ª Brigada Aérea");
+  const [tfpBloque,setTfpBloque]=useState<string>("aviones");
+
+  const faseActiva=FASES.find(f=>f.id===seccion);
+  const nav=[
+    ["situacion","SITUACIÓN INICIAL"],["tfp","TFP"],["fase1","FASE I"],["fase2","FASE II"],["fase3","FASE III"],["fase4","FASE IV"]
+  ] as [Seccion,string][];
+
+  const totalCom=useMemo(()=>Object.values(COMUNICACIONES).flat().reduce((s,x)=>s+x.cantidad,0),[]);
+
+  return <>
+    <button type="button" onClick={()=>setOpen(true)} className="mb-5 w-full rounded-lg border border-emerald-700 bg-emerald-950/30 px-4 py-3 text-left hover:bg-emerald-900/40">
+      <span className="block text-xs font-black uppercase tracking-[.18em] text-emerald-300">A4 · LOGÍSTICA</span>
+      <span className="mt-1 block text-base font-black text-white">Control Logístico TON</span>
+      <span className="mt-1 block text-xs text-slate-400">Situación inicial · TFP · fases y momentos</span>
+    </button>
+
+    {open&&<div className="fixed inset-0 z-[10000] flex flex-col bg-slate-950 text-white">
+      <header className="border-b border-slate-800 bg-slate-950 px-5 py-4">
+        <div className="relative flex items-center justify-center">
+          <div className="text-center"><p className="text-xs font-black uppercase tracking-[.2em] text-emerald-300">CONTROL LOGÍSTICO TON</p><h1 className="mt-1 text-2xl font-black">MOVIMIENTOS LOGÍSTICOS TON</h1></div>
+          <button onClick={()=>setOpen(false)} className="absolute right-0 rounded bg-slate-800 px-3 py-2 text-xs font-bold">Cerrar</button>
+        </div>
+      </header>
+
+      <div className="border-b border-slate-800 bg-slate-900 p-3">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 md:grid-cols-6">
+          {nav.map(([id,label])=>{
+            const faseNav=FASES.find((f)=>f.id===id);
+            const abierta=faseNav ? !!fasesAbiertas[id] : false;
+
+            return <div key={id} className="relative">
+              <button
+                onClick={()=>{
+                  setSeccion(id);
+                  if(faseNav){
+                    setFasesAbiertas((x)=>({...x,[id]:!x[id]}));
+                  }
+                }}
+                className={`flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-3 text-xs font-black ${seccion===id?"border-emerald-500 bg-emerald-700 text-white":"border-slate-700 bg-slate-950 text-slate-300 hover:bg-slate-800"}`}
+              >
+                <span>{label}</span>
+                {faseNav&&<span className="text-[10px]">{abierta?"▲":"▼"}</span>}
+              </button>
+
+              {faseNav&&abierta&&(
+                <div className="absolute left-0 right-0 top-full z-50 mt-1 min-w-[230px] rounded-lg border border-slate-700 bg-slate-950 p-2 shadow-2xl">
+                  <p className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-emerald-300">
+                    Momentos
+                  </p>
+                  <div className="space-y-1">
+                    {faseNav.momentos.map((m,i)=>(
+                      <button
+                        key={`${id}-${i}`}
+                        type="button"
+                        onClick={()=>{
+                          setSeccion(id);
+                          setFasesAbiertas((x)=>({...x,[id]:false}));
+                        }}
+                        className="block w-full rounded px-2 py-2 text-left text-xs text-slate-200 hover:bg-slate-800"
+                      >
+                        {m.nombre}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>;
+          })}
+        </div>
+      </div>
+
+      <main className="min-h-0 flex-1 overflow-auto p-4 md:p-6"><div className="mx-auto max-w-7xl">
+        {seccion==="situacion"&&<div className="space-y-6">
+          <section><h2 className="text-xl font-black text-emerald-300">SITUACIÓN INICIAL</h2><p className="mt-1 text-sm text-slate-400">Dispositivo inicial del CAeC y material logístico antes de aplicar movimientos de campaña.</p></section>
+
+          <section className="space-y-3"><div><h3 className="font-black text-white">UNIDADES Y MEDIOS · ANEXO CHARLIE</h3><p className="text-xs text-slate-500">Cada unidad incorpora además su dotación de comunicaciones del Apéndice 1 de ECCO cuando existe discriminación por unidad.</p></div>
+            {UNIDADES.map(u=>{const abierta=unidadAbierta===u.nombre;return <article key={`${u.nombre}-${u.ubicacion}`} className="rounded-xl border border-slate-800 bg-slate-900">
+              <button onClick={()=>setUnidadAbierta(abierta?null:u.nombre)} className="flex w-full items-center justify-between gap-3 p-4 text-left"><div><b>{u.nombre}</b><p className="text-xs text-slate-500">{u.ubicacion}</p></div><span className="text-slate-400">{abierta?"−":"+"}</span></button>
+              {abierta&&<div className="border-t border-slate-800 p-4"><div className="grid gap-5 lg:grid-cols-2"><div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-cyan-300">Medios asignados</h4>{u.medios.length?<div className="space-y-1">{u.medios.map((m,i)=><div key={i} className="flex items-start justify-between gap-3 rounded bg-slate-950 px-3 py-2 text-xs"><div><b>{m.nombre}</b>{m.detalle&&<p className="text-[10px] text-slate-500">{m.detalle}</p>}</div><b className="text-cyan-300">{m.cantidad??"s/d"}</b></div>)}</div>:<p className="rounded bg-slate-950 p-3 text-xs text-slate-500">Sin medios cuantificados en el apartado de medios asignados de CHARLIE.</p>}</div>
+                <div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-sky-300">Comunicaciones</h4>{u.comunicaciones.length?<div className="grid gap-1 sm:grid-cols-2">{u.comunicaciones.map((c,i)=><div key={i} className="flex justify-between gap-2 rounded bg-slate-950 px-3 py-2 text-xs"><span>{c.equipo}</span><b className="text-sky-300">{c.cantidad}</b></div>)}</div>:<p className="rounded bg-slate-950 p-3 text-xs text-slate-500">ECCO no discrimina equipos específicamente para esta unidad.</p>}{u.observaciones?.map((o,i)=><p key={i} className="mt-2 rounded border border-amber-900/50 bg-amber-950/10 p-2 text-[11px] text-amber-200">{o}</p>)}</div></div></div>}
+            </article>})}
+          </section>
+
+          <section className="space-y-4"><div><h3 className="font-black text-white">MATERIAL Y ABASTECIMIENTO · ANEXO DELTA</h3><p className="text-xs text-slate-500">La estructura separa políticas de sostenimiento, inventarios y servicios. El armamento se presenta inicialmente concentrado en Realicó para el trabajo A4.</p></div>
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">{ABASTECIMIENTO.map((a,i)=><div key={i} className="rounded-xl border border-slate-800 bg-slate-900 p-4"><span className="text-[10px] font-black text-emerald-300">{a.clase}</span><h4 className="mt-1 font-bold">{a.titulo}</h4><ul className="mt-2 space-y-1 text-xs text-slate-300">{a.items.map((x,j)=><li key={j}>• {x}</li>)}</ul></div>)}</div>
+
+            <details className="rounded-xl border border-slate-800 bg-slate-900" open><summary className="cursor-pointer p-4 font-black text-amber-300">ARMAMENTO · DEPÓSITO INICIAL REALICÓ</summary><div className="space-y-4 border-t border-slate-800 p-4">{ARMAMENTO.map((g,i)=><div key={i}><h4 className="mb-2 text-xs font-black uppercase tracking-wider">{g.grupo}</h4><Tabla headers={["Material","Cantidad","Características"]} rows={g.filas}/></div>)}</div></details>
+
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">AERONAVES DE APOYO / TRANSPORTE</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Sistema","Cantidad","Capacidad / función"]} rows={MATERIAL_DELTA.aeronavesApoyo}/></div></details>
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">VYCA Y DEFENSA ANTIAÉREA</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Sistema","Cantidad","Características"]} rows={MATERIAL_DELTA.defensa}/></div></details>
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">TRANSPORTE TERRESTRE</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Vehículo","Cantidad"]} rows={MATERIAL_DELTA.transporte}/></div></details>
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">ABASTECEDORAS DE COMBUSTIBLE AERONÁUTICO</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Ubicación","Capacidad por unidad","Cantidad"]} rows={MATERIAL_DELTA.abastecedoras}/></div></details>
+            <div className="grid gap-3 lg:grid-cols-2"><div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><h4 className="font-black">Mantenimiento</h4><ul className="mt-2 space-y-1 text-xs text-slate-300">{MATERIAL_DELTA.mantenimiento.map((x,i)=><li key={i}>• {x}</li>)}</ul></div><div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><h4 className="font-black">Servicios e infraestructura logística</h4><ul className="mt-2 space-y-1 text-xs text-slate-300">{MATERIAL_DELTA.servicios.map((x,i)=><li key={i}>• {x}</li>)}</ul></div></div>
+          </section>
+          <p className="text-right text-[10px] text-slate-600">Equipos de comunicaciones discriminados: {totalCom} unidades en la tabla ECCO.</p>
+        </div>}
+
+        {seccion==="tfp"&&<div className="space-y-5"><div><h2 className="text-xl font-black text-emerald-300">TFP</h2><p className="mt-1 text-sm text-slate-400">Transcripción organizada de las cinco hojas de TFP (1). En esta etapa sólo se exhiben los factores; todavía no se aplican cálculos a las fases.</p></div>
+          <div className="flex flex-wrap gap-2">{[["aviones","Aeronaves"],["vehiculos","Vehículos terrestres"],["racion","Racionamiento y alojamiento"],["apoyo","Equipo de apoyo"],["distancias","Distancias"]].map(([id,l])=><button key={id} onClick={()=>setTfpBloque(id)} className={`rounded px-3 py-2 text-xs font-bold ${tfpBloque===id?"bg-emerald-700":"bg-slate-800 text-slate-300"}`}>{l}</button>)}</div>
+
+          {tfpBloque==="aviones"&&<div className="space-y-5">{Object.values(TFP_AVIONES).map((b,i)=><div key={i}><h3 className="mb-2 font-black text-cyan-300">{b.titulo}</h3><div className="overflow-x-auto rounded-lg border border-slate-800"><table className="min-w-[1800px] w-full text-xs"><thead className="bg-slate-950 text-slate-400"><tr><th className="sticky left-0 bg-slate-950 px-3 py-2 text-left">Especialidad</th>{AVIONES_TFP.map(x=><th key={x} className="px-3 py-2 text-center">{x}</th>)}</tr></thead><tbody>{b.filas.map((r,ri)=><tr key={ri} className="border-t border-slate-800"><td className="sticky left-0 bg-slate-900 px-3 py-2 font-bold">{r[0]}</td>{r.slice(1).map((v,j)=><td key={j} className="px-3 py-2 text-center text-slate-300">{v}</td>)}</tr>)}</tbody></table></div></div>)}</div>}
+          {tfpBloque==="vehiculos"&&<><Tabla headers={["Vehículo","Cantidad","Choferes/veh.","Choferes/turno","Choferes 3 turnos","L/100 km","Pax","Tn","L/500 km"]} rows={VEHICULOS_TFP}/><div className="rounded bg-slate-900 p-3 text-xs text-slate-400">Totales de la hoja: 139 vehículos; 216 choferes por turno; 648 choferes para 3 turnos. Capacidad total consignada: 49,2 Tn.</div></>}
+          {tfpBloque==="racion"&&<><Tabla headers={["Unidad","Personal","Racionamiento","Cocinas","Carpas racionamiento 500 pers.","Carpas alojamiento 500 pers."]} rows={RACIONAMIENTO}/><p className="rounded bg-slate-900 p-3 text-xs text-slate-400">Nota de la hoja: se consideran 2 raciones por día, una cocina de campaña cada 500 raciones y una carpa de alojamiento cada 500 personas.</p></>}
+          {tfpBloque==="apoyo"&&<Tabla headers={["Equipo","Operador","Ayudante carga","Auxiliar","Supervisor","Total pers. 24h","Diesel L/h","Peso vacío kg","Elevación Tn","Arrastre Tn"]} rows={EQUIPO_APOYO}/>} 
+          {tfpBloque==="distancias"&&<div className="space-y-4"><div className="overflow-x-auto rounded-lg border border-slate-800"><table className="min-w-[1800px] w-full text-xs"><thead className="bg-slate-950 text-slate-400"><tr><th rowSpan={2} className="px-3 py-2 text-left">Origen</th><th colSpan={9} className="px-3 py-2 text-center">VÍA TERRESTRE · km</th><th colSpan={9} className="px-3 py-2 text-center">VÍA AÉREA · km</th></tr><tr>{LUGARES_DIST.map(x=><th key={`t-${x}`} className="px-2 py-2">{x}</th>)}{LUGARES_DIST.map(x=><th key={`a-${x}`} className="px-2 py-2">{x}</th>)}</tr></thead><tbody>{DISTANCIAS.map((r,i)=><tr key={i} className="border-t border-slate-800"><td className="px-3 py-2 font-bold">{r[0]}</td>{r.slice(1).map((v,j)=><td key={j} className="px-2 py-2 text-center text-slate-300">{v}</td>)}</tr>)}</tbody></table></div></div>}
+        </div>}
+
+        {faseActiva&&<div className="space-y-4"><div><h2 className="text-xl font-black text-emerald-300">{faseActiva.titulo}</h2><p className="text-sm text-slate-400">{faseActiva.subtitulo}</p></div><div className="rounded-xl border border-slate-800 bg-slate-900"><button onClick={()=>setFasesAbiertas(x=>({...x,[faseActiva.id]:!x[faseActiva.id]}))} className="flex w-full items-center justify-between p-4 text-left"><div><b>Momentos / denominación</b><p className="text-xs text-slate-500">Presione para desplegar la estructura temporal documentada.</p></div><span>{fasesAbiertas[faseActiva.id]?"−":"+"}</span></button>{fasesAbiertas[faseActiva.id]&&<div className="space-y-2 border-t border-slate-800 p-4">{faseActiva.momentos.map((m,i)=><div key={i} className="rounded-lg bg-slate-950 p-4"><b className="text-cyan-300">{m.nombre}</b><p className="mt-1 text-xs font-semibold text-slate-300">{m.periodo}</p><p className="mt-1 text-xs text-slate-500">{m.detalle}</p></div>)}</div>}</div><div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/40 p-5 text-sm text-slate-500">Esta fase queda preparada para incorporar los movimientos y cálculos logísticos cuando los vayamos definiendo.</div></div>}
+      </div></main>
+    </div>}
+  </>;
+}
+
+export default ControlLogisticoTON;
