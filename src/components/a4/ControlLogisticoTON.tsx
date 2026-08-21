@@ -32,6 +32,31 @@ type Unidad = {
 
 type Fase = { id: Seccion; titulo: string; subtitulo: string; momentos: { nombre: string; periodo: string; detalle: string }[] };
 
+
+type OperacionLogistica = {
+  id: string;
+  fase: Seccion;
+  momento: string;
+  nombre: string;
+  base: string;
+  sistema: string;
+  cantidad: number;
+  armamento: string;
+  armamentoPorAeronave: number;
+  distanciaKm: number;
+  destino: string;
+  esfuerzo: "ERC" | "MESC" | "MEIC";
+  transporte: "Camión 5 Tn" | "Camión 20 Tn";
+  aceptada: boolean;
+};
+
+type InventarioArmamento = {
+  id: string;
+  nombre: string;
+  cantidadInicial: number;
+  pesoKg?: number;
+};
+
 const COMUNICACIONES: Record<string, Comunicacion[]> = {
   "1ba": [
     {equipo:"HARRIS FALCON III RF-7800H-MP",cantidad:2},{equipo:"HARRIS FALCON IV AN/PRC-158",cantidad:1},
@@ -256,20 +281,110 @@ const UNIDADES: Unidad[] = [
   {nombre:"Grupo 2 COM",ubicacion:"Malargüe",medios:[],comunicaciones:COMUNICACIONES.g2},
 ];
 
+
+const ARMAMENTO_REALICO: InventarioArmamento[] = [
+  {id:"gbu10",nombre:"GBU-10 Paveway II",cantidadInicial:48,pesoKg:907},
+  {id:"gbu12",nombre:"GBU-12 Paveway II",cantidadInicial:48,pesoKg:227},
+  {id:"gbu38",nombre:"GBU-38 JDAM",cantidadInicial:78,pesoKg:227},
+  {id:"aim9m",nombre:"AIM-9M Sidewinder",cantidadInicial:180},
+  {id:"aim120c5",nombre:"AIM-120C-5 AMRAAM",cantidadInicial:240},
+  {id:"aim7p",nombre:"AIM-7P Sparrow",cantidadInicial:220},
+  {id:"agm65g",nombre:"AGM-65G Maverick",cantidadInicial:120,pesoKg:302},
+  {id:"agm88c",nombre:"AGM-88C HARM",cantidadInicial:140},
+  {id:"mar1",nombre:"MAR-1",cantidadInicial:96},
+  {id:"mk84",nombre:"MARK 84",cantidadInicial:250,pesoKg:907},
+  {id:"mk83",nombre:"MARK 83",cantidadInicial:250,pesoKg:454},
+  {id:"mk82",nombre:"MARK 82",cantidadInicial:250,pesoKg:227},
+];
+
+const BASES_OPERACION = [
+  "La Rioja","Villa Mercedes","Córdoba","Mendoza","General Acha","Malargüe"
+] as const;
+
+const DISTANCIA_REALICO_KM: Record<string,number> = {
+  "La Rioja":806,
+  "Villa Mercedes":238,
+  "Córdoba":435,
+  "Mendoza":609,
+  "General Acha":294,
+  "Malargüe":582,
+};
+
+const CAPACIDAD_TRANSPORTE_TN: Record<OperacionLogistica["transporte"],number> = {
+  "Camión 5 Tn":5,
+  "Camión 20 Tn":20,
+};
+
+const TFP_TOTAL_POR_4: Record<OperacionLogistica["esfuerzo"],Record<string,number>> = {
+  MEIC:{
+    "F-16C Block 40":56,"F-16D Block 42":56,"F-16CJ Block 50":56,
+    "AMX A-1M":56,"T-6 Texan II":26,"IAI HARPY":10,"EC-130H COMPASS CALL":18,
+    "E-99M ERIEYE":18,"HERMES 450":18,"C-130J":26,"KC-130J":26,"KC-135":26,
+    "LJ-60":18,"DHC-6":14,"CH-47F":14,"UH-1Y":14,"B-412":14,
+  },
+  MESC:{
+    "F-16C Block 40":46,"F-16D Block 42":46,"F-16CJ Block 50":46,
+    "AMX A-1M":46,"T-6 Texan II":26,"IAI HARPY":10,"EC-130H COMPASS CALL":18,
+    "E-99M ERIEYE":18,"HERMES 450":18,"C-130J":20,"KC-130J":20,"KC-135":20,
+    "LJ-60":18,"DHC-6":10,"CH-47F":10,"UH-1Y":10,"B-412":10,
+  },
+  ERC:{
+    "F-16C Block 40":24,"F-16D Block 42":24,"F-16CJ Block 50":24,
+    "AMX A-1M":24,"T-6 Texan II":14,"IAI HARPY":6,"EC-130H COMPASS CALL":10,
+    "E-99M ERIEYE":10,"HERMES 450":10,"C-130J":10,"KC-130J":10,"KC-135":10,
+    "LJ-60":10,"DHC-6":10,"CH-47F":10,"UH-1Y":10,"B-412":10,
+  },
+};
+
+
+const AERONAVES_PLANIFICABLES = new Set([
+  "F-16C Block 40","F-16D Block 42","F-16CJ Block 50",
+  "AMX A-1M","T-6 Texan II","IAI HARPY",
+  "EC-130H COMPASS CALL","E-99M ERIEYE","HERMES 450",
+  "C-130J","KC-130J","KC-135","LJ-60","DHC-6",
+  "CH-47F","UH-1Y","B-412",
+]);
+
+const AERONAVES_TRANSPORTE = new Set([
+  "C-130J","KC-130J","KC-135","LJ-60","DHC-6","CH-47F","UH-1Y","B-412",
+]);
+
+const AERONAVES_SIN_ARMAMENTO_PLANIFICADO = new Set([
+  "C-130J","KC-130J","KC-135","LJ-60","DHC-6","CH-47F","UH-1Y","B-412",
+  "E-99M ERIEYE","EC-130H COMPASS CALL","HERMES 450",
+]);
+
+const COMBUSTIBLE_DOCUMENTADO: Record<string,{internoKg?:number;configKg?:number;nota:string}> = {
+  "F-16C Block 40":{internoKg:3175,configKg:5443,nota:"Dato disponible: 3.175 kg interno; 5.443 kg totales con 2 tanques externos. No existe aún en la documentación cargada un factor de consumo por km/hora para calcular combustible de misión."},
+  "F-16D Block 42":{internoKg:3175,configKg:5443,nota:"Dato disponible: 3.175 kg interno; 5.443 kg totales con 2 tanques externos. No existe aún en la documentación cargada un factor de consumo por km/hora para calcular combustible de misión."},
+  "F-16CJ Block 50":{internoKg:3175,configKg:5443,nota:"Dato disponible: 3.175 kg interno; 5.443 kg totales con 2 tanques externos. No existe aún en la documentación cargada un factor de consumo por km/hora para calcular combustible de misión."},
+};
+
+function esfuerzoPorMomento(fase:Seccion,momento:string): OperacionLogistica["esfuerzo"] {
+  if(fase==="fase2") return "MEIC";
+  if(fase==="fase3") return "MESC";
+  if(fase==="fase4") return "ERC";
+  if(fase==="fase1" && momento.includes("Alerta")) return "MESC";
+  return "ERC";
+}
+
 const FASES: Fase[] = [
   {id:"fase1",titulo:"FASE I",subtitulo:"PREPARACIÓN · recepción del Plan hasta D",momentos:[
-    {nombre:"Momento 1 · CONCEPCIÓN",periodo:"Recepción del Plan → día M",detalle:"Planeamiento de comando de componente."},
-    {nombre:"Momento 2 · PREPARACIÓN",periodo:"Día M → día A",detalle:"Alistamiento, movilización y despliegue. En el Plan Esquemático CAeTON se asocia al ERC."},
-    {nombre:"Momento 3 · ALERTA",periodo:"Día A → día D",detalle:"Acciones para hacer efectiva la alerta estratégica. En el Plan Esquemático CAeTON se asocia al MESC."},
+    {nombre:"Antes de M · Momento 1 · Concepción",periodo:"Recepción del Plan → M",detalle:"Concepción y planeamiento. Los medios aún no están bajo control operacional del CAeTON."},
+    {nombre:"M+1 a M+4 · Momento 2 · Despliegue",periodo:"M+1 → M+4",detalle:"Desplegar los medios a las PPRRFF correspondientes. ERC."},
+    {nombre:"M+5 a M+7 · Momento 2 · Abastecimiento",periodo:"M+5 → M+7",detalle:"Abastecer el armamento necesario a las PPRRFF correspondientes. ERC."},
+    {nombre:"M+8 a M+40 · Momento 2 · Adiestramiento",periodo:"M+8 → M+40",detalle:"Adiestrar los sistemas de armas en el área de operaciones. ERC."},
+    {nombre:"M+41 a M+45 · Momento 2 · Comprobación",periodo:"M+41 → M+45",detalle:"Comprobar el sistema aéreo ofensivo. ERC."},
+    {nombre:"A a D · Momento 3 · Alerta",periodo:"A → D",detalle:"Alerta estratégica y máximo esfuerzo sostenido de combate. MESC."},
   ]},
   {id:"fase2",titulo:"FASE II",subtitulo:"TOMAR LA INICIATIVA · D a D+1",momentos:[
-    {nombre:"Fase sin momentos subordinados denominados",periodo:"D → D+1",detalle:"El cuerpo del Plan la define como TOMAR LA INICIATIVA. El Plan Esquemático CAeTON establece MEIC para esta fase."},
+    {nombre:"D a D+1 · Operaciones",periodo:"D → D+1",detalle:"Operaciones de Fase II. Máximo esfuerzo intensivo de combate (MEIC)."},
   ]},
   {id:"fase3",titulo:"FASE III",subtitulo:"DOMINAR · D+2 a D+9",momentos:[
-    {nombre:"Fase sin momentos subordinados denominados",periodo:"D+2 → D+9",detalle:"El cuerpo del Plan la define como DOMINAR. El Plan Esquemático CAeTON establece MESC para esta fase."},
+    {nombre:"D+2 a D+9 · Operaciones",periodo:"D+2 → D+9",detalle:"Operaciones de Fase III. Máximo esfuerzo sostenido de combate (MESC)."},
   ]},
   {id:"fase4",titulo:"FASE IV",subtitulo:"ESTABILIZACIÓN · D+10 hasta finalizar repliegue",momentos:[
-    {nombre:"Repliegue / estabilización",periodo:"Desde D+10",detalle:"Regreso gradual de las fuerzas a sus asientos naturales. El Plan Esquemático CAeTON prevé ERC durante el repliegue."},
+    {nombre:"D+10 en adelante · Repliegue",periodo:"Desde D+10",detalle:"Repliegue gradual a los asientos naturales. ERC."},
   ]},
 ];
 
@@ -433,6 +548,26 @@ function Tabla({headers,rows}:{headers:string[];rows:(string|number)[][]}){
   return <div className="overflow-x-auto rounded-lg border border-slate-800"><table className="w-full min-w-[760px] text-left text-xs"><thead className="bg-slate-950 text-slate-400"><tr>{headers.map(h=><th key={h} className="whitespace-nowrap px-3 py-2">{h}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={i} className="border-t border-slate-800">{r.map((v,j)=><td key={j} className={`px-3 py-2 ${j===0?"font-semibold text-slate-200":"text-slate-300"}`}>{v}</td>)}</tr>)}</tbody></table></div>;
 }
 
+
+function inventarioAeronavesPorBase(){
+  const salida: Record<string,Record<string,number>> = {};
+  for(const unidad of UNIDADES){
+    salida[unidad.ubicacion] ??= {};
+    for(const medio of unidad.medios){
+      if(typeof medio.cantidad!=="number") continue;
+      if(!AERONAVES_PLANIFICABLES.has(medio.nombre)) continue;
+      salida[unidad.ubicacion][medio.nombre]=(salida[unidad.ubicacion][medio.nombre]??0)+medio.cantidad;
+    }
+  }
+  return salida;
+}
+
+function personalTecnicoTFP(sistema:string,cantidad:number,esfuerzo:OperacionLogistica["esfuerzo"]){
+  const factor=TFP_TOTAL_POR_4[esfuerzo][sistema];
+  if(!factor || cantidad<=0) return null;
+  return Math.ceil((factor*cantidad)/4);
+}
+
 function ControlLogisticoTON(){
   const [open,setOpen]=useState(false);
   const [seccion,setSeccion]=useState<Seccion>("situacion");
@@ -440,7 +575,53 @@ function ControlLogisticoTON(){
   const [unidadAbierta,setUnidadAbierta]=useState<string|null>("5ª Brigada Aérea");
   const [tfpBloque,setTfpBloque]=useState<string>("aviones");
 
+  const [operaciones,setOperaciones]=useState<OperacionLogistica[]>([]);
+  const [momentoPlan,setMomentoPlan]=useState<string>("");
+  const [nombreOperacion,setNombreOperacion]=useState("");
+  const [baseOperacion,setBaseOperacion]=useState<string>("Villa Mercedes");
+  const [sistemaOperacion,setSistemaOperacion]=useState<string>("F-16C Block 40");
+  const [cantidadOperacion,setCantidadOperacion]=useState(1);
+  const [armamentoOperacion,setArmamentoOperacion]=useState("GBU-10 Paveway II");
+  const [armamentoPorAeronave,setArmamentoPorAeronave]=useState(2);
+  const [distanciaOperacion,setDistanciaOperacion]=useState(0);
+  const [destinoOperacion,setDestinoOperacion]=useState("");
+  const [transporteOperacion,setTransporteOperacion]=useState<OperacionLogistica["transporte"]>("Camión 20 Tn");
+  const [tipoEmpleo,setTipoEmpleo]=useState<"operacion"|"movilizacion"|"abastecimiento"|"repliegue">("operacion");
+
   const faseActiva=FASES.find(f=>f.id===seccion);
+
+  const inventarioAeronaves=useMemo(()=>inventarioAeronavesPorBase(),[]);
+  const momentosFase=faseActiva?.momentos??[];
+  const momentoSeleccionado=momentoPlan || momentosFase[0]?.nombre || "";
+  const esfuerzoSeleccionado=esfuerzoPorMomento(seccion,momentoSeleccionado);
+
+  const operacionesAceptadasMomento=operaciones.filter(o=>o.aceptada&&o.fase===seccion&&o.momento===momentoSeleccionado);
+
+  const comprometidosSistemaBase=(base:string,sistema:string)=>
+    operacionesAceptadasMomento
+      .filter(o=>o.base===base&&o.sistema===sistema)
+      .reduce((s,o)=>s+o.cantidad,0);
+
+  const remanenteAeronaves=(base:string,sistema:string)=>{
+    const inicial=inventarioAeronaves[base]?.[sistema]??0;
+    return inicial-comprometidosSistemaBase(base,sistema);
+  };
+
+  const armamentoConsumido=(nombre:string)=>
+    operaciones.filter(o=>o.aceptada&&o.armamento===nombre)
+      .reduce((s,o)=>s+(o.cantidad*o.armamentoPorAeronave),0);
+
+  const armamentoItem=ARMAMENTO_REALICO.find(a=>a.nombre===armamentoOperacion);
+  const sistemaSinArmamento=AERONAVES_SIN_ARMAMENTO_PLANIFICADO.has(sistemaOperacion);
+  const armamentoRequerido=sistemaSinArmamento?0:Math.max(0,cantidadOperacion)*Math.max(0,armamentoPorAeronave);
+  const armamentoRemanenteRealico=(armamentoItem?.cantidadInicial??0)-armamentoConsumido(armamentoOperacion);
+  const pesoArmamentoKg=(armamentoItem?.pesoKg??0)*armamentoRequerido;
+  const viajesArmamento=armamentoItem?.pesoKg
+    ? Math.ceil((pesoArmamentoKg/1000)/CAPACIDAD_TRANSPORTE_TN[transporteOperacion])
+    : null;
+
+  const personalTFP=personalTecnicoTFP(sistemaOperacion,cantidadOperacion,esfuerzoSeleccionado);
+  const combustibleInfo=COMBUSTIBLE_DOCUMENTADO[sistemaOperacion];
   const nav=[
     ["situacion","SITUACIÓN INICIAL"],["tfp","TFP"],["fase1","FASE I"],["fase2","FASE II"],["fase3","FASE III"],["fase4","FASE IV"]
   ] as [Seccion,string][];
@@ -635,7 +816,125 @@ function ControlLogisticoTON(){
           {tfpBloque==="distancias"&&<div className="space-y-4"><div className="overflow-x-auto rounded-lg border border-slate-800"><table className="min-w-[1800px] w-full text-xs"><thead className="bg-slate-950 text-slate-400"><tr><th rowSpan={2} className="px-3 py-2 text-left">Origen</th><th colSpan={9} className="px-3 py-2 text-center">VÍA TERRESTRE · km</th><th colSpan={9} className="px-3 py-2 text-center">VÍA AÉREA · km</th></tr><tr>{LUGARES_DIST.map(x=><th key={`t-${x}`} className="px-2 py-2">{x}</th>)}{LUGARES_DIST.map(x=><th key={`a-${x}`} className="px-2 py-2">{x}</th>)}</tr></thead><tbody>{DISTANCIAS.map((r,i)=><tr key={i} className="border-t border-slate-800"><td className="px-3 py-2 font-bold">{r[0]}</td>{r.slice(1).map((v,j)=><td key={j} className="px-2 py-2 text-center text-slate-300">{v}</td>)}</tr>)}</tbody></table></div></div>}
         </div>}
 
-        {faseActiva&&<div className="space-y-4"><div><h2 className="text-xl font-black text-emerald-300">{faseActiva.titulo}</h2><p className="text-sm text-slate-400">{faseActiva.subtitulo}</p></div><div className="rounded-xl border border-slate-800 bg-slate-900"><button onClick={()=>setFasesAbiertas(x=>({...x,[faseActiva.id]:!x[faseActiva.id]}))} className="flex w-full items-center justify-between p-4 text-left"><div><b>Momentos / denominación</b><p className="text-xs text-slate-500">Presione para desplegar la estructura temporal documentada.</p></div><span>{fasesAbiertas[faseActiva.id]?"−":"+"}</span></button>{fasesAbiertas[faseActiva.id]&&<div className="space-y-2 border-t border-slate-800 p-4">{faseActiva.momentos.map((m,i)=><div key={i} className="rounded-lg bg-slate-950 p-4"><b className="text-cyan-300">{m.nombre}</b><p className="mt-1 text-xs font-semibold text-slate-300">{m.periodo}</p><p className="mt-1 text-xs text-slate-500">{m.detalle}</p></div>)}</div>}</div><div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/40 p-5 text-sm text-slate-500">Esta fase queda preparada para incorporar los movimientos y cálculos logísticos cuando los vayamos definiendo.</div></div>}
+        {faseActiva&&<div className="space-y-5">
+          <div><h2 className="text-xl font-black text-emerald-300">{faseActiva.titulo}</h2><p className="text-sm text-slate-400">{faseActiva.subtitulo}</p></div>
+
+          <div className="rounded-xl border border-slate-800 bg-slate-900">
+            <button onClick={()=>setFasesAbiertas(x=>({...x,[faseActiva.id]:!x[faseActiva.id]}))} className="flex w-full items-center justify-between p-4 text-left">
+              <div><b>Momentos / denominación</b><p className="text-xs text-slate-500">Seleccione el momento sobre el que desea planificar.</p></div>
+              <span>{fasesAbiertas[faseActiva.id]?"−":"+"}</span>
+            </button>
+            {fasesAbiertas[faseActiva.id]&&<div className="space-y-2 border-t border-slate-800 p-4">
+              {faseActiva.momentos.map((m,i)=><button key={i} onClick={()=>setMomentoPlan(m.nombre)} className={`block w-full rounded-lg p-4 text-left ${momentoSeleccionado===m.nombre?"border border-cyan-600 bg-cyan-950/20":"bg-slate-950"}`}>
+                <b className="text-cyan-300">{m.nombre}</b>
+              </button>)}
+            </div>}
+          </div>
+
+          <section className="rounded-xl border border-emerald-800/60 bg-slate-900 p-4">
+            <div className="mb-4">
+              <h3 className="font-black text-emerald-300">PLANIFICADOR LOGÍSTICO DEL MOMENTO</h3>
+              <p className="text-xs text-slate-500">{momentoSeleccionado} · esfuerzo sugerido: <b className="text-slate-300">{esfuerzoSeleccionado}</b></p>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Tipo de empleo</span><select value={tipoEmpleo} onChange={e=>setTipoEmpleo(e.target.value as typeof tipoEmpleo)} className="w-full rounded bg-slate-950 p-2"><option value="operacion">Operación aérea</option><option value="movilizacion">Movilización / despliegue</option><option value="abastecimiento">Abastecimiento</option><option value="repliegue">Repliegue</option></select></label>
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Operación</span><input value={nombreOperacion} onChange={e=>setNombreOperacion(e.target.value)} placeholder="Ej. Salida 1" className="w-full rounded bg-slate-950 p-2"/></label>
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Base de salida</span><select value={baseOperacion} onChange={e=>setBaseOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">{BASES_OPERACION.map(b=><option key={b}>{b}</option>)}</select></label>
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Aeronave</span><select value={sistemaOperacion} onChange={e=>setSistemaOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">{Object.keys(inventarioAeronaves[baseOperacion]??{}).map(s=><option key={s} value={s}>{s}{AERONAVES_TRANSPORTE.has(s)?" · Transporte/Apoyo":""}</option>)}</select></label>
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Cantidad</span><input type="number" min={1} value={cantidadOperacion} onChange={e=>setCantidadOperacion(Math.max(1,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>
+
+              {!sistemaSinArmamento&&<label className="text-xs"><span className="mb-1 block text-slate-400">Armamento</span><select value={armamentoOperacion} onChange={e=>setArmamentoOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">{ARMAMENTO_REALICO.map(a=><option key={a.id}>{a.nombre}</option>)}</select></label>}
+              {!sistemaSinArmamento&&<label className="text-xs"><span className="mb-1 block text-slate-400">Armamento por aeronave</span><input type="number" min={0} value={armamentoPorAeronave} onChange={e=>setArmamentoPorAeronave(Math.max(0,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>}
+              {sistemaSinArmamento&&<div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Configuración</span><b className="block text-sky-200">Sin armamento de ataque en este empleo</b><span className="text-[10px] text-slate-600">Puede utilizarse para transporte, REV, C2, ISR/GE o apoyo según el sistema.</span></div>}
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Destino / objetivo</span><input value={destinoOperacion} onChange={e=>setDestinoOperacion(e.target.value)} placeholder="Destino" className="w-full rounded bg-slate-950 p-2"/></label>
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Distancia ida (km)</span><input type="number" min={0} value={distanciaOperacion} onChange={e=>setDistanciaOperacion(Math.max(0,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>
+            </div>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded bg-slate-950 p-3 text-xs">
+                <span className="text-slate-500">Disponibles en la base</span>
+                <b className="mt-1 block text-xl text-white">{remanenteAeronaves(baseOperacion,sistemaOperacion)}</b>
+                <span className="text-[10px] text-slate-600">antes de aceptar esta operación en el momento seleccionado</span>
+              </div>
+              <div className="rounded bg-slate-950 p-3 text-xs">
+                <span className="text-slate-500">Armamento requerido</span>
+                <b className="mt-1 block text-xl text-white">{sistemaSinArmamento?"N/A":armamentoRequerido}</b>
+                <span className="text-[10px] text-slate-600">{sistemaSinArmamento?"Empleo sin armamento":armamentoOperacion}</span>
+              </div>
+              <div className="rounded bg-slate-950 p-3 text-xs">
+                <span className="text-slate-500">Stock actual en Realicó</span>
+                <b className={`mt-1 block text-xl ${sistemaSinArmamento||armamentoRemanenteRealico>=armamentoRequerido?"text-emerald-300":"text-red-300"}`}>{sistemaSinArmamento?"N/A":armamentoRemanenteRealico}</b>
+              </div>
+              <div className="rounded bg-slate-950 p-3 text-xs">
+                <span className="text-slate-500">Personal técnico TFP</span>
+                <b className="mt-1 block text-xl text-violet-300">{personalTFP??"s/d"}</b>
+                <span className="text-[10px] text-slate-600">{esfuerzoSeleccionado}</span>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 lg:grid-cols-2">
+              <div className="rounded-lg border border-amber-900/50 bg-amber-950/10 p-4">
+                <h4 className="text-xs font-black text-amber-300">COMBUSTIBLE / REV</h4>
+                {combustibleInfo?<div className="mt-2 text-xs text-slate-300">
+                  <p>{combustibleInfo.nota}</p>
+                  <p className="mt-2 rounded bg-slate-950 p-2 text-amber-200"><b>REV:</b> pendiente de cálculo hasta cargar un factor documental de consumo/radio de misión. No se estima automáticamente.</p>
+                  <p className="mt-2 text-[10px] text-slate-500">Distancia cargada: {distanciaOperacion} km de ida / {distanciaOperacion*2} km ida y regreso.</p>
+                </div>:<p className="mt-2 text-xs text-slate-500">No hay parámetros documentales de combustible cargados para este sistema.</p>}
+              </div>
+
+              {!sistemaSinArmamento&&<div className="rounded-lg border border-sky-900/50 bg-sky-950/10 p-4">
+                <h4 className="text-xs font-black text-sky-300">ABASTECIMIENTO DE ARMAMENTO DESDE REALICÓ</h4>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <label className="text-xs"><span className="mb-1 block text-slate-400">Medio de transporte</span><select value={transporteOperacion} onChange={e=>setTransporteOperacion(e.target.value as OperacionLogistica["transporte"])} className="w-full rounded bg-slate-950 p-2"><option>Camión 5 Tn</option><option>Camión 20 Tn</option></select></label>
+                  <div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Realicó ↔ base</span><b className="block text-white">{DISTANCIA_REALICO_KM[baseOperacion]??"s/d"} km</b></div>
+                  <div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Peso del lote</span><b className="block text-white">{armamentoItem?.pesoKg?`${(pesoArmamentoKg/1000).toFixed(2)} Tn`:"s/d"}</b></div>
+                  <div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Empleos / viajes mínimos</span><b className="block text-sky-200">{viajesArmamento??"s/d"}</b></div>
+                </div>
+                {!armamentoItem?.pesoKg&&<p className="mt-2 text-[10px] text-amber-300">No se calcula cantidad de viajes cuando DELTA no aporta peso para ese armamento.</p>}
+              </div>}
+              {sistemaSinArmamento&&<div className="rounded-lg border border-sky-900/50 bg-sky-950/10 p-4">
+                <h4 className="text-xs font-black text-sky-300">MOVILIZACIÓN / APOYO</h4>
+                <p className="mt-2 text-xs text-slate-300">Esta aeronave puede incorporarse a los movimientos de despliegue, transporte, apoyo, reabastecimiento o repliegue. El origen, destino, cantidad y distancia quedan vinculados al momento seleccionado.</p>
+              </div>}
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <button type="button" disabled={cantidadOperacion>remanenteAeronaves(baseOperacion,sistemaOperacion)||(!sistemaSinArmamento&&armamentoRequerido>armamentoRemanenteRealico)}
+                onClick={()=>{
+                  const op:OperacionLogistica={
+                    id:`op-${Date.now()}`,fase:seccion,momento:momentoSeleccionado,nombre:nombreOperacion||"Operación",
+                    base:baseOperacion,sistema:sistemaOperacion,cantidad:cantidadOperacion,armamento:armamentoOperacion,
+                    armamentoPorAeronave,distanciaKm:distanciaOperacion,destino:destinoOperacion,esfuerzo:esfuerzoSeleccionado,
+                    transporte:transporteOperacion,aceptada:true
+                  };
+                  setOperaciones(x=>[...x,op]);
+                }}
+                className="rounded bg-emerald-700 px-4 py-2 text-xs font-black disabled:bg-slate-700 disabled:text-slate-500">
+                ACEPTAR EMPLEO
+              </button>
+              {cantidadOperacion>remanenteAeronaves(baseOperacion,sistemaOperacion)&&<span className="text-xs text-red-300">No hay suficientes aeronaves disponibles en esta base para este momento.</span>}
+              {!sistemaSinArmamento&&armamentoRequerido>armamentoRemanenteRealico&&<span className="text-xs text-red-300">No hay suficiente armamento remanente en Realicó.</span>}
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+            <h3 className="mb-3 text-sm font-black text-white">EMPLEOS ACEPTADOS · {momentoSeleccionado}</h3>
+            {operacionesAceptadasMomento.length===0?<p className="text-xs text-slate-500">Todavía no hay empleos aceptados en este momento.</p>:<div className="space-y-2">
+              {operacionesAceptadasMomento.map(o=><div key={o.id} className="rounded bg-slate-950 p-3 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div><b className="text-cyan-300">{o.nombre}</b><p className="text-slate-400">{o.cantidad} × {o.sistema} · {o.base} → {o.destino||"destino sin nombre"}</p></div>
+                  <button onClick={()=>setOperaciones(x=>x.filter(v=>v.id!==o.id))} className="rounded bg-red-950 px-2 py-1 text-red-300">Deshacer</button>
+                </div>
+                <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                  <span>Armamento: <b>{AERONAVES_SIN_ARMAMENTO_PLANIFICADO.has(o.sistema)?"N/A":`${o.cantidad*o.armamentoPorAeronave} × ${o.armamento}`}</b></span>
+                  <span>Distancia: <b>{o.distanciaKm} km ida</b></span>
+                  <span>Remanente base: <b>{remanenteAeronaves(o.base,o.sistema)}</b></span>
+                </div>
+              </div>)}
+            </div>}
+          </section>
+        </div>}
       </div></main>
     </div>}
   </>;
