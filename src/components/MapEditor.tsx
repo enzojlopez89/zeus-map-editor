@@ -4140,6 +4140,12 @@ export default function MapEditor({
             : "Los paneles visibles corresponden al perfil de este espacio."}
         </p>
 
+        {workspaceCode === "a4" && !readOnly && (
+          <div style={{ order: -1 }}>
+            <ControlLogisticoTON />
+          </div>
+        )}
+
         <div className="sticky top-0 z-20 mb-4 rounded-lg border border-slate-700 bg-slate-950/95 p-3 shadow-lg" style={{ order: -1 }}>
           <div className="flex items-center justify-between gap-2">
             <span className={`text-xs font-semibold ${cambiosPendientes ? "text-amber-300" : "text-emerald-300"}`}>
@@ -5299,7 +5305,7 @@ export default function MapEditor({
           </section>
         )}
 
-        {workspaceCode === "a4" && !readOnly && <ControlLogisticoTON />}
+        
 
         {workspaceCode === "a3" && seleccionado && !seleccionado.sharedExternal && (
           <section {...propiedadesPanel("operaciones")} className="mb-5 space-y-4 rounded border border-cyan-900 bg-slate-900 p-4">

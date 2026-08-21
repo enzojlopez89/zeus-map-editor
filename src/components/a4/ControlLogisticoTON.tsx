@@ -366,6 +366,49 @@ function ControlLogisticoTON(){
         {seccion==="situacion"&&<div className="space-y-6">
           <section><h2 className="text-xl font-black text-emerald-300">SITUACIÓN INICIAL</h2><p className="mt-1 text-sm text-slate-400">Dispositivo inicial del CAeC y material logístico antes de aplicar movimientos de campaña.</p><p className="mt-2 rounded border border-cyan-900/50 bg-cyan-950/10 p-3 text-xs text-cyan-100">En esta pantalla sólo se muestran existencias y capacidades iniciales documentadas. No se calcula todavía si alcanzan, sobran o generan déficit; esos cálculos se incorporarán después utilizando las TFP.</p></section>
 
+          <section className="space-y-3">
+            <div>
+              <h3 className="font-black text-white">PERSONAL, RACIONAMIENTO Y ALOJAMIENTO · SITUACIÓN INICIAL</h3>
+              <p className="text-xs text-slate-500">Valores iniciales consignados en TFP (1). Se muestran como existencia/capacidad inicial, sin evaluar todavía suficiencia ni déficit.</p>
+            </div>
+
+            <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900">
+              <table className="w-full min-w-[980px] text-left text-xs">
+                <thead className="bg-slate-950 text-slate-400">
+                  <tr>
+                    <th className="px-3 py-3">Unidad / asiento</th>
+                    <th className="px-3 py-3">Personal inicial</th>
+                    <th className="px-3 py-3">Racionamiento inicial</th>
+                    <th className="px-3 py-3">Cocinas</th>
+                    <th className="px-3 py-3">Carpas racionamiento</th>
+                    <th className="px-3 py-3">Carpas alojamiento</th>
+                    <th className="px-3 py-3">Capacidad nominal alojamiento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {UNIDADES.filter((u)=>u.logistica).map((u)=>(
+                    <tr key={`log-${u.nombre}-${u.ubicacion}`} className="border-t border-slate-800">
+                      <td className="px-3 py-3">
+                        <b className="text-slate-100">{u.nombre}</b>
+                        <div className="text-[10px] text-slate-500">{u.ubicacion}</div>
+                      </td>
+                      <td className="px-3 py-3 font-black text-white">{u.logistica!.personal}</td>
+                      <td className="px-3 py-3 text-slate-300">{u.logistica!.racionesDia} raciones/día</td>
+                      <td className="px-3 py-3 text-slate-300">{u.logistica!.cocinas}</td>
+                      <td className="px-3 py-3 text-slate-300">{u.logistica!.carpasRacionamiento}</td>
+                      <td className="px-3 py-3 text-slate-300">{u.logistica!.carpasAlojamiento}</td>
+                      <td className="px-3 py-3 font-black text-cyan-300">{u.logistica!.carpasAlojamiento*500} personas</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="rounded border border-cyan-900/40 bg-cyan-950/10 p-3 text-[11px] text-cyan-100">
+              La capacidad nominal de alojamiento se expresa como carpas de alojamiento × 500 personas, de acuerdo con la nota de TFP (1). En esta etapa no se calcula si alcanza o no.
+            </p>
+          </section>
+
           <section className="space-y-3"><div><h3 className="font-black text-white">UNIDADES Y MEDIOS · ANEXO CHARLIE</h3><p className="text-xs text-slate-500">Cada unidad incorpora además su dotación de comunicaciones del Apéndice 1 de ECCO cuando existe discriminación por unidad.</p></div>
             {UNIDADES.map(u=>{const abierta=unidadAbierta===u.nombre;return <article key={`${u.nombre}-${u.ubicacion}`} className="rounded-xl border border-slate-800 bg-slate-900">
               <button onClick={()=>setUnidadAbierta(abierta?null:u.nombre)} className="flex w-full items-center justify-between gap-3 p-4 text-left"><div><b>{u.nombre}</b><p className="text-xs text-slate-500">{u.ubicacion}</p></div><span className="text-slate-400">{abierta?"−":"+"}</span></button>
