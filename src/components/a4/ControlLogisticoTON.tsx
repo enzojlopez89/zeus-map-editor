@@ -412,6 +412,23 @@ const DISTANCIAS = [
 ];
 const LUGARES_DIST=["La Rioja","Villa Mercedes","Córdoba","Mendoza","General Acha","Malargüe","San Luis","Río Cuarto","Realicó"];
 
+
+function resumenPersonalPorDivision(personal: PersonalUnidad){
+  const acumulado: Record<string,{oficiales:number;suboficiales:number;sv:number;civiles:number;total:number}> = {};
+  for(const fila of personal.filas){
+    const division = fila.division ?? "UNIDAD";
+    if(!acumulado[division]){
+      acumulado[division]={oficiales:0,suboficiales:0,sv:0,civiles:0,total:0};
+    }
+    acumulado[division].oficiales += fila.oficiales;
+    acumulado[division].suboficiales += fila.suboficiales;
+    acumulado[division].sv += fila.sv;
+    acumulado[division].civiles += fila.civiles;
+    acumulado[division].total += fila.total;
+  }
+  return Object.entries(acumulado).map(([division,valores])=>({division,...valores}));
+}
+
 function Tabla({headers,rows}:{headers:string[];rows:(string|number)[][]}){
   return <div className="overflow-x-auto rounded-lg border border-slate-800"><table className="w-full min-w-[760px] text-left text-xs"><thead className="bg-slate-950 text-slate-400"><tr>{headers.map(h=><th key={h} className="whitespace-nowrap px-3 py-2">{h}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={i} className="border-t border-slate-800">{r.map((v,j)=><td key={j} className={`px-3 py-2 ${j===0?"font-semibold text-slate-200":"text-slate-300"}`}>{v}</td>)}</tr>)}</tbody></table></div>;
 }
@@ -523,25 +540,55 @@ function ControlLogisticoTON(){
           <section className="space-y-3"><div><h3 className="font-black text-white">UNIDADES Y MEDIOS · ANEXO CHARLIE</h3><p className="text-xs text-slate-500">Cada unidad incorpora además su dotación de comunicaciones del Apéndice 1 de ECCO cuando existe discriminación por unidad.</p></div>
             {UNIDADES.map(u=>{const abierta=unidadAbierta===u.nombre;return <article key={`${u.nombre}-${u.ubicacion}`} className="rounded-xl border border-slate-800 bg-slate-900">
               <button onClick={()=>setUnidadAbierta(abierta?null:u.nombre)} className="flex w-full items-center justify-between gap-3 p-4 text-left"><div><b>{u.nombre}</b><p className="text-xs text-slate-500">{u.ubicacion}</p></div><span className="text-slate-400">{abierta?"−":"+"}</span></button>
-              {abierta&&<div className="border-t border-slate-800 p-4"><div className="grid gap-5 lg:grid-cols-2">{u.medios.length>0&&<div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-cyan-300">Medios asignados</h4><div className="space-y-1">{u.medios.map((m,i)=><div key={i} className="flex items-start justify-between gap-3 rounded bg-slate-950 px-3 py-2 text-xs"><div><b>{m.nombre}</b>{m.detalle&&<p className="text-[10px] text-slate-500">{m.detalle}</p>}</div>{typeof m.cantidad==="number"&&<b className="text-cyan-300">{m.cantidad}</b>}</div>)}</div></div>}
-                {u.personal&&<div className="lg:col-span-2">
-                  <h4 className="mb-2 text-xs font-black uppercase tracking-wider text-violet-300">Personal asignado · Anexo ALFA</h4>
+              {abierta&&<div className="border-t border-slate-800 p-4 space-y-5">
+
+                {u.medios.length>0&&<section>
+                  <div className="mb-2 flex items-end justify-between gap-3">
+                    <div>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-cyan-300">Medios asignados · Anexo CHARLIE</h4>
+                      <p className="text-[10px] text-slate-500">Medio, cantidad y observación según la organización de fuerzas.</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    {u.medios.map((m,i)=><div key={i} className="grid grid-cols-[1fr_auto] items-start gap-4 rounded bg-slate-950 px-3 py-2 text-xs">
+                      <div>
+                        <b className="text-slate-100">{m.nombre}</b>
+                        {m.detalle&&<p className="mt-0.5 text-[10px] text-slate-500">{m.detalle}</p>}
+                      </div>
+                      {typeof m.cantidad==="number"&&<div className="min-w-[72px] text-right">
+                        <span className="block text-[10px] uppercase text-slate-600">Cantidad</span>
+                        <b className="text-base text-cyan-300">{m.cantidad}</b>
+                      </div>}
+                    </div>)}
+                  </div>
+                </section>}
+
+                {u.personal&&<section className="rounded-xl border border-violet-900/40 bg-violet-950/10 p-4">
+                  <h4 className="mb-3 text-xs font-black uppercase tracking-wider text-violet-300">Personal asignado · Anexo ALFA</h4>
+
                   <div className="mb-3 grid grid-cols-5 gap-2 text-center text-xs">
                     <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Oficiales</span><b>{u.personal.total.oficiales}</b></div>
                     <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Suboficiales</span><b>{u.personal.total.suboficiales}</b></div>
                     <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">S/V</span><b>{u.personal.total.sv}</b></div>
                     <div className="rounded bg-slate-950 p-2"><span className="block text-slate-500">Civiles</span><b>{u.personal.total.civiles}</b></div>
-                    <div className="rounded bg-violet-950/30 p-2"><span className="block text-violet-400">TOTAL</span><b className="text-violet-200">{u.personal.total.total}</b></div>
+                    <div className="rounded bg-violet-950/50 p-2"><span className="block text-violet-400">TOTAL</span><b className="text-violet-200">{u.personal.total.total}</b></div>
                   </div>
+
                   <div className="overflow-x-auto rounded-lg border border-slate-800">
-                    <table className="w-full min-w-[760px] text-xs">
+                    <table className="w-full min-w-[650px] text-xs">
                       <thead className="bg-slate-950 text-slate-400">
-                        <tr><th className="px-3 py-2 text-left">División</th><th className="px-3 py-2 text-left">Elemento</th><th className="px-3 py-2 text-center">Of.</th><th className="px-3 py-2 text-center">Subof.</th><th className="px-3 py-2 text-center">S/V</th><th className="px-3 py-2 text-center">Civ.</th><th className="px-3 py-2 text-center">Total</th></tr>
+                        <tr>
+                          <th className="px-3 py-2 text-left">División</th>
+                          <th className="px-3 py-2 text-center">Of.</th>
+                          <th className="px-3 py-2 text-center">Subof.</th>
+                          <th className="px-3 py-2 text-center">S/V</th>
+                          <th className="px-3 py-2 text-center">Civ.</th>
+                          <th className="px-3 py-2 text-center">Total</th>
+                        </tr>
                       </thead>
                       <tbody>
-                        {u.personal.filas.map((f,i)=><tr key={i} className="border-t border-slate-800">
-                          <td className="px-3 py-2 text-[10px] font-bold text-slate-500">{f.division??"—"}</td>
-                          <td className="px-3 py-2 font-semibold text-slate-200">{f.elemento}</td>
+                        {resumenPersonalPorDivision(u.personal).map((f,i)=><tr key={i} className="border-t border-slate-800">
+                          <td className="px-3 py-2 font-semibold text-violet-200">{f.division}</td>
                           <td className="px-3 py-2 text-center text-slate-300">{f.oficiales}</td>
                           <td className="px-3 py-2 text-center text-slate-300">{f.suboficiales}</td>
                           <td className="px-3 py-2 text-center text-slate-300">{f.sv}</td>
@@ -551,8 +598,15 @@ function ControlLogisticoTON(){
                       </tbody>
                     </table>
                   </div>
-                </div>}
-                <div><h4 className="mb-2 text-xs font-black uppercase tracking-wider text-sky-300">Comunicaciones</h4>{u.comunicaciones.length?<div className="grid gap-1 sm:grid-cols-2">{u.comunicaciones.map((c,i)=><div key={i} className="flex justify-between gap-2 rounded bg-slate-950 px-3 py-2 text-xs"><span>{c.equipo}</span><b className="text-sky-300">{c.cantidad}</b></div>)}</div>:<p className="rounded bg-slate-950 p-3 text-xs text-slate-500">ECCO no discrimina equipos específicamente para esta unidad.</p>}{u.observaciones?.map((o,i)=><p key={i} className="mt-2 rounded border border-amber-900/50 bg-amber-950/10 p-2 text-[11px] text-amber-200">{o}</p>)}</div></div>
+                  <p className="mt-2 text-[10px] text-slate-500">El personal se resume por división para no mezclar en esta vista los sistemas de armas con los efectivos.</p>
+                </section>}
+
+                <section>
+                  <h4 className="mb-2 text-xs font-black uppercase tracking-wider text-sky-300">Comunicaciones · Anexo ECCO</h4>
+                  {u.comunicaciones.length?<div className="grid gap-1 sm:grid-cols-2">{u.comunicaciones.map((c,i)=><div key={i} className="flex justify-between gap-2 rounded bg-slate-950 px-3 py-2 text-xs"><span>{c.equipo}</span><b className="text-sky-300">{c.cantidad}</b></div>)}</div>:null}
+                  {u.observaciones?.map((o,i)=><p key={i} className="mt-2 rounded border border-amber-900/50 bg-amber-950/10 p-2 text-[11px] text-amber-200">{o}</p>)}
+                </section>
+
               </div>}
             </article>})}
           </section>
