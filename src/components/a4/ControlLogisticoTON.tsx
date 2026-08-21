@@ -297,6 +297,157 @@ const ARMAMENTO_REALICO: InventarioArmamento[] = [
   {id:"mk82",nombre:"MARK 82",cantidadInicial:250,pesoKg:227},
 ];
 
+
+
+const DESTINOS_ENEMIGOS = [
+  // Alas / bases aéreas enemigas
+  "Ala Aérea n.º 1 / Resistencia",
+  "Ala Aérea n.º 2 / Sáenz Peña",
+  "Ala Aérea n.º 3 / Salta",
+  "Ala Aérea n.º 4 / Catamarca",
+  "Ala Aérea n.º 5 / Tucumán",
+  "Ala Aérea n.º 6 / Formosa",
+  "Ala Aérea n.º 7 / Belén",
+  "Ala Aérea n.º 8 / Tartagal",
+  "Ala Aérea n.º 9 / Las Lomitas",
+  "Escuadrón Aéreo 31 / Santa Rosa (Catamarca)",
+
+  // C2 / radares / objetivos estratégicos
+  "Cuartel General / Salta",
+  "COAe enemigo / Ingeniero Juárez",
+  "Estación radar / Las Lomitas",
+  "Estación radar / Cafayate",
+  "Estación radar / Orán",
+  "Campamento Ratones Eramine / Salar del Ratón",
+
+  // Otros emplazamientos enemigos ya presentes en el mapa
+  "1.ª Brigada de Montaña / Jujuy",
+  "Compañía de Inteligencia de Montaña 11 / Jujuy",
+  "2.ª Brigada de Montaña / Pampa del Infierno",
+  "Compañía de Inteligencia de Montaña 21 / Pampa del Infierno",
+  "Fuerzas de Despliegue Rápido / Orán",
+  "Batallón de Inteligencia de Despliegue Rápido / Orán",
+  "Compañía de Ingenieros Mecanizados N.º 11 / Ingeniero Juárez",
+  "Compañía de Inteligencia Mecanizada 31 / Ingeniero Juárez",
+];
+
+const COORDENADAS_DESTINOS_ENEMIGOS: Record<string,{lat:number;lon:number;grupo:string}> = {
+  "Ala Aérea n.º 1 / Resistencia":{lat:-27.45,lon:-58.99,grupo:"Ala / Base aérea"},
+  "Ala Aérea n.º 2 / Sáenz Peña":{lat:-26.79,lon:-60.44,grupo:"Ala / Base aérea"},
+  "Ala Aérea n.º 3 / Salta":{lat:-24.86,lon:-65.49,grupo:"Ala / Base aérea"},
+  "Ala Aérea n.º 4 / Catamarca":{lat:-28.60,lon:-65.75,grupo:"Ala / Base aérea"},
+  "Ala Aérea n.º 5 / Tucumán":{lat:-26.84,lon:-65.10,grupo:"Ala / Base aérea"},
+  "Ala Aérea n.º 6 / Formosa":{lat:-26.21,lon:-58.23,grupo:"Ala / Base aérea"},
+  "Ala Aérea n.º 7 / Belén":{lat:-27.65,lon:-67.03,grupo:"Ala / Base aérea"},
+  "Ala Aérea n.º 8 / Tartagal":{lat:-22.52,lon:-63.82,grupo:"Ala / Base aérea"},
+  "Ala Aérea n.º 9 / Las Lomitas":{lat:-24.730022,lon:-60.551518,grupo:"Ala / Base aérea"},
+  "Escuadrón Aéreo 31 / Santa Rosa (Catamarca)":{lat:-28.26,lon:-65.34,grupo:"Ala / Base aérea"},
+
+  "Cuartel General / Salta":{lat:-24.79,lon:-65.41,grupo:"C2"},
+  "COAe enemigo / Ingeniero Juárez":{lat:-23.900,lon:-61.855,grupo:"C2"},
+  "Estación radar / Las Lomitas":{lat:-24.730022,lon:-60.551518,grupo:"Radar"},
+  "Estación radar / Cafayate":{lat:-26.062598,lon:-65.925964,grupo:"Radar"},
+  "Estación radar / Orán":{lat:-23.156410,lon:-64.375962,grupo:"Radar"},
+  "Campamento Ratones Eramine / Salar del Ratón":{lat:-25.0827,lon:-66.80665833333333,grupo:"Objetivo estratégico"},
+
+  "1.ª Brigada de Montaña / Jujuy":{lat:-24.185556,lon:-65.299444,grupo:"Ejército enemigo"},
+  "Compañía de Inteligencia de Montaña 11 / Jujuy":{lat:-24.193,lon:-65.287,grupo:"Ejército enemigo"},
+  "2.ª Brigada de Montaña / Pampa del Infierno":{lat:-26.512,lon:-61.175,grupo:"Ejército enemigo"},
+  "Compañía de Inteligencia de Montaña 21 / Pampa del Infierno":{lat:-26.512,lon:-61.175,grupo:"Ejército enemigo"},
+  "Fuerzas de Despliegue Rápido / Orán":{lat:-23.13705,lon:-64.324261,grupo:"Ejército enemigo"},
+  "Batallón de Inteligencia de Despliegue Rápido / Orán":{lat:-23.145,lon:-64.312,grupo:"Ejército enemigo"},
+  "Compañía de Ingenieros Mecanizados N.º 11 / Ingeniero Juárez":{lat:-23.900,lon:-61.855,grupo:"Ejército enemigo"},
+  "Compañía de Inteligencia Mecanizada 31 / Ingeniero Juárez":{lat:-23.907,lon:-61.842,grupo:"Ejército enemigo"},
+};
+
+const COORDENADAS_BASES_PROPIAS: Record<string,{lat:number;lon:number}> = {
+  "La Rioja":{lat:-29.376201,lon:-66.793409},
+  "Villa Mercedes":{lat:-33.738415,lon:-65.370632},
+  "Córdoba":{lat:-31.319799,lon:-64.207857},
+  "Mendoza":{lat:-32.89,lon:-68.84},
+  "General Acha":{lat:-37.425428,lon:-64.639206},
+  "Malargüe":{lat:-35.47,lon:-69.58},
+  "Realicó":{lat:-35.035,lon:-64.245},
+};
+
+
+function normalizarNombreMedio(valor:string){
+  return valor.toLowerCase()
+    .replace(" block 40","")
+    .replace(" block 42","")
+    .replace(" block 50","")
+    .replace(" stratotanker","")
+    .replace(" compass call","")
+    .replace(" erieye","")
+    .replace(" texan ii","")
+    .trim();
+}
+
+function coincideMedioTFP(medioTabla:string,medioSeleccionado:string){
+  const tabla=normalizarNombreMedio(medioTabla);
+  const seleccionado=normalizarNombreMedio(medioSeleccionado);
+
+  if(medioTabla.startsWith("F-16") && medioSeleccionado.startsWith("F-16")) return true;
+  if(medioTabla.startsWith("DHC6") && medioSeleccionado.startsWith("DHC-6")) return true;
+  if(medioTabla.startsWith("IAI Harpy") && medioSeleccionado.toUpperCase().startsWith("IAI HARPY")) return true;
+  if(medioTabla.startsWith("Elbit Hermes 450") && medioSeleccionado.toUpperCase().includes("HERMES 450")) return true;
+  if(medioTabla.startsWith("EC-130H") && medioSeleccionado.startsWith("EC-130H")) return true;
+  if(medioTabla.startsWith("E-99M") && medioSeleccionado.startsWith("E-99M")) return true;
+  if(medioTabla.startsWith("Learjet 60") && medioSeleccionado.startsWith("LJ-60")) return true;
+
+  const tablaReducida=tabla.replace("c/d/cj","");
+  return seleccionado.includes(tablaReducida) || tablaReducida.includes(seleccionado);
+}
+
+function extraerNumeroPlaneamiento(valor:unknown){
+  const coincidencia=String(valor??"").match(/[\d.]+/);
+  return coincidencia ? Number(coincidencia[0].replace(".","")) : null;
+}
+
+function consumoAeronavePerfil(medio:string,perfil:string){
+  const fila=RENDIMIENTO_AERONAVES_TFP.find(
+    r=>coincideMedioTFP(String(r[0]),medio) && String(r[2])===perfil
+  );
+  return fila ? extraerNumeroPlaneamiento(fila[3]) : null;
+}
+
+function velocidadAeronavePerfil(medio:string,perfil:string){
+  const fila=RENDIMIENTO_AERONAVES_TFP.find(
+    r=>coincideMedioTFP(String(r[0]),medio) && String(r[2])===perfil
+  );
+  return fila ? extraerNumeroPlaneamiento(fila[4]) : null;
+}
+
+function distanciaGeodesicaKm(a:{lat:number;lon:number},b:{lat:number;lon:number}){
+  const R=6371;
+  const dLat=(b.lat-a.lat)*Math.PI/180;
+  const dLon=(b.lon-a.lon)*Math.PI/180;
+  const la1=a.lat*Math.PI/180;
+  const la2=b.lat*Math.PI/180;
+  const h=Math.sin(dLat/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLon/2)**2;
+  return Math.round(2*R*Math.asin(Math.sqrt(h)));
+}
+
+function distanciaAutomatica(origen:string,destino:string,via:"aerea"|"terrestre"){
+  const oi=LUGARES_DIST.indexOf(origen);
+  const di=LUGARES_DIST.indexOf(destino);
+
+  if(oi>=0&&di>=0){
+    const matriz=via==="aerea"?DISTANCIAS_AEREAS:DISTANCIAS_TERRESTRES;
+    return Number(String(matriz[oi][di+1]).replace("~",""))||0;
+  }
+
+  const origenCoord=COORDENADAS_BASES_PROPIAS[origen];
+  const destinoCoord=COORDENADAS_DESTINOS_ENEMIGOS[destino];
+  if(!origenCoord||!destinoCoord) return 0;
+
+  const aerea=distanciaGeodesicaKm(origenCoord,destinoCoord);
+
+  // Para objetivos enemigos no existe una matriz terrestre documental completa.
+  // Se usa sólo como estimación de planeamiento si el usuario selecciona vía terrestre.
+  return via==="aerea" ? aerea : Math.round(aerea*1.28);
+}
+
 const BASES_OPERACION = [
   "La Rioja","Villa Mercedes","Córdoba","Mendoza","General Acha","Malargüe"
 ] as const;
@@ -698,6 +849,12 @@ function Tabla({headers,rows}:{headers:string[];rows:(string|number)[][]}){
 }
 
 
+
+const INVENTARIO_TRANSPORTE_TFP: Record<string,number> = {
+  "Camión 5 Tn": 10,
+  "Camión 20 Tn": 7,
+};
+
 function inventarioAeronavesPorBase(){
   const salida: Record<string,Record<string,number>> = {};
   for(const unidad of UNIDADES){
@@ -739,6 +896,22 @@ function ControlLogisticoTON(){
   const [fasesConfirmadas,setFasesConfirmadas]=useState<Record<string,boolean>>({});
   const [viaDistancia,setViaDistancia]=useState<"aerea"|"terrestre">("aerea");
   const [destinoTabla,setDestinoTabla]=useState<string>("Córdoba");
+  const [perfilVuelo,setPerfilVuelo]=useState<string>("");
+
+
+  useEffect(()=>{
+    if(viaDistancia==="terrestre"){
+      if(!Object.prototype.hasOwnProperty.call(INVENTARIO_TRANSPORTE_TFP,sistemaOperacion)){
+        setSistemaOperacion("Camión 20 Tn");
+      }
+      return;
+    }
+
+    const mediosBase=Object.keys(inventarioAeronavesPorBase()[baseOperacion]??{});
+    if(mediosBase.length>0 && !mediosBase.includes(sistemaOperacion)){
+      setSistemaOperacion(mediosBase[0]);
+    }
+  },[viaDistancia,baseOperacion,sistemaOperacion]);
 
   useEffect(()=>{
     try{const raw=localStorage.getItem("zeus-control-logistico-ton-v20"); if(raw){const d=JSON.parse(raw); if(Array.isArray(d.operaciones)) setOperaciones(d.operaciones); if(d.fasesConfirmadas) setFasesConfirmadas(d.fasesConfirmadas);}}catch{}
@@ -759,8 +932,10 @@ function ControlLogisticoTON(){
       .filter(o=>o.base===base&&o.sistema===sistema)
       .reduce((s,o)=>s+o.cantidad,0);
 
-  const remanenteAeronaves=(base:string,sistema:string)=>{
-    const inicial=inventarioAeronaves[base]?.[sistema]??0;
+  const remanenteMedio=(base:string,sistema:string)=>{
+    const inicial=viaDistancia==="terrestre"
+      ? (INVENTARIO_TRANSPORTE_TFP[sistema]??0)
+      : (inventarioAeronaves[base]?.[sistema]??0);
     return inicial-comprometidosSistemaBase(base,sistema);
   };
 
@@ -769,7 +944,7 @@ function ControlLogisticoTON(){
       .reduce((s,o)=>s+(o.cantidad*o.armamentoPorAeronave),0);
 
   const armamentoItem=ARMAMENTO_REALICO.find(a=>a.nombre===armamentoOperacion);
-  const sistemaSinArmamento=AERONAVES_SIN_ARMAMENTO_PLANIFICADO.has(sistemaOperacion);
+  const sistemaSinArmamento=armamentoOperacion==="SIN ARMAMENTO"||(viaDistancia==="aerea"&&AERONAVES_SIN_ARMAMENTO_PLANIFICADO.has(sistemaOperacion));
   const armamentoRequerido=sistemaSinArmamento?0:Math.max(0,cantidadOperacion)*Math.max(0,armamentoPorAeronave);
   const armamentoRemanenteRealico=(armamentoItem?.cantidadInicial??0)-armamentoConsumido(armamentoOperacion);
   const pesoArmamentoKg=(armamentoItem?.pesoKg??0)*armamentoRequerido;
@@ -777,13 +952,22 @@ function ControlLogisticoTON(){
     ? Math.ceil((pesoArmamentoKg/1000)/CAPACIDAD_TRANSPORTE_TN[transporteOperacion])
     : null;
 
-  const personalTFP=personalTecnicoTFP(sistemaOperacion,cantidadOperacion,esfuerzoSeleccionado);
+  const personalTFP=viaDistancia==="aerea"?personalTecnicoTFP(sistemaOperacion,cantidadOperacion,esfuerzoSeleccionado):null;
   const combustibleInfo=COMBUSTIBLE_DOCUMENTADO[sistemaOperacion];
-  const indiceOrigen=LUGARES_DIST.indexOf(baseOperacion);
-  const indiceDestino=LUGARES_DIST.indexOf(destinoTabla);
-  const matrizDist=viaDistancia==="aerea"?DISTANCIAS_AEREAS:DISTANCIAS_TERRESTRES;
-  const distanciaTabla=indiceOrigen>=0&&indiceDestino>=0?Number(String(matrizDist[indiceOrigen][indiceDestino+1]).replace("~","")):0;
-  const distanciaCalculada=destinoTabla==="OTRO"?distanciaOperacion:distanciaTabla;
+  const perfilesDisponibles=viaDistancia==="aerea"
+    ? RENDIMIENTO_AERONAVES_TFP.filter(r=>{
+        const m=String(r[0]).toLowerCase();
+        const s=sistemaOperacion.toLowerCase();
+        return m.includes(s.replace(" block 40","").replace(" block 42","").replace(" block 50","")) ||
+               s.includes(m.replace("c/d/cj","").replace(" stratotanker",""));
+      }).map(r=>String(r[2]))
+    : [];
+  const perfilAplicado=perfilesDisponibles.includes(perfilVuelo)?perfilVuelo:(perfilesDisponibles[0]??"");
+  const consumoPerfilLh=viaDistancia==="aerea"&&perfilAplicado?consumoAeronavePerfil(sistemaOperacion,perfilAplicado):null;
+  const velocidadPerfil=viaDistancia==="aerea"&&perfilAplicado?velocidadAeronavePerfil(sistemaOperacion,perfilAplicado):null;
+  const distanciaCalculada=destinoTabla==="OTRO"?distanciaOperacion:distanciaAutomatica(baseOperacion,destinoTabla,viaDistancia);
+  const tiempoMovimientoHoras=viaDistancia==="aerea"&&velocidadPerfil&&velocidadPerfil>0?distanciaCalculada/velocidadPerfil:0;
+  const consumoMovimientoL=viaDistancia==="aerea"&&consumoPerfilLh&&tiempoMovimientoHoras>0?consumoPerfilLh*tiempoMovimientoHoras:0;
   const faseIndice=FASES.findIndex(f=>f.id===seccion);
   const faseAnterior=FASES[faseIndice-1];
   const puedeConfirmarFase=faseIndice<=0||!!fasesConfirmadas[faseAnterior?.id];
@@ -1088,25 +1272,53 @@ function ControlLogisticoTON(){
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               <label className="text-xs"><span className="mb-1 block text-slate-400">Tipo de empleo</span><select value={tipoEmpleo} onChange={e=>setTipoEmpleo(e.target.value as typeof tipoEmpleo)} className="w-full rounded bg-slate-950 p-2"><option value="operacion">Operación aérea</option><option value="movilizacion">Movilización / despliegue</option><option value="abastecimiento">Abastecimiento</option><option value="repliegue">Repliegue</option></select></label>
-              <label className="text-xs"><span className="mb-1 block text-slate-400">Operación</span><input value={nombreOperacion} onChange={e=>setNombreOperacion(e.target.value)} placeholder="Ej. Salida 1" className="w-full rounded bg-slate-950 p-2"/></label>
-              <label className="text-xs"><span className="mb-1 block text-slate-400">Base de salida</span><select value={baseOperacion} onChange={e=>setBaseOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">{BASES_OPERACION.map(b=><option key={b}>{b}</option>)}</select></label>
-              <label className="text-xs"><span className="mb-1 block text-slate-400">Aeronave</span><select value={sistemaOperacion} onChange={e=>setSistemaOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">{Object.keys(inventarioAeronaves[baseOperacion]??{}).map(s=><option key={s} value={s}>{s}{AERONAVES_TRANSPORTE.has(s)?" · Transporte/Apoyo":""}</option>)}</select></label>
-              <label className="text-xs"><span className="mb-1 block text-slate-400">Cantidad</span><input type="number" min={1} value={cantidadOperacion} onChange={e=>setCantidadOperacion(Math.max(1,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>
 
-              {!sistemaSinArmamento&&<label className="text-xs"><span className="mb-1 block text-slate-400">Armamento</span><select value={armamentoOperacion} onChange={e=>setArmamentoOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">{ARMAMENTO_REALICO.map(a=><option key={a.id}>{a.nombre}</option>)}</select></label>}
-              {!sistemaSinArmamento&&<label className="text-xs"><span className="mb-1 block text-slate-400">Armamento por aeronave</span><input type="number" min={0} value={armamentoPorAeronave} onChange={e=>setArmamentoPorAeronave(Math.max(0,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>}
-              {sistemaSinArmamento&&<div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Configuración</span><b className="block text-sky-200">Sin armamento de ataque en este empleo</b><span className="text-[10px] text-slate-600">Puede utilizarse para transporte, REV, C2, ISR/GE o apoyo según el sistema.</span></div>}
-              <label className="text-xs"><span className="mb-1 block text-slate-400">Destino</span><select value={destinoTabla} onChange={e=>setDestinoTabla(e.target.value)} className="w-full rounded bg-slate-950 p-2">{LUGARES_DIST.filter(x=>x!==baseOperacion).map(x=><option key={x}>{x}</option>)}<option value="OTRO">Objetivo / otro (manual)</option></select></label>
               <label className="text-xs"><span className="mb-1 block text-slate-400">Vía</span><select value={viaDistancia} onChange={e=>setViaDistancia(e.target.value as "aerea"|"terrestre")} className="w-full rounded bg-slate-950 p-2"><option value="aerea">Aérea</option><option value="terrestre">Terrestre</option></select></label>
-              {destinoTabla==="OTRO"&&<label className="text-xs"><span className="mb-1 block text-slate-400">Destino / objetivo</span><input value={destinoOperacion} onChange={e=>setDestinoOperacion(e.target.value)} placeholder="Destino" className="w-full rounded bg-slate-950 p-2"/></label>}
-              {destinoTabla==="OTRO"&&<label className="text-xs"><span className="mb-1 block text-slate-400">Distancia ida (km)</span><input type="number" min={0} value={distanciaOperacion} onChange={e=>setDistanciaOperacion(Math.max(0,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>}
-              {destinoTabla!=="OTRO"&&<div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Distancia automática TFP</span><b className="block text-cyan-200">{distanciaCalculada} km · {viaDistancia==="aerea"?"vía aérea":"vía terrestre"}</b></div>}
+
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Operación</span><input value={nombreOperacion} onChange={e=>setNombreOperacion(e.target.value)} placeholder="Ej. Salida 1" className="w-full rounded bg-slate-950 p-2"/></label>
+
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Base de salida</span><select value={baseOperacion} onChange={e=>setBaseOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">{BASES_OPERACION.map(b=><option key={b}>{b}</option>)}</select></label>
+
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Destino</span>
+                <select value={destinoTabla} onChange={e=>setDestinoTabla(e.target.value)} className="w-full rounded bg-slate-950 p-2">
+                  <optgroup label="BASES / ASIENTOS PROPIOS">
+                    {LUGARES_DIST.filter(x=>x!==baseOperacion).map(x=><option key={`propio-${x}`} value={x}>{x}</option>)}
+                  </optgroup>
+                  <optgroup label="ALAS Y BASES AÉREAS ENEMIGAS">
+                    {DESTINOS_ENEMIGOS.filter(x=>COORDENADAS_DESTINOS_ENEMIGOS[x]?.grupo==="Ala / Base aérea").map(x=><option key={`ala-${x}`} value={x}>{x}</option>)}
+                  </optgroup>
+                  <optgroup label="C2 / RADARES / OBJETIVOS ESTRATÉGICOS">
+                    {DESTINOS_ENEMIGOS.filter(x=>["C2","Radar","Objetivo estratégico"].includes(COORDENADAS_DESTINOS_ENEMIGOS[x]?.grupo)).map(x=><option key={`obj-${x}`} value={x}>{x}</option>)}
+                  </optgroup>
+                  <optgroup label="OTROS EMPLAZAMIENTOS ENEMIGOS DEL MAPA">
+                    {DESTINOS_ENEMIGOS.filter(x=>COORDENADAS_DESTINOS_ENEMIGOS[x]?.grupo==="Ejército enemigo").map(x=><option key={`ej-${x}`} value={x}>{x}</option>)}
+                  </optgroup>
+                </select>
+              </label>
+
+              <div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Distancia automática</span><b className="block text-cyan-200">{distanciaCalculada} km · {viaDistancia==="aerea"?"vía aérea":"vía terrestre"}</b>{DESTINOS_ENEMIGOS.includes(destinoTabla)&&viaDistancia==="terrestre"&&<span className="mt-1 block text-[10px] text-amber-300">≈ distancia terrestre de planeamiento; no proviene de la matriz TFP.</span>}</div>
+
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Medio</span>
+                <select value={sistemaOperacion} onChange={e=>setSistemaOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2">
+                  {viaDistancia==="aerea"
+                    ? Object.keys(inventarioAeronaves[baseOperacion]??{}).map(s=><option key={s} value={s}>{s}</option>)
+                    : <><option value="Camión 5 Tn">Camión 5 Tn</option><option value="Camión 20 Tn">Camión 20 Tn</option></>}
+                </select>
+              </label>
+
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Cantidad de medios</span><input type="number" min={1} value={cantidadOperacion} onChange={e=>setCantidadOperacion(Math.max(1,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>
+
+              {viaDistancia==="aerea"&&perfilesDisponibles.length>0&&<label className="text-xs"><span className="mb-1 block text-slate-400">Configuración / perfil</span><select value={perfilAplicado} onChange={e=>setPerfilVuelo(e.target.value)} className="w-full rounded bg-slate-950 p-2">{perfilesDisponibles.map(p=><option key={p}>{p}</option>)}</select></label>}
+
+              <label className="text-xs"><span className="mb-1 block text-slate-400">Armamento</span><select value={armamentoOperacion} onChange={e=>setArmamentoOperacion(e.target.value)} className="w-full rounded bg-slate-950 p-2"><option value="SIN ARMAMENTO">Sin armamento</option>{ARMAMENTO_REALICO.map(a=><option key={a.id}>{a.nombre}</option>)}</select></label>
+
+              {armamentoOperacion!=="SIN ARMAMENTO"&&<label className="text-xs"><span className="mb-1 block text-slate-400">Armamento por medio</span><input type="number" min={0} value={armamentoPorAeronave} onChange={e=>setArmamentoPorAeronave(Math.max(0,Number(e.target.value)))} className="w-full rounded bg-slate-950 p-2"/></label>}
             </div>
 
             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               <div className="rounded bg-slate-950 p-3 text-xs">
-                <span className="text-slate-500">Disponibles en la base</span>
-                <b className="mt-1 block text-xl text-white">{remanenteAeronaves(baseOperacion,sistemaOperacion)}</b>
+                <span className="text-slate-500">Medios disponibles</span>
+                <b className="mt-1 block text-xl text-white">{remanenteMedio(baseOperacion,sistemaOperacion)}</b>
                 <span className="text-[10px] text-slate-600">antes de aceptar esta operación en el momento seleccionado</span>
               </div>
               <div className="rounded bg-slate-950 p-3 text-xs">
@@ -1129,49 +1341,43 @@ function ControlLogisticoTON(){
               <h4 className="font-black text-cyan-300">RESUMEN DEL CÁLCULO</h4>
               <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                 <span>Fase/momento: <b>{faseActiva.titulo} · {momentoSeleccionado}</b></span>
-                <span>Origen → destino: <b>{baseOperacion} → {destinoTabla==="OTRO"?(destinoOperacion||"otro"):destinoTabla}</b></span>
+                <span>Origen → destino: <b>{baseOperacion} → {destinoTabla}</b></span>
                 <span>Distancia: <b>{distanciaCalculada} km ({viaDistancia})</b></span>
                 <span>Medio: <b>{cantidadOperacion} × {sistemaOperacion}</b></span>
                 <span>TFP técnica: <b>{personalTFP??"s/d"} pers.</b></span>
-                <span>Armamento: <b>{sistemaSinArmamento?"No aplica":`${armamentoRequerido} × ${armamentoOperacion}`}</b></span>
-                <span>Remanente medio al aceptar: <b>{remanenteAeronaves(baseOperacion,sistemaOperacion)-cantidadOperacion}</b></span>
+                <span>Armamento: <b>{armamentoOperacion==="SIN ARMAMENTO"?"Sin armamento":`${armamentoRequerido} × ${armamentoOperacion}`}</b></span>
+                <span>Remanente medio al aceptar: <b>{remanenteMedio(baseOperacion,sistemaOperacion)-cantidadOperacion}</b></span>
                 <span>Remanente armamento: <b>{sistemaSinArmamento?"N/A":armamentoRemanenteRealico-armamentoRequerido}</b></span>
               </div>
             </div>
 
-            <div className="mt-4 grid gap-3 lg:grid-cols-2">
-              <div className="rounded-lg border border-amber-900/50 bg-amber-950/10 p-4">
-                <h4 className="text-xs font-black text-amber-300">COMBUSTIBLE / REV</h4>
-                {combustibleInfo?<div className="mt-2 text-xs text-slate-300">
-                  <p>{combustibleInfo.nota}</p>
-                  <p className="mt-2 rounded bg-slate-950 p-2 text-amber-200"><b>REV:</b> pendiente de cálculo hasta cargar un factor documental de consumo/radio de misión. No se estima automáticamente.</p>
-                  <p className="mt-2 text-[10px] text-slate-500">Distancia cargada: {distanciaCalculada} km de ida / {distanciaCalculada*2} km ida y regreso.</p>
-                </div>:<p className="mt-2 text-xs text-slate-500">No hay parámetros documentales de combustible cargados para este sistema.</p>}
+            <div className="mt-4 rounded-lg border border-emerald-900/50 bg-emerald-950/10 p-4 text-xs">
+              <h4 className="font-black text-emerald-300">CONSUMO SEGÚN TFP</h4>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <span>Vía: <b>{viaDistancia==="aerea"?"Aérea":"Terrestre"}</b></span>
+                <span>Medio: <b>{cantidadOperacion} × {sistemaOperacion}</b></span>
+                <span>Distancia: <b>{distanciaCalculada} km</b></span>
+                {viaDistancia==="aerea"
+                  ? <>
+                      <span>Perfil: <b>{perfilAplicado||"s/d"}</b></span>
+                      <span>Consumo TFP: <b>{consumoPerfilLh?`${consumoPerfilLh.toLocaleString("es-AR")} L/h`:"s/d"}</b></span>
+                      <span>Consumo por medio (ida): <b>{consumoMovimientoL?`${Math.round(consumoMovimientoL).toLocaleString("es-AR")} L`:"s/d"}</b></span>
+                      <span>Consumo total (ida): <b>{consumoMovimientoL?`${Math.round(consumoMovimientoL*cantidadOperacion).toLocaleString("es-AR")} L`:"s/d"}</b></span>
+                    </>
+                  : <>
+                      <span>Consumo TFP: <b>{sistemaOperacion==="Camión 5 Tn"?"0,22 L/km":"0,36 L/km"}</b></span>
+                      <span>Consumo total ida: <b>{Math.round(distanciaCalculada*(sistemaOperacion==="Camión 5 Tn"?0.22:0.36)*cantidadOperacion).toLocaleString("es-AR")} L</b></span>
+                    </>}
               </div>
-
-              {!sistemaSinArmamento&&<div className="rounded-lg border border-sky-900/50 bg-sky-950/10 p-4">
-                <h4 className="text-xs font-black text-sky-300">ABASTECIMIENTO DE ARMAMENTO DESDE REALICÓ</h4>
-                <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                  <label className="text-xs"><span className="mb-1 block text-slate-400">Medio de transporte</span><select value={transporteOperacion} onChange={e=>setTransporteOperacion(e.target.value as OperacionLogistica["transporte"])} className="w-full rounded bg-slate-950 p-2"><option>Camión 5 Tn</option><option>Camión 20 Tn</option></select></label>
-                  <div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Realicó ↔ base</span><b className="block text-white">{DISTANCIA_REALICO_KM[baseOperacion]??"s/d"} km</b></div>
-                  <div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Peso del lote</span><b className="block text-white">{armamentoItem?.pesoKg?`${(pesoArmamentoKg/1000).toFixed(2)} Tn`:"s/d"}</b></div>
-                  <div className="rounded bg-slate-950 p-2 text-xs"><span className="text-slate-500">Empleos / viajes mínimos</span><b className="block text-sky-200">{viajesArmamento??"s/d"}</b></div>
-                </div>
-                {!armamentoItem?.pesoKg&&<p className="mt-2 text-[10px] text-amber-300">No se calcula cantidad de viajes cuando DELTA no aporta peso para ese armamento.</p>}
-              </div>}
-              {sistemaSinArmamento&&<div className="rounded-lg border border-sky-900/50 bg-sky-950/10 p-4">
-                <h4 className="text-xs font-black text-sky-300">MOVILIZACIÓN / APOYO</h4>
-                <p className="mt-2 text-xs text-slate-300">Esta aeronave puede incorporarse a los movimientos de despliegue, transporte, apoyo, reabastecimiento o repliegue. El origen, destino, cantidad y distancia quedan vinculados al momento seleccionado.</p>
-              </div>}
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              <button type="button" disabled={cantidadOperacion>remanenteAeronaves(baseOperacion,sistemaOperacion)||(!sistemaSinArmamento&&armamentoRequerido>armamentoRemanenteRealico)}
+              <button type="button" disabled={cantidadOperacion>remanenteMedio(baseOperacion,sistemaOperacion)||(!sistemaSinArmamento&&armamentoRequerido>armamentoRemanenteRealico)}
                 onClick={()=>{
                   const op:OperacionLogistica={
                     id:`op-${Date.now()}`,fase:seccion,momento:momentoSeleccionado,nombre:nombreOperacion||"Operación",
                     base:baseOperacion,sistema:sistemaOperacion,cantidad:cantidadOperacion,armamento:armamentoOperacion,
-                    armamentoPorAeronave,distanciaKm:distanciaCalculada,destino:destinoTabla==="OTRO"?destinoOperacion:destinoTabla,esfuerzo:esfuerzoSeleccionado,
+                    armamentoPorAeronave,distanciaKm:distanciaCalculada,destino:destinoTabla,esfuerzo:esfuerzoSeleccionado,
                     transporte:transporteOperacion,aceptada:true
                   };
                   setOperaciones(x=>[...x,op]);
@@ -1179,7 +1385,7 @@ function ControlLogisticoTON(){
                 className="rounded bg-emerald-700 px-4 py-2 text-xs font-black disabled:bg-slate-700 disabled:text-slate-500">
                 ACEPTAR EMPLEO
               </button>
-              {cantidadOperacion>remanenteAeronaves(baseOperacion,sistemaOperacion)&&<span className="text-xs text-red-300">No hay suficientes aeronaves disponibles en esta base para este momento.</span>}
+              {cantidadOperacion>remanenteMedio(baseOperacion,sistemaOperacion)&&<span className="text-xs text-red-300">No hay suficientes medios disponibles para este momento.</span>}
               {!sistemaSinArmamento&&armamentoRequerido>armamentoRemanenteRealico&&<span className="text-xs text-red-300">No hay suficiente armamento remanente en Realicó.</span>}
             </div>
           </section>
@@ -1195,7 +1401,7 @@ function ControlLogisticoTON(){
                 <div className="mt-2 grid gap-2 sm:grid-cols-3">
                   <span>Armamento: <b>{AERONAVES_SIN_ARMAMENTO_PLANIFICADO.has(o.sistema)?"N/A":`${o.cantidad*o.armamentoPorAeronave} × ${o.armamento}`}</b></span>
                   <span>Distancia: <b>{o.distanciaKm} km ida</b></span>
-                  <span>Remanente base: <b>{remanenteAeronaves(o.base,o.sistema)}</b></span>
+                  <span>Remanente medio: <b>{remanenteMedio(o.base,o.sistema)}</b></span>
                 </div>
               </div>)}
             </div>}
