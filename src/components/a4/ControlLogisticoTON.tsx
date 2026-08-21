@@ -432,6 +432,46 @@ const ARMAMENTO = [
   ]},
 ];
 
+
+const ARMAMENTO_REALICO_UNIFICADO = [
+  ["MARK 84","250","F-16 C/D/CJ","Bomba A/T PG · 907 kg","DELTA discrimina 250 para F-16. El lote MARK 84/83/82 de AMX (300) no permite sumar individualmente cada modelo."],
+  ["MARK 83","250","F-16 C/D/CJ","Bomba A/T PG · 454 kg","DELTA discrimina 250 para F-16. El lote AMX no se reparte sin fuente adicional."],
+  ["MARK 82","250","F-16 C/D/CJ","Bomba A/T PG · 227 kg","Además forma parte de configuraciones GBU-12/GBU-38; el lote AMX/T-6 no se suma cuando la fuente lo presenta agrupado."],
+  ["MARK 84/83/82 · lote AMX","300","AMX A-1M","Bombas A/T PG · lote no discriminado","No se divide 100/100/100 porque DELTA no individualiza las cantidades por modelo."],
+  ["MARK 81/82 · lote T-6","180 / 180","T-6 Texan II","Bombas A/T PG","DELTA consigna 180 MARK 81 y 180 MARK 82 para T-6."],
+  ["GBU-10 Paveway II","96","F-16 C/D/CJ · AMX A-1M","Guiado láser · emplea cuerpo Mk 84","48 F-16 + 48 AMX."],
+  ["GBU-12 Paveway II","144","F-16 C/D/CJ · AMX A-1M · T-6 Texan II","Guiado láser · emplea cuerpo Mk 82","48 F-16 + 48 AMX + 48 T-6."],
+  ["GBU-16 Paveway II","48","AMX A-1M","Guiado láser","Cantidad consignada en lote GBU-10/12/16 del AMX."],
+  ["GBU-38 JDAM","78","F-16 C/D/CJ","JDAM · cuerpo Mk 82",""],
+  ["AIM-9M Sidewinder","320","F-16 C/D/CJ · AMX A-1M","Misil A/A IR · alcance consignado 18 km","180 F-16 + 140 AMX."],
+  ["AIM-120C-5 AMRAAM","240","F-16 C/D/CJ","Misil BVR A/A","105 km; NEZ 65 km según DELTA."],
+  ["AIM-7P Sparrow","220","F-16 C/D/CJ","Misil BVR A/A","70 km según DELTA."],
+  ["AGM-65G Maverick","120","F-16 C/D/CJ","A/T · 302 kg · guía TV","34 km según DELTA."],
+  ["AGM-88C HARM","140","F-16 C/D/CJ","Misil antirradiación A/S","148 km según DELTA."],
+  ["AGM-119 Penguin","80","F-16 C/D/CJ","Misil antibuque · 385 kg","55 km según DELTA."],
+  ["MAR-1","96","AMX A-1M","Misil antirradiación A/S","80 km según DELTA."],
+  ["LAU-61/A","900","AMX A-1M · T-6 Texan II","Lanzador de cohetes 2,75 pulgadas","450 AMX + 450 T-6."],
+  ["LAU-61/66 · lote F-16","450 / 450","F-16 C/D/CJ","Lanzadores/cohetes A/S","Se conserva separado porque DELTA consigna 450 / 450."],
+  ["20 mm","68.000","F-16 C/D/CJ","Munición cañón M61A1 Vulcan",""],
+  ["30 mm","24.000","AMX A-1M","Munición para 2 x DEFA 554",""],
+  ["12,7 mm","78.000","T-6 Texan II · UH-1Y","Munición","64.000 T-6 + 14.000 UH-1Y."],
+  ["M134 MINIGUN","72.000","CH-47F · UH-1Y · B-412","Munición para pods/afustes","12.000 CH-47F + 48.000 UH-1Y + 12.000 B-412."],
+  ["HYDRA 70 APKWS","520","UH-1Y","Cohete con guía láser",""],
+  ["9 mm","300.000","Fuerza terrestre","Munición terrestre",""],
+  ["5,56 mm","380.000","Fuerza terrestre","Munición terrestre",""],
+  ["7,62 mm","150.000","Fuerza terrestre","Munición terrestre",""],
+  [".38","1.500","Fuerza terrestre","Munición terrestre",""],
+  [".50","55.000","Fuerza terrestre","Munición terrestre",""],
+  ["Mina terrestre antipersonal","500","Fuerza terrestre","Mina AP",""],
+  ["Mina terrestre antitanque","1.800","Fuerza terrestre","Mina AT",""],
+  ["Misil PATRIOT","80","MIM-104B Patriot PAC 1","Munición antiaérea",""],
+  ["Misil AIM-120B","130","NASAMS 1","Munición antiaérea",""],
+  ["Misil RBS-70NG","250","RBS-70 NG","Munición antiaérea",""],
+  ["35 mm","320.000","Skyguard III / Oerlikon GDF007","Munición antiaérea",""],
+  ["CHAFF","22.000","F-16 C/D/CJ · AMX A-1M","Contramedida","16.000 + 6.000."],
+  ["FLARE","22.000","F-16 C/D/CJ · AMX A-1M","Contramedida","16.000 + 6.000."],
+];
+
 const MATERIAL_DELTA = {
   transporte:[
     ["Citroën C4","5"],["Toyota Land Cruiser","35"],["Mercedes Benz Sprinter","12"],["Volkswagen Amarok","22"],
@@ -451,11 +491,12 @@ const MATERIAL_DELTA = {
     ["B-412","14","La Rioja (4) / Villa Mercedes (4) / Córdoba (2) / Mendoza (2) / General Acha (2)","CASEVAC / BYS / TPT tropas / carga / asalto aéreo"],
   ],
   defensa:[
-    ["RADAR TPS-77 MRR","3 unidades","Max rango 250–300 NM (360°)"],["RADAR GM 400 ALPHA","1 unidad","Max rango 270–320 NM (360°)"],
-    ["MIM-104B Patriot PAC 1","2 baterías","Max rango 160 km; max altitud 24.240 m"],
-    ["NASAMS 1","6 baterías","MR 35 km / 16.000 m; SR 15 km / 9.000 m"],
-    ["Skyguard III / Oerlikon GDF007","8 baterías","1 unidad control tiro + 2 piezas gemelas 35 mm; 4.000 m"],
-    ["RBS-70 NG","80 unidades de lanzamiento","Max rango 9 km; max altitud 5.000 m"],
+    ["RADAR TPS-77 MRR","3 unidades","La Rioja (1) / Villa Mercedes (1) / Córdoba (1)","Max rango 250–300 NM (360°)"],
+    ["RADAR GM 400 ALPHA","1 unidad","General Acha (1)","Max rango 270–320 NM (360°)"],
+    ["MIM-104B Patriot PAC 1","2 baterías","Córdoba (1) / Mendoza (1)","Max rango 160 km; max altitud 24.240 m"],
+    ["NASAMS 1","6 baterías","La Rioja (1) / Villa Mercedes (2) / General Acha (1) / Malargüe (2)","MR 35 km / 16.000 m; SR 15 km / 9.000 m"],
+    ["Skyguard III / Oerlikon GDF007","8 baterías","La Rioja (1) / Villa Mercedes (1) / Córdoba (1) / Mendoza (1) / General Acha (1) / Malargüe (1) / 2 sin emplazamiento discriminado","1 unidad control tiro + 2 piezas gemelas 35 mm; 4.000 m"],
+    ["RBS-70 NG","80 unidades de lanzamiento","La Rioja / Villa Mercedes / Córdoba / Mendoza / General Acha / Malargüe (CHARLIE no discrimina cantidad por asiento)","Max rango 9 km; max altitud 5.000 m"],
   ],
   abastecedoras:[
     ["1ª BA","3","20.000 L","60.000 L"],
@@ -483,12 +524,11 @@ const MATERIAL_DELTA = {
 };
 
 const FUELTAINER_DYMAC = [
-  ["FTV-SSA-12000L","12.000 L","Portable / almacenamiento de combustible aeronáutico"],
-  ["FTV-SSA-18000L","18.000 L","Portable / almacenamiento de combustible aeronáutico"],
-  ["FTV-SSA-30000L","30.000 L","Portable / almacenamiento de combustible aeronáutico"],
-  ["FTV-SSA-38000L","38.000 L","Portable / almacenamiento de combustible aeronáutico"],
-  ["FTV-SSA-68000L","68.000 L","Gran capacidad; despliegue vacío y llenado en PRF"],
-  ["FTV-SSA-75000L","75.000 L","Gran capacidad / almacenamiento estático desplegable"],
+  ["2ª Brigada Aérea (Villa Mercedes)","100.000","7","500.000","700.000"],
+  ["3ª Brigada Aérea (Córdoba)","100.000","8","400.000","800.000"],
+  ["4ª Brigada Aérea (Mendoza)","100.000","9","500.000","900.000"],
+  ["5ª Brigada Aérea (Gral. Acha)","100.000","6","100.000","600.000"],
+  ["AM Realicó","100.000","2","200.000","200.000"],
 ];
 
 const TFP_AVIONES = {
@@ -895,10 +935,17 @@ function ControlLogisticoTON(){
             <details className="rounded-xl border border-slate-800 bg-slate-900" open><summary className="cursor-pointer p-4 font-black text-amber-300">ARMAMENTO · DEPÓSITO INICIAL REALICÓ</summary><div className="space-y-4 border-t border-slate-800 p-4">{ARMAMENTO.map((g,i)=><div key={i}><h4 className="mb-2 text-xs font-black uppercase tracking-wider">{g.grupo}</h4><Tabla headers={["Material","Cantidad","Características"]} rows={g.filas}/></div>)}</div></details>
 
             <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">AERONAVES DE APOYO / TRANSPORTE</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Sistema","Cantidad","Base/s de asiento","Capacidad / función"]} rows={MATERIAL_DELTA.aeronavesApoyo}/></div></details>
-            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">VYCA Y DEFENSA ANTIAÉREA</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Sistema","Cantidad","Características"]} rows={MATERIAL_DELTA.defensa}/></div></details>
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">VYCA Y DEFENSA ANTIAÉREA</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Sistema","Cantidad","Lugar de emplazamiento","Características"]} rows={MATERIAL_DELTA.defensa}/></div></details>
+            <details className="rounded-xl border border-amber-800/60 bg-slate-900">
+              <summary className="cursor-pointer p-4 font-black text-amber-300">ARMAMENTO TOTAL EN REALICÓ · INVENTARIO UNIFICADO</summary>
+              <div className="space-y-3 border-t border-slate-800 p-4">
+                <p className="text-xs text-slate-400">Inventario de situación inicial concentrado en Realicó según el criterio indicado para A4. Se unifican denominaciones idénticas cuando DELTA permite hacerlo sin inferencias; los lotes no discriminados permanecen separados.</p>
+                <Tabla headers={["Armamento / munición","Cantidad total","Medios compatibles","Características","Datos de interés"]} rows={ARMAMENTO_REALICO_UNIFICADO}/>
+              </div>
+            </details>
             <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">TRANSPORTE TERRESTRE</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Vehículo","Cantidad"]} rows={MATERIAL_DELTA.transporte}/></div></details>
             <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">ABASTECEDORAS DE COMBUSTIBLE AERONÁUTICO</summary><div className="border-t border-slate-800 p-4"><Tabla headers={["Ubicación","Cantidad","Capacidad por unidad","Capacidad total"]} rows={MATERIAL_DELTA.abastecedoras}/></div></details>
-            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">ABASTECIMIENTO MEDIANTE DYMAC FUELTAINER</summary><div className="space-y-3 border-t border-slate-800 p-4"><p className="text-xs text-slate-400">Alternativa de almacenamiento contenerizado y desplegable para combustible aeronáutico en PRF. La familia FuelTainer Aviation se ofrece en capacidades de 12.000 a 75.000 L.</p><Tabla headers={["Modelo","Capacidad","Empleo"]} rows={FUELTAINER_DYMAC}/></div></details>
+            <details className="rounded-xl border border-slate-800 bg-slate-900"><summary className="cursor-pointer p-4 font-black">ABASTECIMIENTO MEDIANTE DYMAC FUELTAINER</summary><div className="space-y-3 border-t border-slate-800 p-4"><p className="text-xs text-slate-400">Distribución inicial proporcionada para los DyMac FuelTainer. Se conserva también la capacidad total consignada para poder contrastarla con el producto aritmético capacidad unitaria × cantidad.</p><Tabla headers={["Ubicación","Capacidad unitaria (Lts)","Cantidad de unidades","Capacidad total consignada (Lts)","Capacidad total calculada (Lts)"]} rows={FUELTAINER_DYMAC}/><div className="rounded border border-amber-800/50 bg-amber-950/10 p-3 text-xs text-amber-200"><b>Control de consistencia:</b> los valores consignados para Villa Mercedes, Córdoba, Mendoza y General Acha no coinciden matemáticamente con 100.000 L × cantidad de unidades. Se muestran ambos valores sin corregir silenciosamente. Realicó sí coincide: 2 × 100.000 = 200.000 L.</div></div></details>
             <div className="grid gap-3 lg:grid-cols-2"><div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><h4 className="font-black">Mantenimiento</h4><ul className="mt-2 space-y-1 text-xs text-slate-300">{MATERIAL_DELTA.mantenimiento.map((x,i)=><li key={i}>• {x}</li>)}</ul></div><div className="rounded-xl border border-slate-800 bg-slate-900 p-4"><h4 className="font-black">Servicios e infraestructura logística</h4><ul className="mt-2 space-y-1 text-xs text-slate-300">{MATERIAL_DELTA.servicios.map((x,i)=><li key={i}>• {x}</li>)}</ul></div></div>
           </section>
           <p className="text-right text-[10px] text-slate-600">Equipos de comunicaciones discriminados: {totalCom} unidades en la tabla ECCO.</p>
