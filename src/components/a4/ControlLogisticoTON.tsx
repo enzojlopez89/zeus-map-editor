@@ -555,23 +555,52 @@ const TFP_AVIONES = {
 const AVIONES_TFP=["F-16C Block 40 / F-16D Block 42","AMX A-1M","T-6 Texan II","IAI Harpy (UCAV)","EC-130H Compass Call","E-99M Erieye","Elbit Hermes 450","C-130J","KC-130J","KC-135 Stratotanker","Learjet 60","DHC6-400","CH-47F","UH-1Y","B-412"];
 
 const RENDIMIENTO_AERONAVES_TFP = [
-  ["F-16C/D/CJ","Crucero alto","≈ 1.400 L/h","≈ 880 km/h","Referencia pública de crucero; varía por configuración"],
-  ["F-16C/D/CJ","Baja cota","≈ 2.130 L/h","≈ 610 km/h","Mayor consumo; referencia de planeamiento"],
-  ["F-16C/D/CJ","Alto-Bajo-Alto","≈ 1.750 L/h","Variable","Promedio provisional para modelar configuración"],
-  ["AMX A-1M","Crucero","s/d","≈ 900 km/h","Pendiente de fuente de consumo validada"],
-  ["T-6 Texan II","Crucero LRC","≈ 220–330 L/h","≈ 470–500 km/h","Según altitud; tabla pública de planeamiento T-6"],
-  ["IAI Harpy","Misión / merodeo","s/d","s/d","Hasta 9 h de misión; consumo no publicado"],
-  ["EC-130H Compass Call","Crucero","≈ 2.550 L/h","≈ 550–600 km/h","Referencia familia C-130; validar variante H"],
-  ["E-99M Erieye","Crucero","≈ 1.500 L/h","≈ 800 km/h","Referencia ERJ-145; provisional"],
-  ["Elbit Hermes 450","Crucero","s/d","≈ 130 km/h","Consumo no publicado en fuente cargada"],
-  ["C-130J","Crucero","≈ 2.550 L/h","≈ 640–675 km/h","Referencia AFMAN: 4.500 lb/h"],
-  ["KC-130J","Crucero","≈ 2.550 L/h","≈ 640 km/h","Consumo propio; transferencia REV aparte"],
-  ["KC-135","Crucero / planeamiento","≈ 11.900 L/h","≈ 850 km/h","Valor provisional; transferencia depende del radio"],
-  ["Learjet 60","Crucero","≈ 814 L/h","≈ 787 km/h","≈215 US gal/h"],
-  ["DHC6-400","Crucero","≈ 320 L/h","≈ 338 km/h","Referencia pública Series 400"],
-  ["CH-47F","Crucero","≈ 1.250 L/h","≈ 220–269 km/h","≈330 US gal/h"],
-  ["UH-1Y","Crucero","s/d","≈ 272 km/h","Consumo no validado; capacidad 388 US gal"],
-  ["B-412","Crucero","≈ 416 L/h","≈ 230–240 km/h","≈110 US gal/h"],
+  // F-16 C/D/CJ
+  ["F-16C/D/CJ","Villa Mercedes / Mendoza / General Acha","Crucero alto / Alto-Alto-Alto","≈ 1.800 L/h","≈ 850–900 km/h","ESTIMADO · perfil económico en altura. El consumo real cambia con peso, tanques, stores y potencia."],
+  ["F-16C/D/CJ","Villa Mercedes / Mendoza / General Acha","Alto-Bajo-Alto (Hi-Lo-Hi)","≈ 2.500 L/h","≈ 700–850 km/h","ESTIMADO · valor medio de misión. Referencia pública USAF: ≈1.000 US gal en 1,5 h para un vuelo típico (~2.520 L/h)."],
+  ["F-16C/D/CJ","Villa Mercedes / Mendoza / General Acha","Bajo-Bajo-Bajo / penetración baja cota","≈ 3.200 L/h","≈ 600–750 km/h","ESTIMADO · penalización por alta resistencia y mayor potencia a baja cota."],
+  ["F-16C/D/CJ","Villa Mercedes / Mendoza / General Acha","CAP / espera en altura","≈ 2.000 L/h","≈ 650–800 km/h","ESTIMADO · no incluye poscombustión sostenida ni REV."],
+
+  // AMX A-1M
+  ["AMX A-1M","Villa Mercedes / Córdoba","Crucero alto / Alto-Alto-Alto","≈ 900 L/h","≈ 700–850 km/h","ESTIMADO · derivado de capacidad de combustible, autonomía pública y motor Spey 807."],
+  ["AMX A-1M","Villa Mercedes / Córdoba","Alto-Bajo-Alto (Hi-Lo-Hi)","≈ 1.250 L/h","≈ 600–750 km/h","ESTIMADO · el AMX publica radio de combate para perfil Hi-Lo-Hi, pero no consumo horario oficial."],
+  ["AMX A-1M","Villa Mercedes / Córdoba","Bajo-Bajo-Bajo / ataque baja cota","≈ 1.600 L/h","≈ 550–700 km/h","ESTIMADO · mayor consumo por vuelo táctico a baja cota."],
+  ["AMX A-1M","Villa Mercedes / Córdoba","Espera / patrulla en altura","≈ 1.000 L/h","≈ 550–700 km/h","ESTIMADO."],
+
+  // T-6
+  ["T-6 Texan II","Villa Mercedes / Córdoba","Crucero económico (LRC)","≈ 265 L/h","≈ 470 km/h","REFERENCIA PÚBLICA · ≈468 lb/h en crucero económico."],
+  ["T-6 Texan II","Villa Mercedes / Córdoba","Crucero de sector","≈ 325 L/h","≈ 480–500 km/h","REFERENCIA PÚBLICA · ≈575 lb/h para sector típico."],
+  ["T-6 Texan II","Villa Mercedes / Córdoba","CAS / bajo nivel","≈ 380 L/h","≈ 350–450 km/h","ESTIMADO · mayor potencia y maniobra a baja cota."],
+
+  // Sistemas no tripulados
+  ["IAI Harpy","General Acha","Tránsito / búsqueda","≈ 8 L/h","≈ 150–185 km/h","ESTIMADO · IAI publica hasta 9 h de misión, pero no consumo horario. Valor sólo para planeamiento logístico."],
+  ["IAI Harpy","General Acha","Merodeo / búsqueda prolongada","≈ 6 L/h","≈ 100–150 km/h","ESTIMADO · baja confianza; sustituir si se obtiene dato técnico del fabricante."],
+  ["Elbit Hermes 450","Villa Mercedes / General Acha","Crucero ISR","≈ 8 L/h","≈ 120–130 km/h","ESTIMADO · basado en clase de motor/endurance; Elbit no publica consumo horario en la ficha disponible."],
+  ["Elbit Hermes 450","Villa Mercedes / General Acha","Órbita / vigilancia","≈ 6 L/h","≈ 90–120 km/h","ESTIMADO · planeamiento."],
+
+  // GE / AEW&C / transporte
+  ["EC-130H Compass Call","General Acha","Crucero / tránsito","≈ 2.550 L/h","≈ 480–555 km/h","ESTIMADO DE FAMILIA C-130 · el EC-130H usa T56 y su peso/configuración puede aumentar el consumo."],
+  ["EC-130H Compass Call","General Acha","Órbita GE","≈ 2.300 L/h","≈ 400–500 km/h","ESTIMADO · perfil de órbita; no existe en la fuente pública un fuel-flow horario oficial."],
+  ["E-99M Erieye","Córdoba","Crucero / tránsito","≈ 1.500 L/h","≈ 780–820 km/h","ESTIMADO · referencia de familia ERJ-145."],
+  ["E-99M Erieye","Córdoba","Órbita AEW&C","≈ 1.250 L/h","≈ 650–750 km/h","ESTIMADO · menor velocidad de órbita."],
+  ["C-130J","La Rioja","Crucero LRC","≈ 2.550 L/h","≈ 640–675 km/h","REFERENCIA DE PLANEAMIENTO · AFMAN publica fuel-flow de referencia del orden de 4.500 lb/h."],
+  ["C-130J","La Rioja","Baja cota / táctico","≈ 3.100 L/h","≈ 480–560 km/h","ESTIMADO · mayor potencia/resistencia en perfil táctico."],
+  ["KC-130J","La Rioja","Crucero / tránsito","≈ 2.700 L/h","≈ 620–660 km/h","ESTIMADO · familia C-130J; pods/configuración REV pueden aumentar resistencia."],
+  ["KC-130J","La Rioja","Órbita REV","≈ 2.500 L/h propios","≈ 450–550 km/h","ESTIMADO · consumo propio; combustible transferido se calcula aparte."],
+  ["KC-135 Stratotanker","Córdoba / Mendoza","Crucero / tránsito","≈ 11.900 L/h","≈ 800–850 km/h","ESTIMADO DE PLANEAMIENTO · el manual exige cálculo por perfil/peso; no existe un único fuel-flow oficial fijo."],
+  ["KC-135 Stratotanker","Córdoba / Mendoza","Órbita REV","≈ 10.500 L/h propios","≈ 650–750 km/h","ESTIMADO · combustible transferible se calcula aparte según radio, órbita y reserva."],
+  ["Learjet 60","La Rioja / General Acha","Crucero","≈ 814 L/h","≈ 780–800 km/h","REFERENCIA PÚBLICA · ≈215 US gal/h."],
+  ["Learjet 60","La Rioja / General Acha","Espera / órbita","≈ 650 L/h","≈ 600–700 km/h","ESTIMADO."],
+  ["DHC6-400","La Rioja / Villa Mercedes / Mendoza","Crucero económico","≈ 265 L/h","≈ 270 km/h","REFERENCIA FABRICANTE · 468,2 lb/h a 146 KTAS."],
+  ["DHC6-400","La Rioja / Villa Mercedes / Mendoza","Crucero de sector","≈ 325 L/h","≈ 305–325 km/h","REFERENCIA FABRICANTE · 575 lb/h para sector típico."],
+
+  // Alas rotativas
+  ["CH-47F","Córdoba / General Acha","Crucero","≈ 1.250 L/h","≈ 260–290 km/h","ESTIMADO · Boeing publica 3.914 L de capacidad; consumo horario varía fuertemente con peso/altura."],
+  ["CH-47F","Córdoba / General Acha","Carga externa / táctico","≈ 1.500 L/h","≈ 180–240 km/h","ESTIMADO · mayor potencia requerida."],
+  ["UH-1Y","La Rioja / Villa Mercedes / Córdoba / Mendoza","Crucero","≈ 550 L/h","≈ 270 km/h","ESTIMADO · Bell publica 388 US gal de capacidad y 147 KTAS de crucero, no fuel-flow horario."],
+  ["UH-1Y","La Rioja / Villa Mercedes / Córdoba / Mendoza","Táctico / carga","≈ 650 L/h","≈ 180–240 km/h","ESTIMADO."],
+  ["B-412","La Rioja / Villa Mercedes / Córdoba / Mendoza / General Acha","Crucero","≈ 428 L/h","≈ 230–240 km/h","REFERENCIA FABRICANTE BELL · 113 US gal/h."],
+  ["B-412","La Rioja / Villa Mercedes / Córdoba / Mendoza / General Acha","Táctico / carga","≈ 500 L/h","≈ 180–220 km/h","ESTIMADO · mayor potencia requerida."],
 ];
 
 const BUNKERES_TFP = [
@@ -955,7 +984,15 @@ function ControlLogisticoTON(){
           <div className="flex flex-wrap gap-2">{[["aviones","Aeronaves / personal"],["rendimiento","Consumo y velocidad"],["vehiculos","Vehículos terrestres"],["racion","Racionamiento y alojamiento"],["apoyo","Equipo de apoyo"],["bunkeres","Búnkeres de armamento"],["distancias","Distancias"]].map(([id,l])=><button key={id} onClick={()=>setTfpBloque(id)} className={`rounded px-3 py-2 text-xs font-bold ${tfpBloque===id?"bg-emerald-700":"bg-slate-800 text-slate-300"}`}>{l}</button>)}</div>
 
           {tfpBloque==="aviones"&&<div className="space-y-5">{Object.values(TFP_AVIONES).map((b,i)=><div key={i}><h3 className="mb-2 font-black text-cyan-300">{b.titulo}</h3><div className="overflow-x-auto rounded-lg border border-slate-800"><table className="min-w-[1800px] w-full text-xs"><thead className="bg-slate-950 text-slate-400"><tr><th className="sticky left-0 bg-slate-950 px-3 py-2 text-left">Especialidad</th>{AVIONES_TFP.map(x=><th key={x} className="px-3 py-2 text-center">{x}</th>)}</tr></thead><tbody>{b.filas.map((r,ri)=><tr key={ri} className="border-t border-slate-800"><td className="sticky left-0 bg-slate-900 px-3 py-2 font-bold">{r[0]}</td>{r.slice(1).map((v,j)=><td key={j} className="px-3 py-2 text-center text-slate-300">{v}</td>)}</tr>)}</tbody></table></div></div>)}</div>}
-          {tfpBloque==="rendimiento"&&<div className="space-y-3"><div className="rounded border border-amber-900/40 bg-amber-950/10 p-3 text-xs text-amber-200">Los consumos aeronáuticos varían con configuración, peso, altitud y perfil. Los valores ≈ son referencias de planeamiento y deben sustituirse si se dispone de una TFP validada específica.</div><Tabla headers={["Medio","Configuración / perfil","Consumo combustible","Velocidad promedio","Observación"]} rows={RENDIMIENTO_AERONAVES_TFP}/></div>}
+          {tfpBloque==="rendimiento"&&<div className="space-y-3">
+            <div className="rounded border border-amber-900/40 bg-amber-950/10 p-3 text-xs text-amber-200">
+              <b>Consumos para cálculo logístico:</b> se completaron todos los medios aeronáuticos. Cuando existe una referencia pública utilizable se identifica como REFERENCIA PÚBLICA/FABRICANTE; cuando no existe fuel-flow oficial accesible se incorpora un valor ESTIMADO de planeamiento. Todos los valores ≈ deben tratarse como aproximaciones y pueden ser reemplazados por una TFP validada.
+            </div>
+            <div className="rounded border border-cyan-900/40 bg-cyan-950/10 p-3 text-xs text-cyan-100">
+              Para medios de combate se distinguen perfiles porque el consumo cambia de forma importante con la altura y la configuración: Alto-Alto-Alto, Alto-Bajo-Alto, Bajo-Bajo-Bajo, CAP/espera y CAS/bajo nivel según corresponda.
+            </div>
+            <Tabla headers={["Medio","Base(s) de asiento","Configuración / perfil","Consumo combustible","Velocidad promedio","Estado del dato / observación"]} rows={RENDIMIENTO_AERONAVES_TFP}/>
+          </div>}
           {tfpBloque==="vehiculos"&&<><Tabla headers={["Vehículo","Cantidad","Choferes/veh.","Choferes/turno","Choferes 3 turnos","L/100 km","L/km","Velocidad prom. km/h","Pax","Tn","L/500 km"]} rows={VEHICULOS_TFP}/><div className="rounded bg-slate-900 p-3 text-xs text-slate-400">Totales de la hoja: 139 vehículos; 216 choferes por turno; 648 choferes para 3 turnos. Capacidad total consignada: 49,2 Tn.</div></>}
           {tfpBloque==="racion"&&<><Tabla headers={["Unidad","Personal","Racionamiento","Cocinas","Carpas racionamiento 500 pers.","Carpas alojamiento 500 pers.","Baños químicos (1 cada 20 pers.)"]} rows={RACIONAMIENTO}/><p className="rounded bg-slate-900 p-3 text-xs text-slate-400">Racionamiento y alojamiento conservan TFP (1). Baños químicos: 1 cada 20 personas, redondeando siempre hacia arriba.</p></>}
           {tfpBloque==="apoyo"&&<Tabla headers={["Equipo","Operador","Ayudante carga","Auxiliar","Supervisor","Total pers. 24h","Diesel L/h","Peso vacío kg","Elevación Tn","Arrastre Tn"]} rows={EQUIPO_APOYO}/>} 
